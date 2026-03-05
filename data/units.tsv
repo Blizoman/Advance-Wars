@@ -1,0 +1,4 @@
+Jednotka	Cena (Peníze)	Typ pohybu	Dosah pohybu	Dosah útoku	Speciální vlastnost
+Pěchota	1 000	Pěší	3	1 (Na blízko)	Může zabírat města a HQ.
+Tank	7 000	Vozidlo	6	1 (Na blízko)	Vysoká mobilita a poškození.
+Dělostřelectvo	6 000	Vozidlo	5	2-3 (Na dálku)	Nemůže se hýbat a střílet ve stejném tahu.

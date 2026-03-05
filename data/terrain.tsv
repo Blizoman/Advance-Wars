@@ -1,0 +1,8 @@
+Typ Terénu	Obranný bonus (Hvězdičky)	Cena pohybu: Pěchota	Cena pohybu: Vozidla	Efekt
+Pláň (Plain)	1	1	1	Základní terén.
+Les (Forest)	2	1	2	Poskytuje krytí, zpomaluje vozidla.
+Hora (Mountain)	4	2	Neprůjezdné	Výborná obrana, pouze pro pěchotu.
+Voda (Water)	-	-	Neprůchozí pro všechny jednotky.
+Město (City)	3	1	1	Generuje +1000 peněz/kolo, léčí jednotky.
+Továrna (Factory)	3	1	1	Umožňuje nákup jednotek.
+Velitelství (HQ)	4	1	1	Cíl hry pro dobytí (Capture).

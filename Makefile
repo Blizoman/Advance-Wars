@@ -1,0 +1,29 @@
+LOGIN = xpruzir00
+
+.PHONY: compile run exe clean docs zip
+
+compile:
+	mvn compile
+
+run:
+	mvn javafx:run
+
+exe:
+	mvn package
+
+docs:
+	mvn javadoc:javadoc
+
+c: clean
+clean:
+	clear
+	mvn clean
+
+zip: clean
+	mkdir -p $(LOGIN)
+	cp -r src data lib readme.txt pom.xml ai_audit.md git_history.txt $(LOGIN)/ 
+	zip -r $(LOGIN).zip $(LOGIN)
+	rm -rf $(LOGIN)
+
+# assignment: 	https://moodle.vut.cz/mod/folder/view.php?id=667385
+# github:		https://github.com/RomanPruzinsky/IJA-proj

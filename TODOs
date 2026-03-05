@@ -1,0 +1,19 @@
+Dokumentovat hlavicky suborov (autor, @brief)
+/**
+ * Co tuto bude
+ * @author Roman Pružinský
+ * @date	dd.M.yy
+ */
+
+readme.txt: základní informace k projektu (autoři, způsob překladu apod.)
+
+obrazky a pod. do /lib
+
+pouzivat maven, do readme.txt specifikovat preklad a spustenie
+Přeložení aplikace:
+	zkompilují se zdrojové texty
+	vygeneruje se programová dokumentace
+	vytvoří se spustitelný jar archiv
+
+
+prezentacia podklady atd do /data
