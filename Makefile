@@ -17,9 +17,13 @@ docs:
 c: clean
 clean:
 	clear
+	rm git_history.txt
 	mvn clean
 
-zip: clean
+gh:
+	git log --all --date=short --pretty=format:"%ad %an: %s" > git_history.txt
+
+zip: clean gh
 	mkdir -p $(LOGIN)
 	cp -r src data lib readme.txt pom.xml ai_audit.md git_history.txt $(LOGIN)/ 
 	zip -r $(LOGIN).zip $(LOGIN)
