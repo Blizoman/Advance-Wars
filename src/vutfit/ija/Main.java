@@ -1,6 +1,6 @@
 package vutfit.ija;
 
-import java.nio.file.*;
+import vutfit.ija.classes.unit.UnitFactory;
 
 /**
  * App launcher
@@ -11,6 +11,8 @@ import java.nio.file.*;
 
 public class Main {
 	public static void main(String[] args) {
-		Path unitsDamage = Path.of("data/units-damage.tsv");
+		UnitFactory unitFactory = new UnitFactory();
+		// Game game = new Game(unitFactory);
+		// game.start();
 	}
 }

@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import vutfit.ija.classes.board.Position;
 import vutfit.ija.classes.player.Player;
-import vutfit.ija.tools.consts;
+import vutfit.ija.tools.Consts;
 
 @RequiredArgsConstructor
 public class Unit {
@@ -19,14 +19,14 @@ public class Unit {
 	@Setter
 	@NonNull
 	private Position position;
-	@Getter
-	private int hp = consts.MAX_HP;
+	private int hp = Consts.MAX_HP;
+
+	public boolean isAlive() { return hp > 0; }
+
+	public boolean isDead() { return !isAlive(); }
 
 	public void takeDamage(int damageToTake) {
-		this.hp -= damageToTake;
-		if (this.hp <= 0) {
-			this.hp = 0;
-		}
+		this.hp = Math.max(0, this.hp - damageToTake);
 	}
 
 	public void attack(Unit target) {

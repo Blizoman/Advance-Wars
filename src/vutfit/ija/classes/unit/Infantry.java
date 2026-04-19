@@ -1,5 +1,20 @@
 package vutfit.ija.classes.unit;
 
-public class Infantry {
-	
+import java.util.Map;
+
+public class Infantry extends UnitType {
+	public Infantry() {
+		super(
+				UnitTypeName.INFANTRY,
+				1000,
+				MovementType.HUMAN,
+				3,
+				new AttackRange(1, 1),
+				true,
+				true,
+				Map.of(
+						UnitTypeName.INFANTRY, 55,
+						UnitTypeName.TANK, 5,
+						UnitTypeName.CANNON, 15));
+	}
 }

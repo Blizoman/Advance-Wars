@@ -1,19 +1,22 @@
 package vutfit.ija.classes.unit;
 
 import java.util.Map;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-public record UnitType(
-		String name,
-		int maxHp,
-		int movementSpeed,
-		Map<String, Integer> terrainCosts,
-		Map<String, Integer> damageAgainst) {
+@Getter
+@AllArgsConstructor
+public abstract class UnitType {
+	private final UnitTypeName name;
+	private final int cost;
+	private final MovementType movementType;
+	private final int moveRange;
+	private final AttackRange attackRange;
+	private final boolean canCapture;
+	private final boolean canAttackAfterMove;
+	private final Map<UnitTypeName, Integer> damageAgainst;
 
 	public int getDamageAgainst(UnitType target) {
-		return getDamageAgainst(target.name);
-	}
-
-	private int getDamageAgainst(String targetName) {
-		return damageAgainst.getOrDefault(targetName, 0);
+		return damageAgainst.getOrDefault(target.name, 0);
 	}
 }

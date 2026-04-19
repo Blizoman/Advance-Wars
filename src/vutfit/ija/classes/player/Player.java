@@ -1,6 +1,6 @@
 package vutfit.ija.classes.player;
 
-import vutfit.ija.tools.consts;
+import vutfit.ija.tools.Consts;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -10,7 +10,7 @@ public class Player {
 	@Getter
 	private final String name;
 	@Getter
-	private int money = consts.STARTING_MONEY;
+	private int money = Consts.STARTING_MONEY;
 	@Getter
 	private boolean isAlive = true;
 
