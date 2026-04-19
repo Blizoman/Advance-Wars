@@ -2,7 +2,7 @@ LOGIN = xpruzir00
 
 .PHONY: c compile run exe clean docs clean gh zip
 
-c: compile
+c: clean compile
 compile:
 	mvn compile
 
@@ -17,7 +17,7 @@ docs:
 
 clean:
 	clear
-	rm git_history.txt
+	rm -f git_history.txt
 	mvn clean
 
 gh:
