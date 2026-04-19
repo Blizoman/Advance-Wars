@@ -1,4 +1,4 @@
-package vutfit.ija.classes.board;
+package classes.board;
 
 /**
  * Terrain type

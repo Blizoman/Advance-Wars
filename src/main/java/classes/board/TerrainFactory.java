@@ -1,4 +1,4 @@
-package vutfit.ija.classes.board;
+package classes.board;
 
 import java.util.HashMap;
 import java.util.Map;

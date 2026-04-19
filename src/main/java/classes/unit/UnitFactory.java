@@ -1,8 +1,8 @@
-package vutfit.ija.classes.unit;
+package classes.unit;
 
 import java.util.Map;
-import vutfit.ija.classes.board.Position;
-import vutfit.ija.classes.player.Player;
+import classes.board.Position;
+import classes.player.Player;
 
 public class UnitFactory {
 	private final Map<UnitTypeName, UnitType> unitTypes = Map.of(

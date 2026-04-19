@@ -1,7 +1,7 @@
-package vutfit.ija.classes.unit;
+package classes.unit;
 
 import lombok.Getter;
-import vutfit.ija.tools.Consts;
+import tools.Consts;
 
 public enum UnitTypeName {
 	INFANTRY(Consts.UnitNames.INFANTRY),

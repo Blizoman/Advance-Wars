@@ -1,4 +1,4 @@
-package vutfit.ija.classes.unit;
+package classes.unit;
 
 public enum MovementType {
 	HUMAN,

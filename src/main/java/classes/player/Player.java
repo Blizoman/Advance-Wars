@@ -1,6 +1,6 @@
-package vutfit.ija.classes.player;
+package classes.player;
 
-import vutfit.ija.tools.Consts;
+import tools.Consts;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

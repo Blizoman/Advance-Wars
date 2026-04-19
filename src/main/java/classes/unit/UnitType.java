@@ -1,4 +1,4 @@
-package vutfit.ija.classes.unit;
+package classes.unit;
 
 import java.util.Map;
 import lombok.AllArgsConstructor;

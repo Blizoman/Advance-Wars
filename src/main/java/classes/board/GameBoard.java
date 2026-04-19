@@ -1,8 +1,8 @@
-package vutfit.ija.classes.board;
+package classes.board;
 
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import vutfit.ija.classes.unit.Unit;
+import classes.unit.Unit;
 
 @RequiredArgsConstructor
 public class GameBoard {

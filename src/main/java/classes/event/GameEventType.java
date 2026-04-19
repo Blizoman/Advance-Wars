@@ -1,4 +1,4 @@
-package vutfit.ija.classes.event;
+package classes.event;
 
 public enum GameEventType {
     UNIT_CREATED,

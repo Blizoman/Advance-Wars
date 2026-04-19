@@ -1,4 +1,4 @@
-package vutfit.ija.tools;
+package tools;
 
 public class Consts {
 	public final static int STARTING_MONEY = 5000;
