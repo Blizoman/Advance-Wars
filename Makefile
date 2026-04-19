@@ -1,7 +1,8 @@
 LOGIN = xpruzir00
 
-.PHONY: compile run exe clean docs zip
+.PHONY: c compile run exe clean docs clean gh zip
 
+c: compile
 compile:
 	mvn compile
 
@@ -14,7 +15,6 @@ exe:
 docs:
 	mvn javadoc:javadoc
 
-c: clean
 clean:
 	clear
 	rm git_history.txt

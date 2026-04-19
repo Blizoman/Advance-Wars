@@ -1,8 +1,9 @@
 Dokumentovat hlavicky suborov (autor, @brief)
 /**
- * Co tuto bude
+ * [Description]
  * @author Roman Pružinský
- * @date	dd.M.yy
+ * @author Andrej Bližňák
+ * @date	dd.4.26
  */
 
 readme.txt: základní informace k projektu (autoři, způsob překladu apod.)
