@@ -1,9 +1,12 @@
-package vutfit.ija.classes;
+package vutfit.ija.classes.factories;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import vutfit.ija.classes.board.Position;
 import vutfit.ija.classes.player.Player;
+import vutfit.ija.classes.unit.Unit;
+import vutfit.ija.classes.unit.UnitType;
 import vutfit.ija.tools.consts;
 
 public class UnitFactory {

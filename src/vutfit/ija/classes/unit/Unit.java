@@ -1,9 +1,10 @@
-package vutfit.ija.classes;
+package vutfit.ija.classes.unit;
 
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import vutfit.ija.classes.board.Position;
 import vutfit.ija.classes.player.Player;
 import vutfit.ija.tools.consts;
 

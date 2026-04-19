@@ -1,8 +1,9 @@
-package vutfit.ija.classes;
+package vutfit.ija.classes.board;
 
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import vutfit.ija.classes.unit.Unit;
 
 @RequiredArgsConstructor
 public class Tile {

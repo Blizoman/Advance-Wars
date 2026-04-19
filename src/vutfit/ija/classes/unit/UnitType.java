@@ -1,4 +1,4 @@
-package vutfit.ija.classes;
+package vutfit.ija.classes.unit;
 
 import java.util.Map;
 
