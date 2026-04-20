@@ -1,11 +1,9 @@
 package classes.unit;
 
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import classes.board.Position;
 import classes.player.Player;
+import classes.unit.type.UnitType;
 import tools.Consts;
 
 @RequiredArgsConstructor
@@ -15,10 +13,6 @@ public class Unit {
 	private final Player player;
 	@Getter
 	private final UnitType type;
-	@Getter
-	@Setter
-	@NonNull
-	private Position position;
 	private int hp = Consts.MAX_HP;
 
 	public boolean isAlive() { return hp > 0; }

@@ -1,31 +1,28 @@
 package classes.board;
 
+import classes.board.terrain.TerrainType;
+import classes.unit.Unit;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import classes.unit.Unit;
 
 @RequiredArgsConstructor
 public class Tile {
 
     @Getter
     @NonNull
-    private final Terrain terrain;
+    private final TerrainType terrain;
 
     @Getter
     private Unit unit = null;
 
     public boolean isEmpty() { return this.unit == null; }
 
-    public void placeUnit(Unit unit) {
+    public boolean placeUnit(Unit unit) {
         if (!isEmpty())
-            throw new IllegalStateException("Tile already occupied");
-        this.unit = unit;
-    }
+            return false;
 
-    public Unit removeUnit() {
-        Unit removed = this.unit;
-        this.unit = null;
-        return removed;
+        this.unit = unit;
+        return true;
     }
 }

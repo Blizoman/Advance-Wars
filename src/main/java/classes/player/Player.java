@@ -18,6 +18,10 @@ public class Player {
 		this.money += amount;
 	}
 
+	public void removeMoney(int amount) {
+		this.money -= amount;
+	}
+
 	public void kill() {
 		this.isAlive = false;
 	}

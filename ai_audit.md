@@ -1,6 +1,6 @@
 # AI Audit Log - Tým xpruzir00
 
-**Datum poslední aktualizace:** [DD. MM. RRRR]
+**Datum poslední aktualizace:** [DD. MM. 2026]
 
 ---
 
@@ -15,14 +15,18 @@
 
 ---
 
-## 2. [NÁZEV DALŠÍ KOMPONENTY]
+## 2. Dogenerovanie návrhu podľa predlohy
 * **Nástroj:** Gemini 3
-* **Datum:** DD. MM. RRRR
+* **Datum:** 20. 04. 2026
 * **Prompt:**
-  > 
+  > fill terrainTypeName with values from terrain.tsv, use same style as UnitTypeName (also COnsts etc)
+  
+  > Now generate TerrainType (similarly to UnitType) with parameters from terrain.tsv, create inheritance (with english naming from file) with predefined v alues from terrain.tsv
+
+try to keep as close coding style as unit/type/
 * **Úprava studentem:**
-  ...
-* **Míra generování:** X%
+  Už som vytvoril OOP návrh pre celú časť unit/, teraz som nechal vygenerovať podľa mojej predlohy terrainType
+* **Míra generování:** 40%
 
 ---
 
@@ -30,7 +34,7 @@
 
 ## 3. [NÁZEV DALŠÍ KOMPONENTY]
 * **Nástroj:** Gemini 3
-* **Datum:** DD. MM. RRRR
+* **Datum:** DD. MM. 2026
 * **Prompt:**
   > 
 * **Úprava studentem:**
@@ -43,7 +47,7 @@
 
 ## 4. [NÁZEV DALŠÍ KOMPONENTY]
 * **Nástroj:** Gemini 3
-* **Datum:** DD. MM. RRRR
+* **Datum:** DD. MM. 2026
 * **Prompt:**
   > 
 * **Úprava studentem:**
@@ -56,7 +60,7 @@
 
 ## 5. [NÁZEV DALŠÍ KOMPONENTY]
 * **Nástroj:** Gemini 3
-* **Datum:** DD. MM. RRRR
+* **Datum:** DD. MM. 2026
 * **Prompt:**
   > 
 * **Úprava studentem:**
@@ -69,7 +73,7 @@
 
 ## 6. [NÁZEV DALŠÍ KOMPONENTY]
 * **Nástroj:** Gemini 3
-* **Datum:** DD. MM. RRRR
+* **Datum:** DD. MM. 2026
 * **Prompt:**
   > 
 * **Úprava studentem:**
@@ -82,7 +86,7 @@
 
 ## 7. [NÁZEV DALŠÍ KOMPONENTY]
 * **Nástroj:** Gemini 3
-* **Datum:** DD. MM. RRRR
+* **Datum:** DD. MM. 2026
 * **Prompt:**
   > 
 * **Úprava studentem:**
@@ -95,7 +99,7 @@
 
 ## 8. [NÁZEV DALŠÍ KOMPONENTY]
 * **Nástroj:** Gemini 3
-* **Datum:** DD. MM. RRRR
+* **Datum:** DD. MM. 2026
 * **Prompt:**
   > 
 * **Úprava studentem:**
@@ -108,7 +112,7 @@
 
 ## 9. [NÁZEV DALŠÍ KOMPONENTY]
 * **Nástroj:** Gemini 3
-* **Datum:** DD. MM. RRRR
+* **Datum:** DD. MM. 2026
 * **Prompt:**
   > 
 * **Úprava studentem:**
@@ -121,7 +125,7 @@
 
 ## 10. [NÁZEV DALŠÍ KOMPONENTY]
 * **Nástroj:** Gemini 3
-* **Datum:** DD. MM. RRRR
+* **Datum:** DD. MM. 2026
 * **Prompt:**
   > 
 * **Úprava studentem:**

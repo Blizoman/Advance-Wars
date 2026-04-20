@@ -1,8 +1,8 @@
 package classes.board;
 
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import classes.unit.Unit;
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class GameBoard {
@@ -20,14 +20,11 @@ public class GameBoard {
 	public boolean moveUnit(Position from, Position to) {
 		Tile fromTile = map.get(from);
 		Tile toTile = map.get(to);
+		Unit unit = fromTile.getUnit();
 
-		if (fromTile == null || toTile == null || fromTile.isEmpty())
+		if (fromTile == null || toTile == null || unit == null || !toTile.isEmpty())
 			return false;
 
-		Unit unit = fromTile.removeUnit();
-		toTile.placeUnit(unit);
-		unit.setPosition(to);
-
-		return true;
+		return toTile.placeUnit(unit);
 	}
 }

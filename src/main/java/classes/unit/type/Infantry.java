@@ -1,6 +1,8 @@
-package classes.unit;
+package classes.unit.type;
 
 import java.util.Map;
+import classes.unit.AttackRange;
+import classes.unit.MovementType;
 
 public class Infantry extends UnitType {
 	public Infantry() {
