@@ -20,26 +20,31 @@ public class GameBoardLoader {
 		JsonObject json = JsonParser.parseReader(new FileReader(path.toFile())).getAsJsonObject();
 		Map<Position, Tile> map = new HashMap<>();
 
-		int width = JsonSimples.getInt(json, Consts.GameBoard.WIDTH);
-		int height = JsonSimples.getInt(json, Consts.GameBoard.HEIGHT);
-		JsonArray rows = JsonSimples.getArray(json, Consts.GameBoard.MAP);
+		int width = JsonSimples.requireInt(json, Consts.GameBoard.WIDTH);
+		int height = JsonSimples.requireInt(json, Consts.GameBoard.HEIGHT);
+		JsonArray rows = JsonSimples.requireArray(json, Consts.GameBoard.MAP);
 
 		for (int y = 0; y < height; y++) {
 			JsonArray cols = rows.get(y).getAsJsonArray();
 			for (int x = 0; x < width; x++) {
 				JsonObject data = cols.get(x).getAsJsonObject();
 
-				Player owner = null;
-				String ownerString = JsonSimples.getString(data, Consts.GameBoard.OWNER);
-				if (ownerString != null)
-					owner = players
-							.stream()
-							.filter(p -> p.getName() == ownerString)
-							.findFirst()
-							.orElse(null);
+				Tile tile = new Tile(
+						Terrain.valueOf(JsonSimples.requireString(data, Consts.GameBoard.TERRAIN)));
 
-				Tile tile = new Tile(Terrain.valueOf(JsonSimples.getString(data, Consts.GameBoard.TERRAIN)));
-				tile.setOwner(owner);
+				Player owner = null;
+				Integer ownerIndex = JsonSimples.getInt(data, Consts.GameBoard.OWNER);
+				if (ownerIndex != null) {
+					if (ownerIndex >= players.size())
+						throw new IllegalArgumentException(
+								"Player index " + ownerIndex +
+										" too high at [" + x + "," + y + "]" +
+										"\nMybe map doesn't support only " + players.size()
+										+ " players game");
+
+					owner = players.get(ownerIndex);
+					tile.setOwner(owner);
+				}
 
 				map.put(new Position(x, y), tile);
 			}
