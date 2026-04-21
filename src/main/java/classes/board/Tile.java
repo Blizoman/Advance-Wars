@@ -1,5 +1,6 @@
 package classes.board;
 
+import classes.player.Player;
 import classes.unit.Unit;
 import lombok.Getter;
 import lombok.NonNull;
@@ -10,8 +11,9 @@ public class Tile {
 
     @Getter
     @NonNull
-    private final TerrainType terrain;
-
+    private final Terrain terrain;
+    @Getter
+    private Player owner = null;
     @Getter
     private Unit unit = null;
 
@@ -23,5 +25,15 @@ public class Tile {
 
         this.unit = unit;
         return true;
+    }
+
+    public void setOwner(Player player) {
+        if (!terrain.isCapturable())
+            throw new IllegalStateException("Cannot own non-capturable terrain");
+        this.owner = player;
+    }
+
+    public void unsetOwner() {
+        this.owner = null;
     }
 }

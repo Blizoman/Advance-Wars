@@ -4,7 +4,7 @@ import java.util.Map;
 import classes.unit.MovementType;
 import lombok.Getter;
 
-public enum TerrainType {
+public enum Terrain {
 	PLAIN(1, Map.of(MovementType.HUMAN, 1, MovementType.VEHICLE, 1)),
 	FOREST(2, Map.of(MovementType.HUMAN, 1, MovementType.VEHICLE, 2)),
 	MOUNTAIN(4, Map.of(MovementType.HUMAN, 2)),
@@ -23,11 +23,15 @@ public enum TerrainType {
 	private final boolean produceUnits;
 	private final Map<MovementType, Integer> movementCosts;
 
-	TerrainType(int defenseBonus, Map<MovementType, Integer> movementCosts) {
+	public Terrain fromString(String from) {
+		return Terrain.valueOf(from);
+	}
+
+	Terrain(int defenseBonus, Map<MovementType, Integer> movementCosts) {
 		this(defenseBonus, false, false, false, movementCosts);
 	}
 
-	TerrainType(int defenseBonus, boolean capturable, boolean heals,
+	Terrain(int defenseBonus, boolean capturable, boolean heals,
 			boolean produceUnits, Map<MovementType, Integer> movementCosts) {
 		this.defenseBonus = defenseBonus;
 		this.capturable = capturable;

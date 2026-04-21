@@ -29,4 +29,10 @@ public class GameBoard {
 
 		return toTile.placeUnit(unit);
 	}
+
+	public boolean canPlaceUnit(Position wantedPosition) {
+		Tile wantedTile = this.getTile(wantedPosition);
+		return wantedTile.getTerrain() != Terrain.WATER &&
+				wantedTile.isEmpty();
+	}
 }
