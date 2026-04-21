@@ -19,12 +19,14 @@ public class Tile {
 
     public boolean isEmpty() { return this.unit == null; }
 
-    public boolean placeUnit(Unit unit) {
+    public void placeUnit(Unit unit) throws IllegalAccessException {
         if (!isEmpty())
-            return false;
-
+            throw new IllegalAccessException("Tile already occupied");
         this.unit = unit;
-        return true;
+    }
+
+    public void removeUnit() {
+        this.unit = null;
     }
 
     public void setOwner(Player player) {

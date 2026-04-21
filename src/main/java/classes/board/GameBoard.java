@@ -1,5 +1,7 @@
 package classes.board;
 
+import java.nio.channels.AlreadyBoundException;
+import java.rmi.NoSuchObjectException;
 import java.util.Map;
 import classes.unit.Unit;
 import lombok.RequiredArgsConstructor;
@@ -17,17 +19,22 @@ public class GameBoard {
 		return tile == null ? null : tile.getUnit();
 	}
 
-	public boolean moveUnit(Position from, Position to) {
+	public void moveUnit(Position from, Position to)
+			throws IndexOutOfBoundsException, NoSuchObjectException, IllegalAccessException {
 		Tile fromTile = map.get(from);
 		Tile toTile = map.get(to);
-		if (fromTile == null || toTile == null || !toTile.isEmpty())
-			return false;
+
+		if (fromTile == null || toTile == null)
+			throw new IndexOutOfBoundsException("Invalid location: " + from + " -> " + to);
+		if (!toTile.isEmpty())
+			throw new IllegalAccessException("Tile " + to + " already occupied");
 
 		Unit unit = fromTile.getUnit();
 		if (unit == null)
-			return false;
+			throw new NoSuchObjectException("No unit found at " + from);
 
-		return toTile.placeUnit(unit);
+		fromTile.removeUnit();
+		toTile.placeUnit(unit);
 	}
 
 	public boolean canPlaceUnit(Position wantedPosition) {
