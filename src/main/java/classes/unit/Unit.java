@@ -3,7 +3,6 @@ package classes.unit;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import classes.player.Player;
-import classes.unit.type.UnitType;
 import tools.Consts;
 
 @RequiredArgsConstructor

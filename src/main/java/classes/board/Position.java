@@ -1,4 +1,5 @@
 package classes.board;
 
-public record Position(int row, int col) {
+// Starting at [0,0] in BOTTOM-LEFT corner
+public record Position(int x, int y) {
 }

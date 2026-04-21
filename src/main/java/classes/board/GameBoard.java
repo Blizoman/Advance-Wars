@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class GameBoard {
-	private Map<Position, Tile> map;
+	private final Map<Position, Tile> map;
 
 	public Tile getTile(Position position) {
 		return this.map.get(position);
@@ -20,9 +20,11 @@ public class GameBoard {
 	public boolean moveUnit(Position from, Position to) {
 		Tile fromTile = map.get(from);
 		Tile toTile = map.get(to);
-		Unit unit = fromTile.getUnit();
+		if (fromTile == null || toTile == null || !toTile.isEmpty())
+			return false;
 
-		if (fromTile == null || toTile == null || unit == null || !toTile.isEmpty())
+		Unit unit = fromTile.getUnit();
+		if (unit == null)
 			return false;
 
 		return toTile.placeUnit(unit);

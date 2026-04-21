@@ -1,6 +1,5 @@
 package classes.board;
 
-import classes.board.terrain.TerrainType;
 import classes.unit.Unit;
 import lombok.Getter;
 import lombok.NonNull;

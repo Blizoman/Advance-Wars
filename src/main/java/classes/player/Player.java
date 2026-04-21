@@ -25,4 +25,8 @@ public class Player {
 	public void kill() {
 		this.isAlive = false;
 	}
+
+	public boolean canAfford(int cost) {
+		return this.money >= cost;
+	}
 }
