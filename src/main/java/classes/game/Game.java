@@ -49,11 +49,8 @@ public class Game {
 	}
 
 	private void processUnits() {
-		Player player = getActive();
-		List<Unit> allUnits = gameBoard.getAllUnits();
-		List<Unit> playerUnits = gameBoard.getUnitsOf(player);
-
-		resetMovement(allUnits);
+		List<Unit> playerUnits = gameBoard.getUnitsOf(getActive());
+		resetMovement(playerUnits);
 		healUnits(playerUnits);
 	}
 
@@ -118,9 +115,11 @@ public class Game {
 
 	public void tryCapture(Unit unit, Tile tile) {
 		Player originalOwner = tile.getOwner();
+		boolean wasHq = tile.getTerrain() == Terrain.HQ;
 		tile.evalCapture(unit);
 
-		if (tile.getTerrain() == Terrain.HQ && tile.getOwner() != originalOwner) {
+		if (wasHq && tile.getOwner() != originalOwner) {
+			tile.convertHqToCity();
 			eliminatePlayer(originalOwner);
 		}
 	}
@@ -133,13 +132,19 @@ public class Game {
 	}
 
 	public void endTurn() {
-		currentPlayerIndex = ++currentPlayerIndex % players.size();
+		currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
 		startTurn();
 	}
 
 	private void eliminatePlayer(Player player) {
+		int eliminatedIndex = players.indexOf(player);
 		player.kill();
 		this.players.remove(player);
+
+		if (eliminatedIndex < currentPlayerIndex)
+			currentPlayerIndex--;
+		else if (eliminatedIndex == currentPlayerIndex)
+			currentPlayerIndex = currentPlayerIndex % players.size();
 
 		gameBoard.getUnitsOf(player).forEach(gameBoard::removeUnit);
 		gameBoard.getTilesOf(player).forEach(t -> {

@@ -18,19 +18,19 @@ public class JsonSimples {
 
 	public static String requireString(JsonObject data, String key) {
 		if (!data.has(key))
-			throw new NullPointerException("Missing required field: " + key);
+			throw new IllegalArgumentException("Missing required field: " + key);
 		return getString(data, key);
 	}
 
 	public static int requireInt(JsonObject data, String key) {
 		if (!data.has(key))
-			throw new NullPointerException("Missing required field: " + key);
+			throw new IllegalArgumentException("Missing required field: " + key);
 		return getInt(data, key);
 	}
 
 	public static JsonArray requireArray(JsonObject data, String key) {
 		if (!data.has(key))
-			throw new NullPointerException("Missing required field: " + key);
+			throw new IllegalArgumentException("Missing required field: " + key);
 		return getArray(data, key);
 	}
 }
