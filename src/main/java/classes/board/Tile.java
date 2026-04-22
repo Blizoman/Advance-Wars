@@ -12,7 +12,7 @@ public class Tile {
 
     @Getter
     @NonNull
-    private final Terrain terrain;
+    private Terrain terrain;
     @Getter
     private Player owner = null;
     @Getter
@@ -48,8 +48,14 @@ public class Tile {
         int captureAmount = (int) Math.floor(unit.getHp() / 10.0);
         this.captureHp = Math.max(0, this.captureHp - captureAmount);
         if (this.captureHp == 0) {
+            convertHqToCity();
             setOwner(unit.getPlayer());
             resetCapturableHp();
         }
+    }
+
+    public void convertHqToCity() {
+        if (this.terrain == Terrain.HQ)
+            this.terrain = Terrain.CITY;
     }
 }

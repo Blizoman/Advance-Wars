@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.List;
 import classes.board.GameBoard;
 import classes.board.Position;
+import classes.board.Terrain;
 import classes.board.Tile;
 import classes.player.Player;
 import classes.unit.Unit;
@@ -102,12 +103,23 @@ public class Game {
 		int damage = EvalDamage.evalDamage(attacker, defender, defenseBonus);
 		defender.takeDamage(damage);
 
-		if (defender.isDead())
+		if (defender.isDead()) {
 			gameBoard.removeUnit(defender);
+
+			boolean hasUnits = gameBoard.getAllUnits().stream()
+					.anyMatch(u -> u.getPlayer() == defender.getPlayer());
+			if (!hasUnits)
+				eliminatePlayer(defender.getPlayer());
+		}
 	}
 
 	public void tryCapture(Unit unit, Tile tile) {
+		Player originalOwner = tile.getOwner();
 		tile.evalCapture(unit);
+
+		if (tile.getTerrain() == Terrain.HQ && tile.getOwner() != originalOwner) {
+			eliminatePlayer(originalOwner);
+		}
 	}
 
 	public void buyUnit(Position position, UnitType unitType) {
@@ -120,5 +132,26 @@ public class Game {
 	public void endTurn() {
 		currentPlayerIndex = ++currentPlayerIndex % players.size();
 		startTurn();
+	}
+
+	private void eliminatePlayer(Player player) {
+		player.kill();
+		this.players.remove(player);
+
+		gameBoard.getAllUnits().stream()
+				.filter(u -> u.getPlayer() == player)
+				.forEach(gameBoard::removeUnit);
+
+		gameBoard.getAllTiles().stream()
+				.filter(t -> t.getOwner() == player && t.getTerrain() == Terrain.HQ)
+				.forEach(Tile::convertHqToCity);
+
+		gameBoard.getAllTiles().stream()
+				.filter(t -> t.getOwner() == player)
+				.forEach(Tile::unsetOwner);
+
+		if (this.players.size() == 1) {
+			;//TODO: WIN!
+		}
 	}
 }
