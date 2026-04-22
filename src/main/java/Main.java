@@ -1,6 +1,7 @@
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import classes.board.AvailableMaps;
 import classes.board.GameBoard;
@@ -13,9 +14,9 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 		Main app = new Main();
 
-		List<Player> players = List.of(
+		ArrayList<Player> players = new ArrayList<>(List.of(
 				new Player("Alfa"),
-				new Player("Beta"));
+				new Player("Beta")));
 
 		Game game = new Game(app.loadMap(players), players);
 		game.startTurn();

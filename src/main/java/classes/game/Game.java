@@ -1,5 +1,6 @@
 package classes.game;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import classes.board.GameBoard;
@@ -21,7 +22,7 @@ public class Game {
 	private final GameBoard gameBoard;
 
 	@Getter
-	private final List<Player> players;
+	private final ArrayList<Player> players;
 
 	@Getter
 	private int currentPlayerIndex = 0;
