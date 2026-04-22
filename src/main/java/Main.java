@@ -8,6 +8,7 @@ import classes.board.GameBoard;
 import classes.board.GameBoardLoader;
 import classes.game.Game;
 import classes.player.Player;
+import tools.P;
 
 
 public class Main {
@@ -19,6 +20,7 @@ public class Main {
 				new Player("Beta")));
 
 		Game game = new Game(app.loadMap(players), players);
+		game.setOnGameEnd(winner -> P.println("Winner: " + winner.getName()));
 		game.startTurn();
 	}
 

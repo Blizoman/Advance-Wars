@@ -3,6 +3,7 @@ package classes.game;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Consumer;
 import classes.board.GameBoard;
 import classes.board.Position;
 import classes.board.Terrain;
@@ -13,11 +14,15 @@ import classes.unit.UnitFactory;
 import classes.unit.UnitType;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import tools.Consts;
 import tools.EvalDamage;
 
 @RequiredArgsConstructor
 public class Game {
+	@Setter
+	private Consumer<Player> onGameEnd;
+
 	@Getter
 	private final GameBoard gameBoard;
 
@@ -143,8 +148,8 @@ public class Game {
 			t.unsetOwner();
 		});
 
-		if (this.players.size() == 1) {
-			;//TODO: WIN!
+		if (this.players.size() == 1 && onGameEnd != null) {
+			onGameEnd.accept(this.players.get(0));
 		}
 	}
 }
