@@ -2,6 +2,9 @@ package classes.board;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
@@ -15,9 +18,20 @@ import tools.Consts;
 import tools.JsonSimples;
 
 public class GameBoardLoader {
-	public GameBoard loadFromFile(Path path, List<Player> players)
+	public static GameBoard loadFromStream(InputStream inputStream, List<Player> players)
+			throws JsonIOException, FileNotFoundException {
+		InputStreamReader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+		JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
+		return loadFromJson(json, players);
+	}
+
+	public static GameBoard loadFromFile(Path path, List<Player> players)
 			throws JsonIOException, FileNotFoundException {
 		JsonObject json = JsonParser.parseReader(new FileReader(path.toFile())).getAsJsonObject();
+		return loadFromJson(json, players);
+	}
+
+	private static GameBoard loadFromJson(JsonObject json, List<Player> players) {
 		Map<Position, Tile> map = new HashMap<>();
 
 		int width = JsonSimples.requireInt(json, Consts.GameBoard.WIDTH);
@@ -49,6 +63,6 @@ public class GameBoardLoader {
 				map.put(new Position(x, y), tile);
 			}
 		}
-		return new GameBoard(map);
+		return new GameBoard(map, width, height);
 	}
 }

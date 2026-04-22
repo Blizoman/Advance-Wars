@@ -1,14 +1,16 @@
 package classes.board;
 
-import java.nio.channels.AlreadyBoundException;
 import java.rmi.NoSuchObjectException;
 import java.util.Map;
 import classes.unit.Unit;
 import lombok.RequiredArgsConstructor;
+import tools.P;
 
 @RequiredArgsConstructor
 public class GameBoard {
 	private final Map<Position, Tile> map;
+	private final int width;
+	private final int height;
 
 	public Tile getTile(Position position) {
 		return this.map.get(position);
@@ -41,5 +43,31 @@ public class GameBoard {
 		Tile wantedTile = this.getTile(wantedPosition);
 		return wantedTile.getTerrain() != Terrain.WATER &&
 				wantedTile.isEmpty();
+	}
+
+	public void printMap() {
+		P.println("MAP h×w " + height + "×" + width + " :");
+		P.eprintln();
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				Tile tile = map.get(new Position(x, y));
+				Terrain terrain = tile.getTerrain();
+				String symbol = terrain.name().substring(0, 1);
+				String colorCode = switch (terrain) {
+					case WATER -> "\u001B[34m";
+					case PLAIN -> "\u001B[92m";
+					case FOREST -> "\u001B[32m";
+					case MOUNTAIN -> "\u001B[97m";
+					case HQ -> "\u001B[38;5;208m";
+					case FACTORY -> "\u001B[31m";
+					case CITY -> "\u001B[33m";
+				};
+				String RESET = "\u001B[0m";
+
+				P.print(colorCode + symbol + RESET);
+				P.print(" ");
+			}
+			P.eprintln();
+		}
 	}
 }
