@@ -2,6 +2,7 @@ package classes.board;
 
 import java.util.List;
 import java.util.Map;
+import classes.player.Player;
 import classes.unit.Unit;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -55,5 +56,17 @@ public class GameBoard {
 
 	public void removeUnit(Unit unit) {
 		getTile(unit.getPosition()).removeUnit();
+	}
+
+	public List<Tile> getTilesOf(Player player) {
+		return getAllTiles().stream()
+				.filter(t -> t.getOwner() == player)
+				.toList();
+	}
+
+	public List<Unit> getUnitsOf(Player player) {
+		return getAllUnits().stream()
+				.filter(u -> u.getPlayer() == player)
+				.toList();
 	}
 }

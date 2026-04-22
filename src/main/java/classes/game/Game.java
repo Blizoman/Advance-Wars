@@ -37,18 +37,15 @@ public class Game {
 
 	private void processIncome() {
 		Player player = getActive();
-		gameBoard.getAllTiles().stream()
-				.filter(t -> t.getOwner() == player && t.getTerrain().isGenerateIncome())
+		gameBoard.getTilesOf(player).stream()
+				.filter(t -> t.getTerrain().isGenerateIncome())
 				.forEach(t -> player.addMoney(Consts.CITY_INCOME));
 	}
 
 	private void processUnits() {
-		List<Unit> allUnits = gameBoard.getAllUnits();
-
 		Player player = getActive();
-		List<Unit> playerUnits = allUnits.stream()
-				.filter(u -> u.getPlayer() == player)
-				.toList();
+		List<Unit> allUnits = gameBoard.getAllUnits();
+		List<Unit> playerUnits = gameBoard.getUnitsOf(player);
 
 		resetMovement(allUnits);
 		healUnits(playerUnits);
@@ -138,17 +135,12 @@ public class Game {
 		player.kill();
 		this.players.remove(player);
 
-		gameBoard.getAllUnits().stream()
-				.filter(u -> u.getPlayer() == player)
-				.forEach(gameBoard::removeUnit);
-
-		gameBoard.getAllTiles().stream()
-				.filter(t -> t.getOwner() == player && t.getTerrain() == Terrain.HQ)
-				.forEach(Tile::convertHqToCity);
-
-		gameBoard.getAllTiles().stream()
-				.filter(t -> t.getOwner() == player)
-				.forEach(Tile::unsetOwner);
+		gameBoard.getUnitsOf(player).forEach(gameBoard::removeUnit);
+		gameBoard.getTilesOf(player).forEach(t -> {
+			if (t.getTerrain() == Terrain.HQ)
+				t.convertHqToCity();
+			t.unsetOwner();
+		});
 
 		if (this.players.size() == 1) {
 			;//TODO: WIN!
