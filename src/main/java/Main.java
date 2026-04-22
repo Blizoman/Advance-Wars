@@ -5,40 +5,30 @@ import java.util.List;
 import classes.board.AvailableMaps;
 import classes.board.GameBoard;
 import classes.board.GameBoardLoader;
+import classes.game.Game;
 import classes.player.Player;
-import classes.unit.UnitFactory;
-import tools.P;
 
 
 public class Main {
-	UnitFactory unitFactory = new UnitFactory();
-
 	public static void main(String[] args) throws IOException {
 		Main app = new Main();
-		app.start();
 
-		// Game game = new Game(unitFactory);
-		// game.start();
+		List<Player> players = List.of(
+				new Player("Alfa"),
+				new Player("Beta"));
+
+		Game game = new Game(app.loadMap(players), players);
+		game.startTurn();
 	}
 
-	private void start() throws IOException {
-		for (AvailableMaps.MapMetadata map : AvailableMaps.getAvailableMaps()) {
-			String mapName = AvailableMaps.getFilename(map);
+	private GameBoard loadMap(List<Player> players) throws IOException {
+		AvailableMaps.MapMetadata map = AvailableMaps.getAvailableMaps().get(1);
+		String mapName = AvailableMaps.getFilename(map);
 
-			List<Player> players = List.of(
-					new Player("Alfa"),
-					new Player("Beta"));
-			try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(mapName)) {
-				if (inputStream == null)
-					throw new FileNotFoundException("Map file " + mapName + " not found");
-
-				GameBoard gb = GameBoardLoader.loadFromStream(inputStream, players);
-				P.println(map.title());
-				gb.printMap();
-
-				P.eprintln();
-				P.eprintln();
-			}
+		try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(mapName)) {
+			if (inputStream == null)
+				throw new FileNotFoundException("Map file " + mapName + " not found");
+			return GameBoardLoader.loadFromStream(inputStream, players);
 		}
 	}
 }

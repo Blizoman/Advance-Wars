@@ -1,6 +1,6 @@
 package classes.unit;
 
 public enum MovementType {
-	HUMAN,
+	FOOT,
 	VEHICLE;
 }

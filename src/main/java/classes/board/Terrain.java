@@ -5,13 +5,13 @@ import classes.unit.MovementType;
 import lombok.Getter;
 
 public enum Terrain {
-	PLAIN(1, Map.of(MovementType.HUMAN, 1, MovementType.VEHICLE, 1)),
-	FOREST(2, Map.of(MovementType.HUMAN, 1, MovementType.VEHICLE, 2)),
-	MOUNTAIN(4, Map.of(MovementType.HUMAN, 2)),
-	WATER(0, Map.of()),
-	CITY(3, true, true, false, Map.of(MovementType.HUMAN, 1, MovementType.VEHICLE, 1)),
-	FACTORY(3, true, false, true, Map.of(MovementType.HUMAN, 1, MovementType.VEHICLE, 1)),
-	HQ(4, true, true, false, Map.of(MovementType.HUMAN, 1, MovementType.VEHICLE, 1));
+	PLAIN(1, false, Map.of(MovementType.FOOT, 1, MovementType.VEHICLE, 1)),
+	FOREST(2, false, Map.of(MovementType.FOOT, 1, MovementType.VEHICLE, 2)),
+	MOUNTAIN(4, false, Map.of(MovementType.FOOT, 2)),
+	WATER(0, false, Map.of()),
+	CITY(3, true, true, false, true, Map.of(MovementType.FOOT, 1, MovementType.VEHICLE, 1)),
+	FACTORY(3, true, false, true, false, Map.of(MovementType.FOOT, 1, MovementType.VEHICLE, 1)),
+	HQ(4, true, true, false, false, Map.of(MovementType.FOOT, 1, MovementType.VEHICLE, 1));
 
 	@Getter
 	private final int defenseBonus;
@@ -21,27 +21,33 @@ public enum Terrain {
 	private final boolean heals;
 	@Getter
 	private final boolean produceUnits;
+	@Getter
+	private final boolean generateIncome;
 	private final Map<MovementType, Integer> movementCosts;
 
-	public Terrain fromString(String from) {
+	public static Terrain fromString(String from) {
 		return Terrain.valueOf(from);
 	}
 
-	Terrain(int defenseBonus, Map<MovementType, Integer> movementCosts) {
-		this(defenseBonus, false, false, false, movementCosts);
+	Terrain(int defenseBonus, boolean generateIncome, Map<MovementType, Integer> movementCosts) {
+		this(defenseBonus, false, false, false, generateIncome, movementCosts);
 	}
 
 	Terrain(int defenseBonus, boolean capturable, boolean heals,
-			boolean produceUnits, Map<MovementType, Integer> movementCosts) {
+			boolean produceUnits, boolean generateIncome, Map<MovementType, Integer> movementCosts) {
 		this.defenseBonus = defenseBonus;
 		this.capturable = capturable;
 		this.heals = heals;
 		this.produceUnits = produceUnits;
+		this.generateIncome = generateIncome;
 		this.movementCosts = movementCosts;
 	}
 
-	public int getCost(MovementType type) {
-		return movementCosts.getOrDefault(type, null);
+	public int getMovementCost(MovementType type) {
+		Integer movementCost = movementCosts.get(type);
+		if (movementCost == null)
+			throw new IllegalStateException(type + " cannot go through " + this);
+		return movementCost;
 	}
 
 	public boolean isPassable(MovementType type) {

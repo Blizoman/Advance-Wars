@@ -1,42 +1,50 @@
 package classes.board;
 
-import java.rmi.NoSuchObjectException;
+import java.util.List;
 import java.util.Map;
 import classes.unit.Unit;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import tools.P;
 
 @RequiredArgsConstructor
 public class GameBoard {
 	private final Map<Position, Tile> map;
+	@Getter
 	private final int width;
+	@Getter
 	private final int height;
 
 	public Tile getTile(Position position) {
-		return this.map.get(position);
+		Tile tile = this.map.get(position);
+		if (tile == null)
+			throw new IllegalStateException("Invalid position: " + position);
+		return tile;
+	}
+
+	public List<Tile> getAllTiles() { return this.map.values().stream().toList(); }
+
+	public List<Unit> getAllUnits() {
+		return map.values().stream()
+				.filter(t -> t.getUnit() != null)
+				.map(p -> p.getUnit())
+				.toList();
 	}
 
 	public Unit getUnit(Position position) {
-		Tile tile = getTile(position);
-		return tile == null ? null : tile.getUnit();
+		return getTile(position).getUnit();
 	}
 
-	public void moveUnit(Position from, Position to)
-			throws IndexOutOfBoundsException, NoSuchObjectException, IllegalAccessException {
-		Tile fromTile = map.get(from);
-		Tile toTile = map.get(to);
-
-		if (fromTile == null || toTile == null)
-			throw new IndexOutOfBoundsException("Invalid location: " + from + " -> " + to);
-		if (!toTile.isEmpty())
-			throw new IllegalAccessException("Tile " + to + " already occupied");
+	public void moveUnit(Position from, Position to) {
+		Tile fromTile = getTile(from);
+		Tile toTile = getTile(to);
 
 		Unit unit = fromTile.getUnit();
 		if (unit == null)
-			throw new NoSuchObjectException("No unit found at " + from);
+			throw new IllegalStateException("No unit found at " + from);
 
 		fromTile.removeUnit();
 		toTile.placeUnit(unit);
+		unit.setPosition(to);
 	}
 
 	public boolean canPlaceUnit(Position wantedPosition) {
@@ -45,28 +53,7 @@ public class GameBoard {
 				wantedTile.isEmpty();
 	}
 
-	public void printMap() {
-		P.println("MAP h×w " + height + "×" + width + " :");
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
-				Tile tile = map.get(new Position(x, y));
-				Terrain terrain = tile.getTerrain();
-				String symbol = terrain.name().substring(0, 1);
-				String colorCode = switch (terrain) {
-					case WATER -> "\u001B[34m";
-					case PLAIN -> "\u001B[92m";
-					case FOREST -> "\u001b[38;5;94m";
-					case MOUNTAIN -> "\u001B[97m";
-					case HQ -> "\u001B[38;5;208m";
-					case FACTORY -> "\u001B[31m";
-					case CITY -> "\u001B[33m";
-				};
-				String RESET = "\u001B[0m";
-
-				P.print(colorCode + symbol + RESET);
-				P.print(" ");
-			}
-			P.eprintln();
-		}
+	public void removeUnit(Unit unit) {
+		getTile(unit.getPosition()).removeUnit();
 	}
 }

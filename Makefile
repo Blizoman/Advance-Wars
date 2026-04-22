@@ -29,5 +29,10 @@ zip: clean gh
 	zip -r $(LOGIN).zip $(LOGIN)
 	rm -rf $(LOGIN)
 
+copyJavas:
+	rm -rf ~/Downloads/IJA-projSrcs
+	mkdir -p ~/Downloads/IJA-projSrcs
+	find src/main/java/ -name "*.java" -exec cp {} ~/Downloads/IJA-projSrcs \;
+
 # assignment: 	https://moodle.vut.cz/mod/folder/view.php?id=667385
 # github:		https://github.com/RomanPruzinsky/IJA-proj

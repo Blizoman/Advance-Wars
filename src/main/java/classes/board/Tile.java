@@ -5,6 +5,7 @@ import classes.unit.Unit;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import tools.Consts;
 
 @RequiredArgsConstructor
 public class Tile {
@@ -16,12 +17,12 @@ public class Tile {
     private Player owner = null;
     @Getter
     private Unit unit = null;
+    @Getter
+    private int captureHp = Consts.CAPTURE_HP;
 
     public boolean isEmpty() { return this.unit == null; }
 
-    public void placeUnit(Unit unit) throws IllegalAccessException {
-        if (!isEmpty())
-            throw new IllegalAccessException("Tile already occupied");
+    public void placeUnit(Unit unit) {
         this.unit = unit;
     }
 
@@ -37,5 +38,18 @@ public class Tile {
 
     public void unsetOwner() {
         this.owner = null;
+    }
+
+    public final void resetCapturableHp() {
+        this.captureHp = Consts.CAPTURE_HP;
+    }
+
+    public void evalCapture(Unit unit) {
+        int captureAmount = (int) Math.floor(unit.getHp() / 10.0);
+        this.captureHp = Math.max(0, this.captureHp - captureAmount);
+        if (this.captureHp == 0) {
+            setOwner(unit.getPlayer());
+            resetCapturableHp();
+        }
     }
 }
