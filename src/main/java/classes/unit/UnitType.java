@@ -3,17 +3,22 @@ package classes.unit;
 import java.util.Map;
 import lombok.Getter;
 
-@Getter
 public enum UnitType {
 	INFANTRY(1000, MovementType.HUMAN, 3, new AttackRange(1, 1), true, true),
 	TANK(7000, MovementType.VEHICLE, 6, new AttackRange(1, 1), false, true),
 	CANNON(6000, MovementType.VEHICLE, 5, new AttackRange(2, 3), false, false);
 
+	@Getter
 	private final int cost;
+	@Getter
 	private final MovementType movementType;
+	@Getter
 	private final int moveRange;
+	@Getter
 	private final AttackRange attackRange;
+	@Getter
 	private final boolean canCapture;
+	@Getter
 	private final boolean canAttackAfterMove;
 	private Map<UnitType, Integer> damageAgainst;
 

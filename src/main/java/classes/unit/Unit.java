@@ -12,6 +12,7 @@ public class Unit {
 	private final Player player;
 	@Getter
 	private final UnitType type;
+	@Getter
 	private int hp = Consts.MAX_HP;
 
 	public boolean isAlive() { return hp > 0; }
@@ -22,8 +23,7 @@ public class Unit {
 		this.hp = Math.max(0, this.hp - damageToTake);
 	}
 
-	public void attack(Unit target) {
-		int damageDealt = this.type.getDamageAgainst(target.getType());
-		target.takeDamage(damageDealt);
+	public void heal(int hpToHeal) {
+		this.hp = Math.min(this.hp + hpToHeal, Consts.MAX_HP);
 	}
 }

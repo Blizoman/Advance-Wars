@@ -33,6 +33,7 @@ public class Main {
 					throw new FileNotFoundException("Map file " + mapName + " not found");
 
 				GameBoard gb = GameBoardLoader.loadFromStream(inputStream, players);
+				P.println(map.title());
 				gb.printMap();
 
 				P.eprintln();

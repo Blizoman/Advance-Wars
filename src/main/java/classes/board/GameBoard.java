@@ -55,7 +55,7 @@ public class GameBoard {
 				String colorCode = switch (terrain) {
 					case WATER -> "\u001B[34m";
 					case PLAIN -> "\u001B[92m";
-					case FOREST -> "\u001B[32m";
+					case FOREST -> "\u001b[38;5;94m";
 					case MOUNTAIN -> "\u001B[97m";
 					case HQ -> "\u001B[38;5;208m";
 					case FACTORY -> "\u001B[31m";
