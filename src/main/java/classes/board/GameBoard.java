@@ -47,7 +47,6 @@ public class GameBoard {
 
 	public void printMap() {
 		P.println("MAP h×w " + height + "×" + width + " :");
-		P.eprintln();
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
 				Tile tile = map.get(new Position(x, y));

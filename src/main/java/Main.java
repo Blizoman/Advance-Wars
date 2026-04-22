@@ -2,10 +2,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import classes.board.AvailableMaps;
 import classes.board.GameBoard;
 import classes.board.GameBoardLoader;
 import classes.player.Player;
 import classes.unit.UnitFactory;
+import tools.P;
 
 
 public class Main {
@@ -20,16 +22,22 @@ public class Main {
 	}
 
 	private void start() throws IOException {
-		List<Player> players = List.of(
-				new Player("Alfa"),
-				new Player("Beta"));
-		String mapName = "map1.json";
-		try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(mapName)) {
-			if (inputStream == null)
-				throw new FileNotFoundException("Map file " + mapName + " not found");
+		for (AvailableMaps.MapMetadata map : AvailableMaps.getAvailableMaps()) {
+			String mapName = AvailableMaps.getFilename(map);
 
-			GameBoard gb = GameBoardLoader.loadFromStream(inputStream, players);
-			gb.printMap();
+			List<Player> players = List.of(
+					new Player("Alfa"),
+					new Player("Beta"));
+			try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(mapName)) {
+				if (inputStream == null)
+					throw new FileNotFoundException("Map file " + mapName + " not found");
+
+				GameBoard gb = GameBoardLoader.loadFromStream(inputStream, players);
+				gb.printMap();
+
+				P.eprintln();
+				P.eprintln();
+			}
 		}
 	}
 }
