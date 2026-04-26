@@ -148,11 +148,11 @@ public class Game {
 	}
 
 	public void loadSession(Path path) throws IOException {
-		List<GameEvent> events = LogFiler.load(path);
+		List<GameEvent> events = LogFiler.load(path, this.players);
 		this.session = new Session(this, events);
 	}
 
 	public void saveSession(Path path) throws IOException {
-		LogFiler.save(session.getEventLog(), path);
+		LogFiler.save(session.getEventLog(), path, this.players);
 	}
 }
