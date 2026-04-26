@@ -1,268 +1,264 @@
 {
-    "width": 10,
-    "height": 8,
-    "map": [
-        [
-            {
-                "terrain": "WATER"
-            },
-            {
-                "terrain": "WATER"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            }
-        ],
-        [
-            {
-                "terrain": "WATER"
-            },
-            {
-                "terrain": "WATER"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            }
-        ],
-        [
-            {
-                "terrain": "WATER"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            }
-        ],
-        [
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "FOREST"
-            },
-            {
-                "terrain": "FOREST"
-            },
-            {
-                "terrain": "FOREST"
-            },
-            {
-                "terrain": "FOREST"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            }
-        ],
-        [
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "FOREST"
-            },
-            {
-                "terrain": "FOREST"
-            },
-            {
-                "terrain": "FOREST"
-            },
-            {
-                "terrain": "FOREST"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            }
-        ],
-        [
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            }
-        ],
-        [
-            {
-                "terrain": "FACTORY",
-                "owner": 0
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "MOUNTAIN"
-            },
-            {
-                "terrain": "MOUNTAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "FACTORY",
-                "owner": 1
-            }
-        ],
-        [
-            {
-                "terrain": "HQ",
-                "owner": 0
-            },
-            {
-                "terrain": "CITY",
-                "owner": 0
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "MOUNTAIN"
-            },
-            {
-                "terrain": "MOUNTAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "PLAIN"
-            },
-            {
-                "terrain": "CITY",
-                "owner": 1
-            },
-            {
-                "terrain": "HQ",
-                "owner": 1
-            }
-        ]
+  "width": 10,
+  "height": 8,
+  "map": [
+    [
+      {
+        "terrain": "WATER"
+      },
+      {
+        "terrain": "WATER"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      }
+    ],
+    [
+      {
+        "terrain": "WATER"
+      },
+      {
+        "terrain": "WATER"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      }
+    ],
+    [
+      {
+        "terrain": "WATER"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      }
+    ],
+    [
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "FOREST"
+      },
+      {
+        "terrain": "FOREST"
+      },
+      {
+        "terrain": "FOREST"
+      },
+      {
+        "terrain": "FOREST"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      }
+    ],
+    [
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "FOREST"
+      },
+      {
+        "terrain": "FOREST"
+      },
+      {
+        "terrain": "FOREST"
+      },
+      {
+        "terrain": "FOREST"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      }
+    ],
+    [
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      }
+    ],
+    [
+      {
+        "terrain": "FACTORY"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "MOUNTAIN"
+      },
+      {
+        "terrain": "MOUNTAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "FACTORY"
+      }
+    ],
+    [
+      {
+        "terrain": "HQ",
+        "owner": 0
+      },
+      {
+        "terrain": "CITY"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "MOUNTAIN"
+      },
+      {
+        "terrain": "MOUNTAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "CITY"
+      },
+      {
+        "terrain": "HQ",
+        "owner": 1
+      }
     ]
+  ]
 }

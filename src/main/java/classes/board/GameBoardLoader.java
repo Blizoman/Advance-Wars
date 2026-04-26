@@ -55,6 +55,7 @@ public class GameBoardLoader {
 										" too high at [" + x + "," + y + "]" +
 										"\nMybe map doesn't support only " + players.size()
 										+ " players game");
+										//TODO: fix low index too
 
 					owner = players.get(ownerIndex);
 					tile.setOwner(owner);
