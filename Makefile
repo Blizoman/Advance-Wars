@@ -7,7 +7,8 @@ compile:
 	mvn compile
 
 run:
-	mvn javafx:run
+# 	mvn javafx:run
+	mvn javafx:run -Djavafx.mainClass=gui.App
 
 exe:
 	mvn package
