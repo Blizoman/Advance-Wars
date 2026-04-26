@@ -55,6 +55,8 @@ public class Tile {
 
     public void convertHqToCity() {
         if (this.terrain == Terrain.HQ)
-            this.terrain = Terrain.CITY;
+            setTerrain(Terrain.CITY);
     }
+
+    public void setTerrain(Terrain to) { this.terrain = to; }
 }

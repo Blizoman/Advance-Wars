@@ -22,6 +22,14 @@ public class GameBoard {
 		return tile;
 	}
 
+	public Position getPosition(Tile tile) {
+		return this.map.entrySet().stream()
+				.filter(e -> e.getValue() == tile)
+				.map(Map.Entry::getKey)
+				.findFirst()
+				.orElseThrow(() -> new IllegalStateException("Invalid tile"));
+	}
+
 	public List<Tile> getAllTiles() { return this.map.values().stream().toList(); }
 
 	public List<Unit> getAllUnits() {
@@ -56,6 +64,10 @@ public class GameBoard {
 
 	public void removeUnit(Unit unit) {
 		getTile(unit.getPosition()).removeUnit();
+	}
+
+	public void placeUnit(Unit unit) {
+		getTile(unit.getPosition()).placeUnit(unit);
 	}
 
 	public List<Tile> getTilesOf(Player player) {

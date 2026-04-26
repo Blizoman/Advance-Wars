@@ -1,7 +1,7 @@
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
+import java.nio.file.Path;
 import java.util.List;
 import classes.board.AvailableMaps;
 import classes.board.GameBoard;
@@ -15,13 +15,23 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 		Main app = new Main();
 
-		ArrayList<Player> players = new ArrayList<>(List.of(
+		List<Player> players = List.of(
 				new Player("Alfa"),
-				new Player("Beta")));
+				new Player("Beta"));
 
 		Game game = new Game(app.loadMap(players), players);
-		game.setOnGameEnd(winner -> P.println("Winner: " + winner.getName()));
-		game.startTurn();
+		game.initSession();
+		game.getSession().setOnGameEnd(winner -> P.println("Winner: " + winner.getName()));
+		game.getSession().startTurn();
+	}
+
+	public void saveSession(Game game) throws IOException {
+		game.saveSession(Path.of("gamelog.json"));
+	}
+
+	public void loadSession(Game game) throws IOException {
+		game.loadSession(Path.of("gamelog.json"));
+		game.getSession().stepForward();
 	}
 
 	private GameBoard loadMap(List<Player> players) throws IOException {

@@ -29,4 +29,8 @@ public class Player {
 	public boolean canAfford(int cost) {
 		return this.money >= cost;
 	}
+
+	public void realive() {
+		this.isAlive = true;
+	}
 }

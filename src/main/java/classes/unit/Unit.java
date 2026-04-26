@@ -22,6 +22,7 @@ public class Unit {
 	@Getter
 	private int movesLeft;
 	@Getter
+	@Setter
 	private int hp = Consts.MAX_HP;
 
 	public boolean isAlive() { return hp > 0; }
