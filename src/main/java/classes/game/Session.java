@@ -59,7 +59,7 @@ public class Session {
 
 	public void endTurn() {
 		game.forwardTurn();
-		log(new TurnChangedEvent());
+		log(new TurnChangedEvent(game.getActive()));
 		startTurn();
 	}
 

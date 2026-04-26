@@ -1,8 +1,14 @@
 package classes.event;
 
 import classes.game.Game;
+import classes.player.Player;
 
-public record TurnChangedEvent() implements GameEvent {
+public record TurnChangedEvent(Player player) implements GameEvent {
+	@Override
+	public String toString() {
+		return "TurnChangedEvent[player=" + player.getName() + "]";
+	}
+
 	public GameEventType type() {
 		return GameEventType.TURN_CHANGED;
 	}
