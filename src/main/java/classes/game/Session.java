@@ -42,12 +42,10 @@ public class Session {
 			eventLog.get(--logCursor).undo(game);
 	}
 
-	public void switchToPlayMode() {
-		eventLog.subList(logCursor, eventLog.size()).clear();
-	}
-
-	private void log(GameEvent event) {
-		switchToPlayMode();
+	private void execute(GameEvent event) {
+		if (logCursor < eventLog.size())
+			eventLog.subList(logCursor, eventLog.size()).clear();
+		event.execute(game);
 		eventLog.add(event);
 		logCursor++;
 	}
@@ -58,37 +56,19 @@ public class Session {
 	}
 
 	public void endTurn() {
-		game.forwardTurn();
-		log(new TurnChangedEvent(game.getActive()));
+		execute(new TurnChangedEvent(game.getActive()));
 	}
 
 	public void moveUnit(Unit unit, Position to) {
 		Position from = unit.getPosition();
-		game.moveUnit(unit, to);
-		log(new UnitMovedEvent(from, to));
+		if (from.equals(to))
+			return;
+		execute(new UnitMovedEvent(from, to, unit.getMovesLeft()));
 	}
 
 	public void attack(Unit attacker, Unit defender) {
-		int attackerHpBefore = attacker.getHp();
-		int defenderHpBefore = defender.getHp();
-
-		game.dealDamage(attacker, defender);
-		if (defender.isDead()) {
-			game.removeUnit(defender);
-		}
-
-		if (defender.isAlive() && defender.canAttackTo(attacker)) {
-			game.dealDamage(defender, attacker);
-			if (attacker.isDead()) {
-				game.removeUnit(attacker);
-			}
-		}
-
-		log(new UnitAttackEvent(
-				attacker, attackerHpBefore,
-				defender, defenderHpBefore,
-				attackerHpBefore - attacker.getHp(),
-				defenderHpBefore - defender.getHp()));
+		UnitAttackEvent event = new UnitAttackEvent(attacker, defender);
+		execute(event);
 	}
 
 	public void tryCapture(Unit unit, Tile tile) {
@@ -96,36 +76,29 @@ public class Session {
 		Terrain previousTerrain = tile.getTerrain();
 		boolean wasHq = previousTerrain == Terrain.HQ;
 
-		game.capture(tile, unit);
+		execute(new CityCapturedEvent(
+				game.getGameBoard().getPosition(tile),
+				previousTerrain, tile.getOwner(), originalOwner,
+				unit));
 
-		if (tile.getOwner() != originalOwner) {
-			log(new CityCapturedEvent(
-					game.getGameBoard().getPosition(tile),
-					previousTerrain, tile.getOwner(), originalOwner));
-
-			if (wasHq) {
-				tile.convertHqToCity();
-				eliminatePlayer(originalOwner);
-			}
-		}
+		if (wasHq && tile.getOwner() != originalOwner)
+			eliminatePlayer(originalOwner);
 	}
 
 	public void buyUnit(Position position, UnitType unitType) {
-		game.buyUnit(position, unitType);
-		Unit unit = game.getGameBoard().getUnit(position);
-		log(new UnitBoughtEvent(unit));
+		execute(new UnitBoughtEvent(position, unitType, game.getActive()));
 	}
 
-	private void eliminatePlayer(Player player) {
+	public void eliminatePlayer(Player player) {
 		List<GameEvent> subEvents = new ArrayList<>();
+		game.getGameBoard().getUnitsOf(player)
+				.forEach(u -> subEvents.add(new UnitDiedEvent(u)));
+		game.getGameBoard().getTilesOf(player)
+				.forEach(t -> subEvents.add(new CityCapturedEvent(
+						game.getGameBoard().getPosition(t),
+						t.getTerrain(), null, player, null)));
 
-		game.getGameBoard().getUnitsOf(player).forEach(u -> subEvents.add(new UnitDiedEvent(u)));
-		game.getGameBoard().getTilesOf(player).forEach(t -> subEvents.add(new CityCapturedEvent(
-				game.getGameBoard().getPosition(t),
-				t.getTerrain(), null, player)));
-
-		game.eliminatePlayer(player);
-		log(new MultipleGameEvent(subEvents, player));
+		execute(new MultipleGameEvent(subEvents, player));
 
 		if (game.getPlayers().size() == 1 && onGameEnd != null)
 			onGameEnd.accept(game.getPlayers().get(0));

@@ -20,6 +20,7 @@ public class Unit {
 	@NonNull
 	private Position position;
 	@Getter
+	@Setter
 	private int movesLeft;
 	@Getter
 	@Setter
@@ -45,12 +46,5 @@ public class Unit {
 
 	public void resetMovement() {
 		this.movesLeft = this.type.getMoveRange();
-	}
-
-	public void moveBy(int tiles) {
-		if (this.movesLeft < tiles)
-			throw new IllegalStateException(
-					"Cannot move by " + tiles + ", allowed only " + this.movesLeft);
-		this.movesLeft -= tiles;
 	}
 }

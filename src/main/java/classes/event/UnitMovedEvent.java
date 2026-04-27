@@ -2,17 +2,22 @@ package classes.event;
 
 import classes.board.Position;
 import classes.game.Game;
+import classes.unit.Unit;
 
-public record UnitMovedEvent(Position from, Position to) implements GameEvent {
+public record UnitMovedEvent(Position from, Position to, int movesLeftBefore) implements GameEvent {
 	public GameEventType type() {
 		return GameEventType.UNIT_MOVED;
 	}
 
 	public void execute(Game game) {
-		game.moveUnit(game.getGameBoard().getUnit(from), to);
+		Unit unit = game.getGameBoard().getUnit(from);
+		unit.setMovesLeft(movesLeftBefore - from.distanceTo(to));
+		game.moveUnit(unit, to);
 	}
 
 	public void undo(Game game) {
-		game.moveUnit(game.getGameBoard().getUnit(to), from);
+		Unit unit = game.getGameBoard().getUnit(to);
+		game.moveUnit(unit, from);
+		unit.setMovesLeft(movesLeftBefore);
 	}
 }

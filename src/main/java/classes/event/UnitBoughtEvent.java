@@ -1,20 +1,34 @@
 package classes.event;
 
+import classes.board.Position;
 import classes.game.Game;
+import classes.player.Player;
 import classes.unit.Unit;
+import classes.unit.UnitType;
 
-public record UnitBoughtEvent(Unit unit) implements GameEvent {
+public class UnitBoughtEvent implements GameEvent {
+	private final Position position;
+	private final UnitType unitType;
+	private final Player player;
+	private Unit createdUnit;
+
+	public UnitBoughtEvent(Position position, UnitType unitType, Player player) {
+		this.position = position;
+		this.unitType = unitType;
+		this.player = player;
+	}
+
 	public GameEventType type() {
 		return GameEventType.UNIT_BOUGHT;
 	}
 
 	public void execute(Game game) {
-		game.getGameBoard().getTile(unit.getPosition()).placeUnit(unit);
-		unit.getPlayer().removeMoney(unit.getType().getCost());
+		game.buyUnit(position, unitType);
+		createdUnit = game.getGameBoard().getUnit(position);
 	}
 
 	public void undo(Game game) {
-		game.getGameBoard().removeUnit(unit);
-		unit.getPlayer().addMoney(unit.getType().getCost());
+		game.getGameBoard().removeUnit(createdUnit);
+		player.addMoney(unitType.getCost());
 	}
 }

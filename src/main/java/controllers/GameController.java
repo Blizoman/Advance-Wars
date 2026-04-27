@@ -79,11 +79,11 @@ public class GameController {
 	}
 
 	public void startGame() {
+		session.startTurn();
 		runTurnLoop();
 	}
 
 	private void runTurnLoop() {
-		session.startTurn();
 		System.out.println(
 				"Turn: " + session.getActive().getName() + " isBot: " + session.getActive().isBot());
 		if (session.getActive().isBot()) {

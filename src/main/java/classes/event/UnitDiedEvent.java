@@ -9,10 +9,10 @@ public record UnitDiedEvent(Unit unit) implements GameEvent {
 	}
 
 	public void execute(Game game) {
-		game.getGameBoard().removeUnit(unit);
+		game.removeUnit(unit);
 	}
 
 	public void undo(Game game) {
-		game.getGameBoard().placeUnit(unit);
+		game.placeUnit(unit);
 	}
 }

@@ -87,7 +87,6 @@ public class Game {
 	}
 
 	public void moveUnit(Unit unit, Position to) {
-		unit.moveBy(unit.getPosition().distanceTo(to));
 		gameBoard.moveUnit(unit.getPosition(), to);
 	}
 
