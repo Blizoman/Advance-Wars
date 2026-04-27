@@ -1,7 +1,7 @@
-package classes.event;
+package event;
 
-import classes.game.Game;
-import classes.unit.Unit;
+import game.Game;
+import unit.Unit;
 
 public class UnitAttackEvent implements GameEvent {
 	private final Unit attacker;

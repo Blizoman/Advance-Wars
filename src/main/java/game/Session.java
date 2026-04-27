@@ -1,17 +1,17 @@
-package classes.game;
+package game;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-import classes.board.Position;
-import classes.board.Terrain;
-import classes.board.Tile;
-import classes.event.*;
-import classes.player.Player;
-import classes.unit.Unit;
-import classes.unit.UnitType;
+import board.Position;
+import board.Terrain;
+import board.Tile;
+import event.*;
 import lombok.Getter;
 import lombok.Setter;
+import player.Player;
+import unit.Unit;
+import unit.UnitType;
 
 public class Session {
 	private final Game game;
@@ -108,5 +108,5 @@ public class Session {
 
 	public List<Player> getPlayers() { return game.getPlayers(); }
 
-	public classes.board.GameBoard getGameBoard() { return game.getGameBoard(); }
+	public board.GameBoard getGameBoard() { return game.getGameBoard(); }
 }

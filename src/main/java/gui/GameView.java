@@ -5,17 +5,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import classes.board.AvailableMaps;
-import classes.board.GameBoard;
-import classes.board.GameBoardLoader;
-import classes.board.Position;
-import classes.game.Game;
-import classes.player.Player;
+import board.AvailableMaps;
+import board.GameBoard;
+import board.GameBoardLoader;
+import board.Position;
 import controllers.GameController;
+import game.Game;
 import javafx.geometry.Insets;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import player.Player;
 
 public class GameView extends HBox {
 	private final GameController controller;

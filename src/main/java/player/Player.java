@@ -1,4 +1,4 @@
-package classes.player;
+package player;
 
 import tools.Consts;
 import lombok.Getter;

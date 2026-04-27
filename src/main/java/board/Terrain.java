@@ -1,8 +1,8 @@
-package classes.board;
+package board;
 
 import java.util.Map;
-import classes.unit.MovementType;
 import lombok.Getter;
+import unit.MovementType;
 
 public enum Terrain {
 	PLAIN(1, false, Map.of(MovementType.FOOT, 1, MovementType.VEHICLE, 1)),

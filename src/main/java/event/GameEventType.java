@@ -1,4 +1,4 @@
-package classes.event;
+package event;
 
 public enum GameEventType {
     UNIT_BOUGHT,

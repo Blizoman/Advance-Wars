@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
-import classes.event.*;
-import classes.player.Player;
+import event.*;
+import player.Player;
 
 public class LogFiler {
 

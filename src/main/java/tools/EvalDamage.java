@@ -1,6 +1,6 @@
 package tools;
 
-import classes.unit.Unit;
+import unit.Unit;
 
 public class EvalDamage {
 	public static int evalDamage(Unit attacker, Unit defender, int terrainBonus) {

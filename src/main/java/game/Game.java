@@ -1,23 +1,23 @@
-package classes.game;
+package game;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import classes.board.GameBoard;
-import classes.board.Position;
-import classes.board.Terrain;
-import classes.board.Tile;
-import classes.event.GameEvent;
-import classes.player.Player;
-import classes.unit.Unit;
-import classes.unit.UnitFactory;
-import classes.unit.UnitType;
+import board.GameBoard;
+import board.Position;
+import board.Terrain;
+import board.Tile;
+import event.GameEvent;
 import lombok.Getter;
+import player.Player;
 import tools.Consts;
 import tools.EvalDamage;
 import tools.LogFiler;
+import unit.Unit;
+import unit.UnitFactory;
+import unit.UnitType;
 
 public class Game {
 	@Getter

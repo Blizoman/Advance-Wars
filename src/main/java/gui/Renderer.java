@@ -1,17 +1,17 @@
 package gui;
 
-import classes.board.GameBoard;
-import classes.board.Position;
-import classes.board.Terrain;
-import classes.board.Tile;
-import classes.player.Player;
-import classes.unit.Unit;
+import board.GameBoard;
+import board.Position;
+import board.Terrain;
+import board.Tile;
 import controllers.GameController;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import player.Player;
+import unit.Unit;
 
 public class Renderer {
 	private static final int TILE_SIZE = 80;

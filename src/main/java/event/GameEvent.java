@@ -1,6 +1,6 @@
-package classes.event;
+package event;
 
-import classes.game.Game;
+import game.Game;
 
 public interface GameEvent {
 	GameEventType type();

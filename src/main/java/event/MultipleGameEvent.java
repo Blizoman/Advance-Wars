@@ -1,7 +1,7 @@
-package classes.event;
+package event;
 
-import classes.game.Game;
-import classes.player.Player;
+import game.Game;
+import player.Player;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

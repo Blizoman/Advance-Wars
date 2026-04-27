@@ -1,10 +1,10 @@
-package classes.event;
+package event;
 
 import java.util.HashMap;
 import java.util.Map;
-import classes.game.Game;
-import classes.player.Player;
-import classes.unit.Unit;
+import game.Game;
+import player.Player;
+import unit.Unit;
 
 public class TurnChangedEvent implements GameEvent {
 	private final Player player;

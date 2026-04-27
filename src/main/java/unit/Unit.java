@@ -1,11 +1,11 @@
-package classes.unit;
+package unit;
 
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import classes.board.Position;
-import classes.player.Player;
+import player.Player;
+import board.Position;
 import tools.Consts;
 
 @RequiredArgsConstructor

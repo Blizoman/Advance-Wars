@@ -4,19 +4,19 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
-import classes.board.Position;
-import classes.bot.DummyBot;
-import classes.game.Game;
-import classes.game.PathFinder;
-import classes.game.Session;
-import classes.player.Player;
-import classes.unit.Unit;
-import classes.unit.UnitType;
+import board.Position;
+import bot.DummyBot;
+import game.Game;
+import game.PathFinder;
+import game.Session;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.util.Duration;
 import lombok.Getter;
 import lombok.Setter;
+import player.Player;
+import unit.Unit;
+import unit.UnitType;
 
 public class GameController {
 	@Getter

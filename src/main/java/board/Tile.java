@@ -1,11 +1,11 @@
-package classes.board;
+package board;
 
-import classes.player.Player;
-import classes.unit.Unit;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import player.Player;
 import tools.Consts;
+import unit.Unit;
 
 @RequiredArgsConstructor
 public class Tile {

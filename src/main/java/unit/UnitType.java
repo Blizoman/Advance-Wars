@@ -1,4 +1,4 @@
-package classes.unit;
+package unit;
 
 import java.util.Map;
 import lombok.Getter;

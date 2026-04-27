@@ -1,11 +1,11 @@
 package gui;
 
 import java.util.List;
-import classes.board.AvailableMaps;
-import classes.player.Player;
+import board.AvailableMaps;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import player.Player;
 
 public class App extends Application {
 	private Stage stage;

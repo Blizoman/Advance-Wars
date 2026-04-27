@@ -1,11 +1,11 @@
-package classes.board;
+package board;
 
 import java.util.List;
 import java.util.Map;
-import classes.player.Player;
-import classes.unit.Unit;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import player.Player;
+import unit.Unit;
 
 @RequiredArgsConstructor
 public class GameBoard {

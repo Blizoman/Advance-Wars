@@ -1,10 +1,10 @@
 package gui;
 
-import classes.board.Terrain;
-import classes.unit.UnitType;
 import javafx.scene.image.Image;
+import unit.UnitType;
 import java.util.HashMap;
 import java.util.Map;
+import board.Terrain;
 
 public class AssetLoader {
 	private static final Map<String, Image> loaded = new HashMap<>();

@@ -2,12 +2,12 @@ package gui;
 
 import java.util.ArrayList;
 import java.util.List;
-import classes.board.AvailableMaps;
-import classes.player.Player;
+import board.AvailableMaps;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+import player.Player;
 
 public class MapSelectView extends VBox {
 	public MapSelectView(App app) {

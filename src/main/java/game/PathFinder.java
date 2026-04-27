@@ -1,11 +1,11 @@
-package classes.game;
+package game;
 
 import java.util.*;
-import classes.board.GameBoard;
-import classes.board.Position;
-import classes.board.Tile;
-import classes.player.Player;
-import classes.unit.Unit;
+import board.GameBoard;
+import board.Position;
+import board.Tile;
+import player.Player;
+import unit.Unit;
 
 public class PathFinder {
 	private static final int NOT_PASSABLE = 1_000_000;

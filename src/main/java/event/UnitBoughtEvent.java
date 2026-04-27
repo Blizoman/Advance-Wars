@@ -1,10 +1,10 @@
-package classes.event;
+package event;
 
-import classes.board.Position;
-import classes.game.Game;
-import classes.player.Player;
-import classes.unit.Unit;
-import classes.unit.UnitType;
+import board.Position;
+import game.Game;
+import player.Player;
+import unit.Unit;
+import unit.UnitType;
 
 public class UnitBoughtEvent implements GameEvent {
 	private final Position position;

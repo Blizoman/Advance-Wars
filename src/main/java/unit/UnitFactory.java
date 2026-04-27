@@ -1,7 +1,7 @@
-package classes.unit;
+package unit;
 
-import classes.board.Position;
-import classes.player.Player;
+import board.Position;
+import player.Player;
 
 public class UnitFactory {
 	public Unit createUnit(UnitType type, Player player, Position position) {

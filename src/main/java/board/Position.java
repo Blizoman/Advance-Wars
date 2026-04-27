@@ -1,4 +1,4 @@
-package classes.board;
+package board;
 
 // Starting at [0,0] in TOP-LEFT corner
 public record Position(int x, int y) {

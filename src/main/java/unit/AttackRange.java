@@ -1,4 +1,4 @@
-package classes.unit;
+package unit;
 
 public record AttackRange(
 		int min,

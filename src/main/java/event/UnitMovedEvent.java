@@ -1,8 +1,8 @@
-package classes.event;
+package event;
 
-import classes.board.Position;
-import classes.game.Game;
-import classes.unit.Unit;
+import board.Position;
+import game.Game;
+import unit.Unit;
 
 public record UnitMovedEvent(Position from, Position to, int movesLeftBefore) implements GameEvent {
 	public GameEventType type() {

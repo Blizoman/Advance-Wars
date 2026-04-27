@@ -1,4 +1,4 @@
-package classes.board;
+package board;
 
 import java.util.List;
 import lombok.Getter;

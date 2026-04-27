@@ -1,11 +1,11 @@
-package classes.bot;
+package bot;
 
 import java.util.*;
-import classes.board.Position;
-import classes.game.PathFinder;
-import classes.game.Session;
-import classes.unit.Unit;
-import classes.unit.UnitType;
+import board.Position;
+import game.PathFinder;
+import game.Session;
+import unit.Unit;
+import unit.UnitType;
 
 public class DummyBot {
 	private final PathFinder pathFinder;
