@@ -21,11 +21,11 @@ public class DummyBot {
 
 		for (Unit unit : units) {
 			// move to random reachable tile
-			Set<Position> moves = pathFinder.findReachableTiles(unit);
+			Map<Position, Integer> moves = pathFinder.findReachableTiles(unit);
 			if (!moves.isEmpty()) {
-				List<Position> moveList = new ArrayList<>(moves);
+				List<Position> moveList = new ArrayList<>(moves.keySet());
 				Position target = moveList.get(random.nextInt(moveList.size()));
-				session.moveUnit(unit, target);
+				session.moveUnit(unit, target, moves.get(target));
 			}
 		}
 

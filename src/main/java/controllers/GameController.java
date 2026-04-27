@@ -2,8 +2,8 @@ package controllers;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Collections;
+import java.util.Map;
 import board.Position;
 import bot.DummyBot;
 import game.Game;
@@ -30,7 +30,7 @@ public class GameController {
 	@Getter
 	private Unit selectedUnit;
 	@Getter
-	private Set<Position> validMoves = new HashSet<>();
+	private Map<Position, Integer> moveCosts = Collections.emptyMap();
 
 	public GameController(Session session, Game game) {
 		this.session = session;
@@ -50,12 +50,12 @@ public class GameController {
 		if (selectedUnit == null) {
 			if (unit != null && unit.getPlayer() == session.getActive()) {
 				selectedUnit = unit;
-				validMoves = pathFinder.findReachableTiles(unit);
+				moveCosts = pathFinder.findReachableTiles(unit);
 				stateChanged();
 			}
 		} else {
-			if (validMoves.contains(position))
-				session.moveUnit(selectedUnit, position);
+			if (moveCosts.containsKey(position))
+				session.moveUnit(selectedUnit, position, moveCosts.get(position));
 			deselect();
 		}
 	}
@@ -125,7 +125,7 @@ public class GameController {
 
 	private void deselect() {
 		selectedUnit = null;
-		validMoves.clear();
+		moveCosts = Collections.emptyMap();
 		stateChanged();
 	}
 

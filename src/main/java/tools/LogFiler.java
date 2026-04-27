@@ -61,6 +61,7 @@ public class LogFiler {
 				case UNIT_DIED -> context.deserialize(obj, UnitDiedEvent.class);
 				case UNIT_BOUGHT -> context.deserialize(obj, UnitBoughtEvent.class);
 				case CITY_CAPTURED -> context.deserialize(obj, CityCapturedEvent.class);
+				case CAPTURE_PROGRESS -> context.deserialize(obj, CaptureProgressEvent.class);
 				case TURN_CHANGED -> context.deserialize(obj, TurnChangedEvent.class);
 				case PLAYER_ELIMINATED -> context.deserialize(obj, MultipleGameEvent.class);
 			};

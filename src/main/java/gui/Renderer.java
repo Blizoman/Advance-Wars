@@ -41,7 +41,7 @@ public class Renderer {
 
 		// draw valid move highlights
 		gc.setFill(Color.color(0, 1, 0, 0.35));
-		controller.getValidMoves().forEach(
+		controller.getMoveCosts().keySet().forEach(
 				pos -> gc.fillRect(pos.x() * TILE_SIZE, pos.y() * TILE_SIZE, TILE_SIZE, TILE_SIZE));
 
 		// draw selected unit highlight

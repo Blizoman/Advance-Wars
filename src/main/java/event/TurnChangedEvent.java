@@ -7,22 +7,18 @@ import player.Player;
 import unit.Unit;
 
 public class TurnChangedEvent implements GameEvent {
-	private final Player player;
-	private int moneyBefore;
-	private int moneyAfter;
+	private Map<Player, Integer> moneyBefore = new HashMap<>();
+	private Map<Player, Integer> moneyAfter = new HashMap<>();
 	private Map<Unit, Integer> hpBefore = new HashMap<>();
 	private Map<Unit, Integer> hpAfter = new HashMap<>();
-
-	public TurnChangedEvent(Player player) {
-		this.player = player;
-	}
 
 	public GameEventType type() {
 		return GameEventType.TURN_CHANGED;
 	}
 
 	public void execute(Game game) {
-		moneyBefore = game.getActive().getMoney();
+		// snapshot all players money before
+		game.getPlayers().forEach(p -> moneyBefore.put(p, p.getMoney()));
 		game.getGameBoard().getUnitsOf(game.getActive())
 				.forEach(u -> hpBefore.put(u, u.getHp()));
 
@@ -30,14 +26,17 @@ public class TurnChangedEvent implements GameEvent {
 		game.processIncome();
 		game.processUnits();
 
-		moneyAfter = game.getActive().getMoney();
+		// snapshot all players money after
+		game.getPlayers().forEach(p -> moneyAfter.put(p, p.getMoney()));
 		game.getGameBoard().getUnitsOf(game.getActive())
 				.forEach(u -> hpAfter.put(u, u.getHp()));
 	}
 
 	public void undo(Game game) {
-		hpAfter.forEach((unit, hp) -> unit.setHp(hp));
-		game.getActive().setMoney(moneyBefore);
+		hpAfter.forEach(Unit::setHp);
+		moneyAfter.forEach(Player::setMoney);
 		game.previousTurn();
+		moneyBefore.forEach(Player::setMoney);
+		hpBefore.forEach(Unit::setHp);
 	}
 }

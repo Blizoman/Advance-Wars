@@ -3,6 +3,7 @@ package board;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import player.Player;
 import tools.Consts;
 import unit.Unit;
@@ -18,6 +19,7 @@ public class Tile {
     @Getter
     private Unit unit = null;
     @Getter
+    @Setter
     private int captureHp = Consts.CAPTURE_HP;
 
     public boolean isEmpty() { return this.unit == null; }

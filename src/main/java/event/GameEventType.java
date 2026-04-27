@@ -6,6 +6,7 @@ public enum GameEventType {
     UNIT_ATTACKED,
     UNIT_DIED,
     CITY_CAPTURED,
+    CAPTURE_PROGRESS,
     PLAYER_ELIMINATED,
     TURN_CHANGED,
 }

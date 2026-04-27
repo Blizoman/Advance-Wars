@@ -29,10 +29,12 @@ zip: clean gh
 	zip -r $(LOGIN).zip $(LOGIN)
 	rm -rf $(LOGIN)
 
+CJF=~/Downloads/IJA-projSrcs
 copyJavas:
-	rm -rf ~/Downloads/IJA-projSrcs
-	mkdir -p ~/Downloads/IJA-projSrcs
-	find src/main/java/ -name "*.java" -exec cp {} ~/Downloads/IJA-projSrcs \;
+	rm -rf $(CJF)
+	mkdir -p $(CJF)
+# 	find src/main/java/ -name "*.java" -exec cp {} $(CJF) \;
+	find src/main/java/ \( -path "*/event/*" -o -path "*/game/*" -o -path "*/controllers/*" \) -type f -exec cp {} $(CJF)/ \;
 
 # assignment: 	https://moodle.vut.cz/mod/folder/view.php?id=667385
 # github:		https://github.com/RomanPruzinsky/IJA-proj

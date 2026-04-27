@@ -4,7 +4,6 @@ import java.util.*;
 import board.GameBoard;
 import board.Position;
 import board.Tile;
-import player.Player;
 import unit.Unit;
 
 public class PathFinder {
@@ -15,10 +14,9 @@ public class PathFinder {
 		this.board = board;
 	}
 
-	public Set<Position> findReachableTiles(Unit unit) {
+	public Map<Position, Integer> findReachableTiles(Unit unit) {
 		Position start = unit.getPosition();
 		int maxRange = unit.getMovesLeft();
-		Player player = unit.getPlayer();
 
 		PriorityQueue<Node> openSet = new PriorityQueue<>();
 		Map<Position, Integer> costAt = new HashMap<>();
@@ -33,7 +31,7 @@ public class PathFinder {
 
 			for (Position neighbor : getNeighbors(current.pos)) {
 				Unit unitAtNeighbor = board.getUnit(neighbor);
-				if (unitAtNeighbor != null && unitAtNeighbor.getPlayer() != player)
+				if (unitAtNeighbor != null && unitAtNeighbor.getPlayer() != unit.getPlayer())
 					continue;
 
 				int newCost = current.cost + getMovementCost(unit, neighbor);
@@ -50,7 +48,7 @@ public class PathFinder {
 			if (unitAtPos == null || pos.equals(start))
 				result.add(pos);
 		}
-		return result;
+		return costAt;
 	}
 
 	private List<Position> getNeighbors(Position pos) {
@@ -60,7 +58,6 @@ public class PathFinder {
 			Position neighbor = new Position(pos.x() + d[0], pos.y() + d[1]);
 			if (board.isValidPosition(neighbor))
 				neighbors.add(neighbor);
-			neighbors.add(neighbor);
 		}
 		return neighbors;
 	}

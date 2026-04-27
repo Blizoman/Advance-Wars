@@ -5,22 +5,19 @@ import board.Terrain;
 import board.Tile;
 import game.Game;
 import player.Player;
-import unit.Unit;
 
 public class CityCapturedEvent implements GameEvent {
 	private final Position position;
 	private final Terrain previousTerrain;
 	private final Player newOwner;
 	private final Player previousOwner;
-	private final Unit capturingUnit;
 
 	public CityCapturedEvent(Position position, Terrain previousTerrain,
-			Player newOwner, Player previousOwner, Unit capturingUnit) {
+			Player newOwner, Player previousOwner) {
 		this.position = position;
 		this.previousTerrain = previousTerrain;
 		this.newOwner = newOwner;
 		this.previousOwner = previousOwner;
-		this.capturingUnit = capturingUnit;
 	}
 
 	public GameEventType type() {
@@ -29,13 +26,13 @@ public class CityCapturedEvent implements GameEvent {
 
 	public void execute(Game game) {
 		Tile tile = game.getGameBoard().getTile(position);
-		if (capturingUnit != null) {
-			game.capture(tile, capturingUnit);
-		} else {
-			if (previousTerrain == Terrain.HQ)
-				tile.setTerrain(Terrain.CITY);
+		if (previousTerrain == Terrain.HQ)
+			tile.setTerrain(Terrain.CITY);
+		if (newOwner != null)
 			tile.setOwner(newOwner);
-		}
+		else
+			tile.unsetOwner();
+		tile.resetCapturableHp();
 	}
 
 	public void undo(Game game) {
