@@ -60,7 +60,6 @@ public class Session {
 	public void endTurn() {
 		game.forwardTurn();
 		log(new TurnChangedEvent(game.getActive()));
-		startTurn();
 	}
 
 	public void moveUnit(Unit unit, Position to) {

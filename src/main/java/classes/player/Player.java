@@ -13,6 +13,8 @@ public class Player {
 	private int money = Consts.STARTING_MONEY;
 	@Getter
 	private boolean isAlive = true;
+	@Getter
+	private final boolean isBot;
 
 	public void addMoney(int amount) {
 		this.money += amount;

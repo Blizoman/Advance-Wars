@@ -5,12 +5,16 @@ import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 import classes.board.Position;
+import classes.bot.DummyBot;
 import classes.game.Game;
 import classes.game.PathFinder;
 import classes.game.Session;
 import classes.player.Player;
 import classes.unit.Unit;
 import classes.unit.UnitType;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.util.Duration;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,6 +23,7 @@ public class GameController {
 	private final Session session;
 	@Getter
 	private final Game game;
+	private final DummyBot bot;
 	private final PathFinder pathFinder;
 	@Setter
 	private Runnable onStateChanged;
@@ -31,6 +36,7 @@ public class GameController {
 		this.session = session;
 		this.game = game;
 		this.pathFinder = new PathFinder(game.getGameBoard());
+		this.bot = new DummyBot(pathFinder);
 		session.setOnGameEnd($_ -> stateChanged());
 	}
 
@@ -72,10 +78,30 @@ public class GameController {
 		session.buyUnit(position, type);
 	}
 
+	public void startGame() {
+		runTurnLoop();
+	}
+
+	private void runTurnLoop() {
+		session.startTurn();
+		System.out.println(
+				"Turn: " + session.getActive().getName() + " isBot: " + session.getActive().isBot());
+		if (session.getActive().isBot()) {
+			new Timeline(new KeyFrame(Duration.millis(800), e -> {
+				bot.takeTurn(session);
+				session.endTurn();
+				stateChanged();
+				runTurnLoop();
+			})).play();
+		} else {
+			stateChanged();
+		}
+	}
+
 	public void onEndTurn() {
 		deselect();
 		session.endTurn();
-		stateChanged();
+		runTurnLoop();
 	}
 
 	public void onStepForward() {
