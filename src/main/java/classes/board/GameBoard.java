@@ -16,10 +16,11 @@ public class GameBoard {
 	private final int height;
 
 	public Tile getTile(Position position) {
-		Tile tile = this.map.get(position);
-		if (tile == null)
-			throw new IllegalStateException("Invalid position: " + position);
-		return tile;
+		return map.get(position);
+	}
+
+	public boolean isValidPosition(Position position) {
+		return map.containsKey(position);
 	}
 
 	public Position getPosition(Tile tile) {
@@ -40,7 +41,10 @@ public class GameBoard {
 	}
 
 	public Unit getUnit(Position position) {
-		return getTile(position).getUnit();
+		Tile tile = getTile(position);
+		if (tile == null)
+			return null;
+		return tile.getUnit();
 	}
 
 	public void moveUnit(Position from, Position to) {

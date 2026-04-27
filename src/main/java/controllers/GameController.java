@@ -6,7 +6,9 @@ import java.util.HashSet;
 import java.util.Set;
 import classes.board.Position;
 import classes.game.Game;
+import classes.game.PathFinder;
 import classes.game.Session;
+import classes.player.Player;
 import classes.unit.Unit;
 import classes.unit.UnitType;
 import lombok.Getter;
@@ -17,7 +19,7 @@ public class GameController {
 	private final Session session;
 	@Getter
 	private final Game game;
-
+	private final PathFinder pathFinder;
 	@Setter
 	private Runnable onStateChanged;
 	@Getter
@@ -28,14 +30,13 @@ public class GameController {
 	public GameController(Session session, Game game) {
 		this.session = session;
 		this.game = game;
+		this.pathFinder = new PathFinder(game.getGameBoard());
 		session.setOnGameEnd($_ -> stateChanged());
 	}
 
 	private void stateChanged() {
 		if (onStateChanged != null)
 			onStateChanged.run();
-		// TODO: on View set this:
-		// controller.setOnStateChanged(() -> repaint());
 	}
 
 	public void onTileClicked(Position position) {
@@ -43,7 +44,7 @@ public class GameController {
 		if (selectedUnit == null) {
 			if (unit != null && unit.getPlayer() == session.getActive()) {
 				selectedUnit = unit;
-				validMoves = new HashSet<>(); // TODO: ADO pathfinder
+				validMoves = pathFinder.findReachableTiles(unit);
 				stateChanged();
 			}
 		} else {
@@ -101,4 +102,6 @@ public class GameController {
 		validMoves.clear();
 		stateChanged();
 	}
+
+	public Player getActivePlayer() { return session.getActive(); }
 }
