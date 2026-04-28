@@ -78,22 +78,21 @@ public class Session {
 		int captureHpBefore = tile.getCaptureHp();
 		boolean wasHq = previousTerrain == Terrain.HQ;
 
-		game.capture(tile, unit);
+		game.capture(tile, unit); // execute action directly
 
 		if (tile.getOwner() != originalOwner) {
-			CityCapturedEvent event = new CityCapturedEvent(
+			// capture completed - log final state
+			execute(new CityCapturedEvent(
 					game.getGameBoard().getPosition(tile),
-					previousTerrain, tile.getOwner(), originalOwner);
-			eventLog.add(event);
-			logCursor++;
+					previousTerrain, tile.getOwner(), originalOwner, captureHpBefore));
+
 			if (wasHq)
 				eliminatePlayer(originalOwner);
 		} else {
-			CaptureProgressEvent event = new CaptureProgressEvent(
+			// partial capture - log progress only
+			execute(new CaptureProgressEvent(
 					game.getGameBoard().getPosition(tile),
-					captureHpBefore, tile.getCaptureHp());
-			eventLog.add(event);
-			logCursor++;
+					captureHpBefore, tile.getCaptureHp()));
 		}
 	}
 
@@ -108,7 +107,7 @@ public class Session {
 		game.getGameBoard().getTilesOf(player)
 				.forEach(t -> subEvents.add(new CityCapturedEvent(
 						game.getGameBoard().getPosition(t),
-						t.getTerrain(), null, player)));
+						t.getTerrain(), null, player, t.getCaptureHp())));
 
 		execute(new MultipleGameEvent(subEvents, player));
 

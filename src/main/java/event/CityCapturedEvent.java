@@ -5,20 +5,15 @@ import board.Terrain;
 import board.Tile;
 import game.Game;
 import player.Player;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 public class CityCapturedEvent implements GameEvent {
 	private final Position position;
 	private final Terrain previousTerrain;
 	private final Player newOwner;
 	private final Player previousOwner;
-
-	public CityCapturedEvent(Position position, Terrain previousTerrain,
-			Player newOwner, Player previousOwner) {
-		this.position = position;
-		this.previousTerrain = previousTerrain;
-		this.newOwner = newOwner;
-		this.previousOwner = previousOwner;
-	}
+	private final int previousCaptureHp;
 
 	public GameEventType type() {
 		return GameEventType.CITY_CAPTURED;
@@ -42,5 +37,6 @@ public class CityCapturedEvent implements GameEvent {
 			tile.unsetOwner();
 		else
 			tile.setOwner(previousOwner);
+		tile.setCaptureHp(previousCaptureHp);
 	}
 }
