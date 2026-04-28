@@ -89,10 +89,12 @@ public class MapSelectView extends VBox {
 		playerRows = new ArrayList<>();
 		playersBox.getChildren().setAll(new Label("Players:"));
 		for (int i = 0; i < count; i++) {
-			String defaultName = i < previousNames.size() && previousNames.get(i) != null && !previousNames.get(i).isBlank()
-					? previousNames.get(i)
-					: "Player " + (i + 1);
-			boolean defaultBot = i < previousBots.size() && previousBots.get(i) != null && previousBots.get(i);
+			String defaultName = i < previousNames.size() && previousNames.get(i) != null
+					&& !previousNames.get(i).isBlank()
+							? previousNames.get(i)
+							: "Player " + (i + 1);
+			boolean defaultBot =
+					i < previousBots.size() && previousBots.get(i) != null && previousBots.get(i);
 			PlayerInputRow row = createPlayerRow(i + 1, defaultName, defaultBot);
 			playerRows.add(row);
 			playersBox.getChildren().add(row.container());
@@ -103,7 +105,7 @@ public class MapSelectView extends VBox {
 		Label label = new Label("Player " + index + ":");
 		label.setMinWidth(70);
 		TextField nameField = new TextField(defaultName);
-		nameField.setPrefWidth(180);
+		nameField.setPrefWidth(160);
 		CheckBox botCheckBox = new CheckBox("Bot");
 		botCheckBox.setSelected(defaultBot);
 

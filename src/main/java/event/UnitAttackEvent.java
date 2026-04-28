@@ -41,4 +41,8 @@ public class UnitAttackEvent implements GameEvent {
 		attacker.setHp(attackerHpBefore);
 		defender.setHp(defenderHpBefore);
 	}
+
+	public gamer.Player getPlayer() {
+		return attacker.getPlayer();
+	}
 }

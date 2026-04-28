@@ -5,11 +5,16 @@ import java.util.List;
 import board.Position;
 import game.Game;
 import gamer.Player;
+import lombok.Getter;
 import unit.Unit;
 
 public class TurnChangedEvent implements GameEvent {
 	private final List<PlayerMoney> moneyBefore = new ArrayList<>();
 	private final List<UnitHp> hpBefore = new ArrayList<>();
+	@Getter
+	private gamer.Player playerBefore;
+	@Getter
+	private gamer.Player playerAfter;
 
 	private record PlayerMoney(Player player, int money) {}
 	private record UnitHp(Position position, int hp) {}
@@ -26,9 +31,11 @@ public class TurnChangedEvent implements GameEvent {
 		hpBefore.clear();
 		game.getGameBoard().getAllUnits().forEach(u -> hpBefore.add(new UnitHp(u.getPosition(), u.getHp())));
 
+		this.playerBefore = game.getActive();
 		game.forwardTurn();
 		game.processIncome();
 		game.processUnits();
+		this.playerAfter = game.getActive();
 	}
 
 	public void undo(Game game) {

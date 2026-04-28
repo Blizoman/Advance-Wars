@@ -3,12 +3,14 @@ package event;
 import board.Position;
 import game.Game;
 import gamer.Player;
+import lombok.Getter;
 import unit.Unit;
 import unit.UnitType;
 
 public class UnitBoughtEvent implements GameEvent {
 	private final Position position;
 	private final UnitType unitType;
+	@Getter
 	private final Player player;
 	private Unit createdUnit;
 

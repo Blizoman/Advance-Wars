@@ -3,6 +3,8 @@ package event;
 import board.Position;
 import board.Tile;
 import game.Game;
+import gamer.Player;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import unit.Unit;
 
@@ -13,6 +15,8 @@ public class UnitMovedEvent implements GameEvent {
 	private final int movesLeftBefore;
 	private final int actualCost;
 	private Integer fromCaptureHpBeforeReset;
+	@Getter
+	private Player player;
 
 	public GameEventType type() {
 		return GameEventType.UNIT_MOVED;
@@ -20,6 +24,7 @@ public class UnitMovedEvent implements GameEvent {
 
 	public void execute(Game game) {
 		Unit unit = game.getGameBoard().getUnit(from);
+		this.player = unit.getPlayer();
 		Tile fromTile = game.getGameBoard().getTile(from);
 		fromCaptureHpBeforeReset = null;
 		if (fromTile.getTerrain().isCapturable() && fromTile.getOwner() != unit.getPlayer()) {

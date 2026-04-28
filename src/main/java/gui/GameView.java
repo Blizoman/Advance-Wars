@@ -133,6 +133,10 @@ public class GameView extends HBox {
 		Runnable refresh = () -> {
 			Player active = controller.getActivePlayer();
 			playerLabel.setText("Turn: " + active.getName());
+			// color the player name label with player's color
+			javafx.scene.paint.Color c = active.getColor();
+			String rgb = String.format("rgb(%d,%d,%d)", (int) Math.round(c.getRed() * 255), (int) Math.round(c.getGreen() * 255), (int) Math.round(c.getBlue() * 255));
+			playerLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: " + rgb + ";");
 			moneyLabel.setText("Money: $" + active.getMoney());
 			refreshEventLog(controller);
 			renderer.render();
@@ -183,13 +187,53 @@ public class GameView extends HBox {
 				super.updateItem(event, empty);
 				if (empty || event == null) {
 					setText(null);
+					setGraphic(null);
 					setStyle("");
 					return;
 				}
 
 				int index = getIndex();
 				String marker = index == currentLogCursor - 1 ? "▶ " : index >= currentLogCursor ? "↷ " : "  ";
-				setText(marker + (index + 1) + ". " + formatEvent(event));
+				String text = marker + (index + 1) + ". " + formatEvent(event);
+
+				// handle split-color dot for TurnChangedEvent
+				if (event instanceof event.TurnChangedEvent tce && tce.getPlayerBefore() != null && tce.getPlayerAfter() != null) {
+					javafx.scene.Group splitDot = createSplitColorDot(tce.getPlayerBefore().getColor(), tce.getPlayerAfter().getColor(), 6);
+					Label lbl = new Label(text);
+					HBox hb = new HBox(8, splitDot, lbl);
+					hb.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+					setGraphic(hb);
+					setText(null);
+				} else {
+					// attempt to extract a player for coloring (single-color dot)
+					gamer.Player evPlayer = null;
+					if (event instanceof event.UnitBoughtEvent ube)
+						evPlayer = ube.getPlayer();
+					else if (event instanceof event.UnitAttackEvent uae)
+						evPlayer = uae.getPlayer();
+					else if (event instanceof event.UnitMovedEvent ume)
+						evPlayer = ume.getPlayer();
+					else if (event instanceof event.UnitDiedEvent ude)
+						evPlayer = ude.unit().getPlayer();
+					else if (event instanceof event.CaptureProgressEvent cpe)
+						evPlayer = cpe.unit() == null ? null : cpe.unit().getPlayer();
+					else if (event instanceof event.CityCapturedEvent cce)
+						evPlayer = cce.getPlayer();
+					else if (event instanceof event.MultipleGameEvent mge)
+						evPlayer = mge.player();
+
+					if (evPlayer != null) {
+						javafx.scene.shape.Circle dot = new javafx.scene.shape.Circle(6, evPlayer.getColor());
+						Label lbl = new Label(text);
+						HBox hb = new HBox(8, dot, lbl);
+						hb.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+						setGraphic(hb);
+						setText(null);
+					} else {
+						setText(text);
+						setGraphic(null);
+					}
+				}
 
 				if (index == currentLogCursor - 1) {
 					setStyle("-fx-background-color: rgba(64, 128, 255, 0.18); -fx-font-weight: bold;");
@@ -346,5 +390,22 @@ public class GameView extends HBox {
 				throw new FileNotFoundException(filename);
 			return GameBoardLoader.loadFromStream(is, players);
 		}
+	}
+
+	private javafx.scene.Group createSplitColorDot(javafx.scene.paint.Color colorLeft, javafx.scene.paint.Color colorRight, double radius) {
+		javafx.scene.Group group = new javafx.scene.Group();
+		
+		// Left half (left color)
+		javafx.scene.shape.Arc arcLeft = new javafx.scene.shape.Arc(0, 0, radius * 2, radius * 2, 90, 180);
+		arcLeft.setFill(colorLeft);
+		arcLeft.setStroke(javafx.scene.paint.Color.TRANSPARENT);
+		
+		// Right half (right color)
+		javafx.scene.shape.Arc arcRight = new javafx.scene.shape.Arc(0, 0, radius * 2, radius * 2, -90, 180);
+		arcRight.setFill(colorRight);
+		arcRight.setStroke(javafx.scene.paint.Color.TRANSPARENT);
+		
+		group.getChildren().addAll(arcLeft, arcRight);
+		return group;
 	}
 }

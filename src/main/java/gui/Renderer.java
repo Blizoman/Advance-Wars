@@ -120,6 +120,14 @@ public class Renderer {
 					Color.color(0, 0, 0, 0.35));
 		}
 
+		// colored border for buildings owned by a player
+		if (tile.getOwner() != null && (tile.getTerrain() == Terrain.CITY || tile.getTerrain() == Terrain.FACTORY || tile.getTerrain() == Terrain.HQ)) {
+			Color c = playerColor(tile.getOwner());
+			gc.setStroke(c);
+			gc.setLineWidth(Math.max(2, tileSize * 0.04));
+			gc.strokeRect(px + 2, py + 2, tileSize - 4, tileSize - 4);
+		}
+
 		gc.setStroke(Color.color(0, 0, 0, 0.15));
 		gc.strokeRect(px, py, tileSize, tileSize);
 	}
@@ -145,9 +153,9 @@ public class Renderer {
 		gc.strokeRect(px + 1, py + 1, tileSize - 2, unitBodyHeight - 2);
 
 		drawBar(gc, px, py + unitBodyHeight, tileSize, barHeight,
-				unit.getHp() / 100.0,
-				Color.LIME,
-				Color.RED);
+			unit.getHp() / 100.0,
+			playerColor(unit.getPlayer()),
+			Color.color(0.45, 0.45, 0.45));
 
 		gc.setFill(Color.WHITE);
 		gc.setFont(Font.font(Math.max(9, tileSize / 9)));
@@ -167,12 +175,7 @@ public class Renderer {
 	}
 
 	private Color playerColor(Player player) {
-		return switch (player.getName().hashCode() % 4) {
-			case 0 -> Color.DODGERBLUE;
-			case 1 -> Color.TOMATO;
-			case 2 -> Color.LIMEGREEN;
-			default -> Color.MEDIUMPURPLE;
-		};
+		return player.getColor();
 	}
 
 	private void drawBar(GraphicsContext gc, double x, double y, double width, double height,

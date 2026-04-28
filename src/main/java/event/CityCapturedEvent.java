@@ -45,4 +45,10 @@ public class CityCapturedEvent implements GameEvent {
 		if (unit != null)
 			unit.setCaptured(false);
 	}
+
+	public Player getPlayer() {
+		if (unit != null)
+			return unit.getPlayer();
+		return previousOwner;
+	}
 }
