@@ -7,6 +7,8 @@ public class UnitAttackEvent implements GameEvent {
 	private final Unit attacker;
 	private final Unit defender;
 	private int attackerHpBefore;
+	private int attackerMovesLeftBefore;
+	private boolean attackerUsedBefore;
 	private int defenderHpBefore;
 
 	public UnitAttackEvent(Unit attacker, Unit defender) {
@@ -20,10 +22,14 @@ public class UnitAttackEvent implements GameEvent {
 
 	public void execute(Game game) {
 		attackerHpBefore = attacker.getHp();
+		attackerMovesLeftBefore = attacker.getMovesLeft();
+		attackerUsedBefore = attacker.isUsed();
 		defenderHpBefore = defender.getHp();
 
 		game.dealDamage(attacker, defender);
 		attacker.setAttacked(true);
+		attacker.setMovesLeft(0);
+		attacker.setUsed(true);
 		if (defender.isDead())
 			game.removeUnit(defender);
 
@@ -42,9 +48,9 @@ public class UnitAttackEvent implements GameEvent {
 		attacker.setHp(attackerHpBefore);
 		defender.setHp(defenderHpBefore);
 		attacker.setAttacked(false);
+		attacker.setMovesLeft(attackerMovesLeftBefore);
+		attacker.setUsed(attackerUsedBefore);
 	}
 
-	public gamer.Player getPlayer() {
-		return attacker.getPlayer();
-	}
+	public gamer.Player getPlayer() { return attacker.getPlayer(); }
 }

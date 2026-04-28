@@ -96,12 +96,11 @@ public class GeminiBot {
                 bestTarget = getBestMove(unit, reachableMoves.keySet(), board, enemies, me);
             }
 
-            int cost = reachableMoves.getOrDefault(bestTarget, 0);
             boolean moved = !startPos.equals(bestTarget);
 
             // GUI RULE: Only move if target tile is completely empty, or we are staying still
             if (moved && board.getTile(bestTarget).isEmpty()) {
-                session.moveUnit(unit, bestTarget, cost);
+                session.moveUnit(unit, bestTarget);
             } else if (moved) {
                 // If the tile got occupied (should be stopped by PathFinder, but just in case)
                 bestTarget = startPos;

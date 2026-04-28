@@ -15,6 +15,7 @@ public class CityCapturedEvent implements GameEvent {
 	private final Player newOwner;
 	private final Player previousOwner;
 	private final int previousCaptureHp;
+	private Boolean previousUsed = null;
 
 	public GameEventType type() {
 		return GameEventType.CITY_CAPTURED;
@@ -30,8 +31,11 @@ public class CityCapturedEvent implements GameEvent {
 			tile.unsetOwner();
 		tile.resetCapturableHp();
 		Unit liveUnit = game.getGameBoard().getUnit(position);
-		if (liveUnit != null)
+		if (liveUnit != null) {
+			previousUsed = liveUnit.isUsed();
 			liveUnit.setCaptured(true);
+			liveUnit.setUsed(true);
+		}
 	}
 
 	public void undo(Game game) {
@@ -43,11 +47,12 @@ public class CityCapturedEvent implements GameEvent {
 			tile.setOwner(previousOwner);
 		tile.setCaptureHp(previousCaptureHp);
 		Unit liveUnit = game.getGameBoard().getUnit(position);
-		if (liveUnit != null)
+		if (liveUnit != null) {
 			liveUnit.setCaptured(false);
+			if (previousUsed != null)
+				liveUnit.setUsed(previousUsed);
+		}
 	}
 
-	public Player getPlayer() {
-		return newOwner != null ? newOwner : previousOwner;
-	}
+	public Player getPlayer() { return newOwner != null ? newOwner : previousOwner; }
 }

@@ -70,6 +70,7 @@ public class Game {
 		playerUnits.forEach(Unit::resetMovement);
 		playerUnits.forEach(Unit::resetCapture);
 		playerUnits.forEach(Unit::resetAttack);
+		playerUnits.forEach(Unit::resetUsed);
 		healUnits(playerUnits, player);
 	}
 

@@ -73,7 +73,8 @@ public class GameController {
 		}
 
 		if (selectedUnit == null) {
-			if (clickedUnit != null && clickedUnit.getPlayer() == session.getActive()) {
+			if (clickedUnit != null && clickedUnit.getPlayer() == session.getActive()
+					&& !clickedUnit.isUsed()) {
 				selectedUnit = clickedUnit;
 				attackMode = false;
 				moveCosts = pathFinder.findReachableTiles(clickedUnit);
@@ -107,6 +108,8 @@ public class GameController {
 		}
 
 		if (clickedUnit != null && clickedUnit.getPlayer() == selectedUnit.getPlayer()) {
+			if (clickedUnit.isUsed())
+				return;
 			selectedUnit = clickedUnit;
 			attackMode = false;
 			moveCosts = pathFinder.findReachableTiles(clickedUnit);
@@ -116,7 +119,7 @@ public class GameController {
 		}
 
 		if (moveCosts.containsKey(position)) {
-			session.moveUnit(selectedUnit, position, moveCosts.get(position));
+			session.moveUnit(selectedUnit, position);
 			moveCosts = pathFinder.findReachableTiles(selectedUnit);
 			attackTargets = null;
 			stateChanged();
@@ -144,6 +147,8 @@ public class GameController {
 	}
 
 	public void onWait() {
+		if (selectedUnit != null)
+			selectedUnit.setUsed(true);
 		deselect();
 	}
 

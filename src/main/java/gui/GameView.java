@@ -27,11 +27,6 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.Slider;
 import javafx.scene.control.ToolBar;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.BorderStroke;
-import javafx.scene.layout.BorderStrokeStyle;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
@@ -96,6 +91,11 @@ public class GameView extends HBox {
 			if (e.getButton() != MouseButton.PRIMARY)
 				return;
 			Position pos = renderer.screenToGrid(e.getX(), e.getY());
+			if (!controller.getGame().getGameBoard().isValidPosition(pos)) {
+				if (controller.getSelectedUnit() != null)
+					controller.onWait();
+				return;
+			}
 			controller.onTileClicked(pos);
 		});
 
@@ -242,9 +242,10 @@ public class GameView extends HBox {
 					else if (event instanceof event.UnitDiedEvent ude)
 						evPlayer = ude.getUnit().getPlayer();
 					else if (event instanceof event.CaptureProgressEvent cpe)
-						evPlayer = controller.getGame().getGameBoard().getUnit(cpe.position()) == null
+						evPlayer = controller.getGame().getGameBoard().getUnit(cpe.getPosition()) == null
 								? null
-								: controller.getGame().getGameBoard().getUnit(cpe.position()).getPlayer();
+								: controller.getGame().getGameBoard().getUnit(cpe.getPosition())
+										.getPlayer();
 					else if (event instanceof event.CityCapturedEvent cce)
 						evPlayer = cce.getPlayer();
 					else if (event instanceof event.MultipleGameEvent mge)
@@ -294,6 +295,10 @@ public class GameView extends HBox {
 		captureBtn.setPrefWidth(160);
 		captureBtn.setDisable(true);
 
+		Button waitBtn = new Button("Wait");
+		waitBtn.setPrefWidth(160);
+		waitBtn.setOnAction(e -> controller.onWait());
+
 		Label buyLabel = new Label("Buy Unit:");
 		buyLabel.setFont(Font.font(buyLabel.getFont().getFamily(), FontWeight.BOLD, 12));
 		buyLabel.setTextFill(Color.BLACK);
@@ -328,6 +333,7 @@ public class GameView extends HBox {
 				actionLabel,
 				attackBtn,
 				captureBtn,
+				waitBtn,
 				buyLabel,
 				buyInfantryBtn,
 				buyTankBtn,
@@ -368,6 +374,7 @@ public class GameView extends HBox {
 			boolean factorySelected = controller.getSelectedFactoryTile() != null;
 			attackBtn.setDisable(!unitSelected || !controller.canAttack());
 			captureBtn.setDisable(!unitSelected || !controller.canCapture());
+			waitBtn.setDisable(!unitSelected);
 			buyInfantryBtn.setDisable(!factorySelected || !controller.canBuyUnit(UnitType.INFANTRY));
 			buyTankBtn.setDisable(!factorySelected || !controller.canBuyUnit(UnitType.TANK));
 			buyCannonBtn.setDisable(!factorySelected || !controller.canBuyUnit(UnitType.CANNON));

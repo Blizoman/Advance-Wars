@@ -61,12 +61,12 @@ public class Session {
 		execute(new TurnChangedEvent());
 	}
 
-	public void moveUnit(Unit unit, Position to, Integer cost) {
+	public void moveUnit(Unit unit, Position to) {
 		Position from = unit.getPosition();
 		if (from.equals(to))
 			return;
 
-		execute(new UnitMovedEvent(from, to, unit.getMovesLeft(), cost));
+		execute(new UnitMovedEvent(from, to, unit.getMovesLeft()));
 	}
 
 	public void attack(Unit attacker, Unit defender) {

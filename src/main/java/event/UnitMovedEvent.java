@@ -13,7 +13,7 @@ public class UnitMovedEvent implements GameEvent {
 	private final Position from;
 	private final Position to;
 	private final int movesLeftBefore;
-	private final int actualCost;
+	// private final int actualCost;
 	private Integer fromCaptureHpBeforeReset;
 	@Getter
 	private Player player;
@@ -31,7 +31,8 @@ public class UnitMovedEvent implements GameEvent {
 			fromCaptureHpBeforeReset = fromTile.getCaptureHp();
 			fromTile.resetCapturableHp();
 		}
-		unit.setMovesLeft(movesLeftBefore - actualCost);
+		unit.setMovesLeft(0);
+		// unit.setMovesLeft(movesLeftBefore - actualCost);
 		game.moveUnit(unit, to);
 	}
 

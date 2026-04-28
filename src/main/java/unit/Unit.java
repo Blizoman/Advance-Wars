@@ -30,6 +30,9 @@ public class Unit {
 	private boolean captured = false;
 	@Getter
 	@Setter
+	private boolean used = false;
+	@Getter
+	@Setter
 	private boolean attacked = false;
 
 	public boolean isAlive() { return hp > 0; }
@@ -51,6 +54,10 @@ public class Unit {
 
 	public void resetMovement() {
 		this.movesLeft = this.type.getMoveRange();
+	}
+
+	public void resetUsed() {
+		this.used = false;
 	}
 
 	public void resetCapture() {
