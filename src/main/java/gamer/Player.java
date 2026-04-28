@@ -1,6 +1,5 @@
 package gamer;
 
-import java.util.concurrent.ThreadLocalRandom;
 import tools.Consts;
 import tools.PlayerColor;
 import lombok.Getter;
