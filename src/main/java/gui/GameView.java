@@ -3,7 +3,6 @@ package gui;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 import board.AvailableMaps;
 import board.GameBoard;
@@ -16,9 +15,9 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import player.Player;
+import unit.UnitType;
 
 public class GameView extends HBox {
-	private final GameController controller;
 	private final Renderer renderer;
 	private final Label playerLabel = new Label();
 	private final Label moneyLabel = new Label();
@@ -33,7 +32,6 @@ public class GameView extends HBox {
 		game.initSession();
 
 		GameController controller = new GameController(game.getSession(), game);
-		this.controller = controller;
 
 		Canvas canvas = new Canvas(880, 700);
 		this.renderer = new Renderer(canvas, controller);
@@ -65,6 +63,56 @@ public class GameView extends HBox {
 		playerLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 		moneyLabel.setStyle("-fx-font-size: 14px;");
 
+		// Action Menu (for selected unit)
+		VBox actionMenu = new VBox(5);
+		actionMenu.setStyle("-fx-border-color: #ccc; -fx-padding: 8;");
+
+		Label actionLabel = new Label("Unit Actions:");
+		actionLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 12px;");
+
+		Button attackBtn = new Button("Attack");
+		attackBtn.setPrefWidth(160);
+		attackBtn.setDisable(true);
+
+		Button captureBtn = new Button("Capture");
+		captureBtn.setPrefWidth(160);
+		captureBtn.setDisable(true);
+
+		Label buyLabel = new Label("Buy Unit:");
+		buyLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 12px;");
+
+		Button buyInfantryBtn = new Button("Infantry");
+		buyInfantryBtn.setPrefWidth(160);
+		buyInfantryBtn.setDisable(true);
+
+		Button buyTankBtn = new Button("Tank");
+		buyTankBtn.setPrefWidth(160);
+		buyTankBtn.setDisable(true);
+
+		Button buyCannonBtn = new Button("Cannon");
+		buyCannonBtn.setPrefWidth(160);
+		buyCannonBtn.setDisable(true);
+
+        
+
+		attackBtn.setOnAction(e -> {
+			controller.beginAttackMode();
+		});
+		captureBtn.setOnAction(e -> controller.onCapture());
+		buyInfantryBtn.setOnAction(e -> controller.onBuyUnit(UnitType.INFANTRY, controller.findBuyPosition()));
+		buyTankBtn.setOnAction(e -> controller.onBuyUnit(UnitType.TANK, controller.findBuyPosition()));
+		buyCannonBtn.setOnAction(e -> controller.onBuyUnit(UnitType.CANNON, controller.findBuyPosition()));
+        
+
+		actionMenu.getChildren().addAll(
+				actionLabel,
+				attackBtn,
+				captureBtn,
+				buyLabel,
+				buyInfantryBtn,
+				buyTankBtn,
+				buyCannonBtn);
+
 		Button endTurnBtn = new Button("End Turn");
 		endTurnBtn.setPrefWidth(180);
 		endTurnBtn.setOnAction(e -> controller.onEndTurn());
@@ -81,8 +129,22 @@ public class GameView extends HBox {
 		menuBtn.setPrefWidth(180);
 		menuBtn.setOnAction(e -> app.showMapSelect());
 
+		// Update action menu on state changes
+		controller.setOnStateChanged(() -> {
+			boolean unitSelected = controller.getSelectedUnit() != null;
+			boolean factorySelected = controller.getSelectedFactoryTile() != null;
+			attackBtn.setDisable(!unitSelected || !controller.canAttack());
+			captureBtn.setDisable(!unitSelected || !controller.canCapture());
+			buyInfantryBtn.setDisable(!factorySelected || !controller.canBuyUnit(UnitType.INFANTRY));
+			buyTankBtn.setDisable(!factorySelected || !controller.canBuyUnit(UnitType.TANK));
+			buyCannonBtn.setDisable(!factorySelected || !controller.canBuyUnit(UnitType.CANNON));
+            
+		});
+
 		sidebar.getChildren().addAll(
 				playerLabel, moneyLabel,
+				new Separator(),
+				actionMenu,
 				new Separator(),
 				endTurnBtn,
 				new Separator(),

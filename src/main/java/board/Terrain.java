@@ -10,7 +10,7 @@ public enum Terrain {
 	MOUNTAIN(4, false, Map.of(MovementType.FOOT, 2)),
 	WATER(0, false, Map.of()),
 	CITY(3, true, true, false, true, Map.of(MovementType.FOOT, 1, MovementType.VEHICLE, 1)),
-	FACTORY(3, true, false, true, false, Map.of(MovementType.FOOT, 1, MovementType.VEHICLE, 1)),
+	FACTORY(3, true, true, true, false, Map.of(MovementType.FOOT, 1, MovementType.VEHICLE, 1)),
 	HQ(4, true, true, false, false, Map.of(MovementType.FOOT, 1, MovementType.VEHICLE, 1));
 
 	@Getter

@@ -2,9 +2,12 @@ package controllers;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import board.Position;
+import board.Tile;
 import bot.DummyBot;
 import game.Game;
 import game.PathFinder;
@@ -13,7 +16,6 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.util.Duration;
 import lombok.Getter;
-import lombok.Setter;
 import player.Player;
 import unit.Unit;
 import unit.UnitType;
@@ -25,10 +27,13 @@ public class GameController {
 	private final Game game;
 	private final DummyBot bot;
 	private final PathFinder pathFinder;
-	@Setter
-	private Runnable onStateChanged;
+	private final List<Runnable> onStateChangedListeners = new ArrayList<>();
 	@Getter
 	private Unit selectedUnit;
+	@Getter
+	private Position selectedFactoryTile;
+	@Getter
+	private boolean attackMode;
 	@Getter
 	private Map<Position, Integer> moveCosts = Collections.emptyMap();
 
@@ -41,28 +46,89 @@ public class GameController {
 	}
 
 	private void stateChanged() {
+		for (Runnable listener : onStateChangedListeners)
+			listener.run();
+	}
+
+	public void setOnStateChanged(Runnable onStateChanged) {
 		if (onStateChanged != null)
-			onStateChanged.run();
+			onStateChangedListeners.add(onStateChanged);
 	}
 
 	public void onTileClicked(Position position) {
-		Unit unit = game.getGameBoard().getUnit(position);
+		Unit clickedUnit = game.getGameBoard().getUnit(position);
+		Tile clickedTile = game.getGameBoard().getTile(position);
+
+		if (isSelectableFactoryTile(clickedTile, position)) {
+			selectedFactoryTile = position;
+			selectedUnit = null;
+			attackMode = false;
+			moveCosts = Collections.emptyMap();
+			stateChanged();
+			return;
+		}
+
 		if (selectedUnit == null) {
-			if (unit != null && unit.getPlayer() == session.getActive()) {
-				selectedUnit = unit;
-				moveCosts = pathFinder.findReachableTiles(unit);
+			if (clickedUnit != null && clickedUnit.getPlayer() == session.getActive()) {
+				selectedUnit = clickedUnit;
+				attackMode = false;
+				moveCosts = pathFinder.findReachableTiles(clickedUnit);
 				stateChanged();
 			}
-		} else {
-			if (moveCosts.containsKey(position))
-				session.moveUnit(selectedUnit, position, moveCosts.get(position));
-			deselect();
+			return;
 		}
+
+		if (attackMode) {
+			if (clickedUnit != null && getAttackTargets().contains(clickedUnit)) {
+				session.attack(selectedUnit, clickedUnit);
+				deselect();
+				return;
+			}
+			attackMode = false;
+		}
+
+		if (position.equals(selectedUnit.getPosition()) && canCapture()) {
+			session.tryCapture(selectedUnit, game.getGameBoard().getTile(position));
+			deselect();
+			return;
+		}
+
+		if (clickedUnit != null && clickedUnit.getPlayer() != selectedUnit.getPlayer()
+				&& canSelectedUnitAttackNow()
+				&& selectedUnit.canAttackTo(clickedUnit)) {
+			session.attack(selectedUnit, clickedUnit);
+			deselect();
+			return;
+		}
+
+		if (clickedUnit != null && clickedUnit.getPlayer() == selectedUnit.getPlayer()) {
+			selectedUnit = clickedUnit;
+			attackMode = false;
+			moveCosts = pathFinder.findReachableTiles(clickedUnit);
+			stateChanged();
+			return;
+		}
+
+		if (moveCosts.containsKey(position)) {
+			session.moveUnit(selectedUnit, position, moveCosts.get(position));
+			moveCosts = pathFinder.findReachableTiles(selectedUnit);
+			stateChanged();
+			return;
+		}
+
+		deselect();
 	}
 
 	public void onAttack(Unit target) {
 		session.attack(selectedUnit, target);
 		deselect();
+	}
+
+	public void beginAttackMode() {
+		if (selectedUnit != null && canAttack()) {
+			attackMode = true;
+			stateChanged();
+		}
 	}
 
 	public void onCapture() {
@@ -75,7 +141,10 @@ public class GameController {
 	}
 
 	public void onBuyUnit(UnitType type, Position position) {
-		session.buyUnit(position, type);
+		if (position != null && game.getActive().canAfford(type.getCost())
+				&& game.getGameBoard().getTile(position).isEmpty())
+			session.buyUnit(position, type);
+		deselect();
 	}
 
 	public void startGame() {
@@ -125,9 +194,69 @@ public class GameController {
 
 	private void deselect() {
 		selectedUnit = null;
+		selectedFactoryTile = null;
+		attackMode = false;
 		moveCosts = Collections.emptyMap();
 		stateChanged();
 	}
 
+	public boolean canAttack() {
+		return canSelectedUnitAttackNow() && !getAttackTargets().isEmpty();
+	}
+
+	public List<Unit> getAttackTargets() {
+		List<Unit> targets = new ArrayList<>();
+		if (!canSelectedUnitAttackNow())
+			return targets;
+		for (Unit target : game.getGameBoard().getAllUnits()) {
+			if (target.getPlayer() != selectedUnit.getPlayer() && selectedUnit.canAttackTo(target))
+				targets.add(target);
+		}
+		return targets;
+	}
+
+	public boolean canCapture() {
+		if (selectedUnit == null)
+			return false;
+		Tile tile = game.getGameBoard().getTile(selectedUnit.getPosition());
+		return selectedUnit.getType().isCanCapture()
+				&& tile.getTerrain().isCapturable()
+				&& (tile.getOwner() == null || tile.getOwner() != selectedUnit.getPlayer());
+	}
+
+	public boolean canBuyUnit() {
+		return findBuyPosition() != null;
+	}
+
+	public boolean canBuyUnit(UnitType type) {
+		return findBuyPosition() != null && game.getActive().canAfford(type.getCost());
+	}
+
+	public Position findBuyPosition() {
+		if (selectedFactoryTile == null)
+			return null;
+
+		Tile tile = game.getGameBoard().getTile(selectedFactoryTile);
+		if (tile == null)
+			return null;
+		if (!isSelectableFactoryTile(tile, selectedFactoryTile))
+			return null;
+		return selectedFactoryTile;
+	}
+
+	private boolean isSelectableFactoryTile(Tile tile, Position position) {
+		return tile != null
+				&& tile.getTerrain().isProduceUnits()
+				&& tile.getOwner() == session.getActive()
+				&& tile.isEmpty()
+				&& position != null;
+	}
+
 	public Player getActivePlayer() { return session.getActive(); }
+
+	private boolean canSelectedUnitAttackNow() {
+		return selectedUnit != null
+				&& (selectedUnit.getType().isCanAttackAfterMove()
+						|| selectedUnit.getMovesLeft() == selectedUnit.getType().getMoveRange());
+	}
 }

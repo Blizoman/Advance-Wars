@@ -5,6 +5,8 @@ import player.Player;
 
 public class UnitFactory {
 	public Unit createUnit(UnitType type, Player player, Position position) {
-		return new Unit(player, type, position);
+		Unit unit = new Unit(player, type, position);
+		unit.resetMovement();
+		return unit;
 	}
 }

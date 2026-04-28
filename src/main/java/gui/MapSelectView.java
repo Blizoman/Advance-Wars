@@ -54,18 +54,6 @@ public class MapSelectView extends VBox {
 			AvailableMaps.MapMetadata selected = mapList.getSelectionModel().getSelectedItem();
 			if (selected == null)
 				return;
-
-			List<String> names = nameFields.stream()
-					.limit(selected.players())
-					.map(TextField::getText)
-					.filter(s -> !s.isBlank())
-					.toList();
-
-			if (names.size() < selected.players()) {
-				new Alert(Alert.AlertType.WARNING, "Fill in all player names!").show();
-				return;
-			}
-
 			app.showGame(selected, players);
 		});
 
