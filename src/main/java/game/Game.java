@@ -27,6 +27,9 @@ public class Game {
 	private final ArrayList<Player> players;
 
 	@Getter
+	private final List<Player> initialPlayers;
+
+	@Getter
 	private int currentPlayerIndex = 0;
 
 	private final UnitFactory unitFactory = new UnitFactory();
@@ -34,6 +37,7 @@ public class Game {
 	public Game(GameBoard gameBoard, List<Player> players) {
 		this.gameBoard = gameBoard;
 		this.players = new ArrayList<>(players);
+		this.initialPlayers = new ArrayList<>(players);
 
 		List<Tile> hqs = this.gameBoard.getAllTiles().stream()
 				.filter(t -> t.getTerrain() == Terrain.HQ)
@@ -154,6 +158,6 @@ public class Game {
 	}
 
 	public void saveSession(Path path, board.AvailableMaps.MapMetadata map) throws IOException {
-		LogFiler.save(session.getEventLog(), path, map, this.players);
+		LogFiler.save(session.getEventLog(), path, map, this.initialPlayers);
 	}
 }

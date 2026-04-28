@@ -2,6 +2,7 @@ package gui;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.function.Consumer;
 import board.AvailableMaps;
 import gamer.Player;
 import javafx.application.Application;
@@ -36,7 +37,11 @@ public class App extends Application {
 	}
 
 	public void showGameEnd(Player winner) {
-		stage.setScene(new Scene(new GameEndView(this, winner), 400, 300));
+		showGameEnd(winner, null);
+	}
+
+	public void showGameEnd(Player winner, Consumer<Path> onExport) {
+		stage.setScene(new Scene(new GameEndView(this, winner, onExport), 400, 340));
 	}
 
 	public Path chooseLoadReplayFile() {

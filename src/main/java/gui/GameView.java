@@ -139,7 +139,13 @@ public class GameView extends HBox {
 		};
 		controller.setOnStateChanged(refresh);
 
-		game.getSession().setOnGameEnd(winner -> app.showGameEnd(winner));
+		game.getSession().setOnGameEnd(winner -> app.showGameEnd(winner, exportPath -> {
+			try {
+				controller.onSave(exportPath, finalMap);
+			} catch (IOException ex) {
+				throw new RuntimeException("Failed to export replay", ex);
+			}
+		}));
 
 		getChildren().addAll(mapPanel, buildSidebar(app, controller));
 

@@ -9,8 +9,12 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
 
 public class MapSelectView extends VBox {
+	private final VBox playersBox = new VBox(8);
+	private List<PlayerInputRow> playerRows = new ArrayList<>();
+
 	public MapSelectView(App app) {
 		setSpacing(12);
 		setPadding(new Insets(20));
@@ -19,22 +23,6 @@ public class MapSelectView extends VBox {
 
 		Label title = new Label("Advance Wars");
 		title.setStyle("-fx-font-size: 32px; -fx-font-weight: bold;");
-
-		// player name fields
-		List<TextField> nameFields = List.of(
-				new TextField("Player 1"),
-				new TextField("Player 2"),
-				new TextField("Player 3"),
-				new TextField("Player 4"));
-
-
-		List<Player> players = new ArrayList<>();
-		players.add(new Player(nameFields.get(0).getText(), false));
-		players.add(new Player(nameFields.get(1).getText(), false));
-
-		VBox namesBox = new VBox(5);
-		namesBox.getChildren().add(new Label("Player Names:"));
-		namesBox.getChildren().addAll(nameFields);
 
 		// map list
 		ListView<AvailableMaps.MapMetadata> mapList = new ListView<>();
@@ -51,13 +39,20 @@ public class MapSelectView extends VBox {
 		});
 		mapList.getSelectionModel().selectFirst();
 
+		playersBox.getChildren().add(new Label("Players:"));
+		mapList.getSelectionModel().selectedItemProperty().addListener((obs, oldMap, selectedMap) -> {
+			if (selectedMap != null)
+				refreshPlayerRows(selectedMap.players());
+		});
+		refreshPlayerRows(mapList.getSelectionModel().getSelectedItem().players());
+
 		Button startBtn = new Button("Start Game");
 		startBtn.setStyle("-fx-font-size: 16px;");
 		startBtn.setOnAction(e -> {
 			AvailableMaps.MapMetadata selected = mapList.getSelectionModel().getSelectedItem();
 			if (selected == null)
 				return;
-			app.showGame(selected, players);
+			app.showGame(selected, buildPlayers());
 		});
 
 		Button loadReplayBtn = new Button("Load Replay");
@@ -69,17 +64,65 @@ public class MapSelectView extends VBox {
 			Path replayLog = app.chooseLoadReplayFile();
 			if (replayLog == null)
 				return;
-			app.showGame(selected, players, replayLog);
+			app.showGame(selected, buildPlayers(), replayLog);
 		});
 
 		getChildren().addAll(
 				title,
 				new Label("Select Map:"),
 				mapList,
-				namesBox,
+				playersBox,
 				startBtn,
 				loadReplayBtn);
 
 		setMinWidth(520);
 	}
+
+	private void refreshPlayerRows(int count) {
+		List<String> previousNames = playerRows.stream()
+				.map(row -> row.nameField().getText())
+				.toList();
+		List<Boolean> previousBots = playerRows.stream()
+				.map(row -> row.botCheckBox().isSelected())
+				.toList();
+
+		playerRows = new ArrayList<>();
+		playersBox.getChildren().setAll(new Label("Players:"));
+		for (int i = 0; i < count; i++) {
+			String defaultName = i < previousNames.size() && previousNames.get(i) != null && !previousNames.get(i).isBlank()
+					? previousNames.get(i)
+					: "Player " + (i + 1);
+			boolean defaultBot = i < previousBots.size() && previousBots.get(i) != null && previousBots.get(i);
+			PlayerInputRow row = createPlayerRow(i + 1, defaultName, defaultBot);
+			playerRows.add(row);
+			playersBox.getChildren().add(row.container());
+		}
+	}
+
+	private PlayerInputRow createPlayerRow(int index, String defaultName, boolean defaultBot) {
+		Label label = new Label("Player " + index + ":");
+		label.setMinWidth(70);
+		TextField nameField = new TextField(defaultName);
+		nameField.setPrefWidth(180);
+		CheckBox botCheckBox = new CheckBox("Bot");
+		botCheckBox.setSelected(defaultBot);
+
+		HBox row = new HBox(10, label, nameField, botCheckBox);
+		row.setAlignment(Pos.CENTER_LEFT);
+		return new PlayerInputRow(row, nameField, botCheckBox);
+	}
+
+	private List<Player> buildPlayers() {
+		List<Player> players = new ArrayList<>();
+		for (int i = 0; i < playerRows.size(); i++) {
+			PlayerInputRow row = playerRows.get(i);
+			String name = row.nameField().getText();
+			if (name == null || name.isBlank())
+				name = "Player " + (i + 1);
+			players.add(new Player(name, row.botCheckBox().isSelected()));
+		}
+		return players;
+	}
+
+	private record PlayerInputRow(HBox container, TextField nameField, CheckBox botCheckBox) {}
 }
