@@ -18,7 +18,7 @@ public class AvailableMaps {
 			new MapMetadata("ASYMETRIC", "map2", 3),
 			new MapMetadata("BOT-ADVANTAGE", "map3", 2),
 			new MapMetadata("BOT-ADVANTAGE 2", "map_3p_hard", 3),
-			new MapMetadata("tactical", "tactical", 2)//
+			new MapMetadata("tactical", "tactical", 3)//
 	);
 
 	public static String getFilename(MapMetadata map) {

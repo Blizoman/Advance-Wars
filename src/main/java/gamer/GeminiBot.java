@@ -1,7 +1,6 @@
 package gamer;
 
 import java.util.*;
-
 import board.GameBoard;
 import board.Position;
 import board.Terrain;
@@ -15,27 +14,66 @@ public class GeminiBot {
     private final PathFinder pathFinder;
     private final Random random = new Random();
 
+    private Iterator<Unit> unitIterator;
+    private Iterator<Tile> factoryIterator;
+    private boolean isTurnActive = false;
+
+    // Cache for the threat map
+    private Set<Position> threatMap = new HashSet<>();
+
     public GeminiBot(PathFinder pathFinder) {
         this.pathFinder = pathFinder;
     }
 
-    public void takeTurn(Session session) {
+    private void startTurn(Session session) {
         Player me = session.getActive();
         GameBoard board = session.getGameBoard();
-        List<Unit> myUnits = new ArrayList<>(board.getUnitsOf(me));
+
+        unitIterator = new ArrayList<>(board.getUnitsOf(me)).iterator();
+        factoryIterator = board.getTilesOf(me).stream()
+                .filter(t -> t.getTerrain().isProduceUnits() && t.isEmpty())
+                .toList()
+                .iterator();
+
+        // Calculate threat map at the start of the turn
+        threatMap.clear();
+        List<Unit> enemies = board.getAllUnits().stream()
+                .filter(u -> u.getPlayer() != me && u.isAlive())
+                .toList();
+        for (Unit enemy : enemies) {
+            Map<Position, Integer> enemyReach = pathFinder.findReachableTiles(enemy);
+            for (Position reachablePos : enemyReach.keySet()) {
+                // Add tiles the enemy can reach to attack
+                int attackRange = enemy.getType().getAttackRange().max();
+                threatMap.addAll(getTilesInRange(reachablePos, attackRange, board));
+            }
+        }
+
+        isTurnActive = true;
+    }
+
+    public boolean performNextAction(Session session) {
+        if (!isTurnActive) {
+            startTurn(session);
+        }
+
+        Player me = session.getActive();
+        GameBoard board = session.getGameBoard();
         List<Unit> enemies = board.getAllUnits().stream()
                 .filter(u -> u.getPlayer() != me && u.isAlive())
                 .toList();
 
-        // 1. UNIT ACTIONS (Move -> Capture/Attack)
-        for (Unit unit : myUnits) {
+        // PHASE 1: Move and attack
+        if (unitIterator != null && unitIterator.hasNext()) {
+            Unit unit = unitIterator.next();
+            if (!unit.isAlive())
+                return true;
+
             Position startPos = unit.getPosition();
             Map<Position, Integer> reachableMoves = pathFinder.findReachableTiles(unit);
-
             Position bestTarget = startPos;
-
-            // Special rule for CANNON: if we can already hit someone, don't move.
             boolean shouldStayToShoot = false;
+
             if (!unit.getType().isCanAttackAfterMove()) {
                 for (Unit enemy : enemies) {
                     if (unit.canAttackTo(enemy)) {
@@ -49,56 +87,49 @@ public class GeminiBot {
                 bestTarget = getBestMove(unit, reachableMoves.keySet(), board, enemies, me);
             }
 
-            // Move the unit (Session ignores if start == target)
             int cost = reachableMoves.getOrDefault(bestTarget, 0);
             session.moveUnit(unit, bestTarget, cost);
 
-            // Determine what to do after moving
             boolean moved = !startPos.equals(unit.getPosition());
             Tile currentTile = board.getTile(unit.getPosition());
-
-            // Try to Capture
             boolean onEnemyOrNeutralBuilding =
                     currentTile.getTerrain().isCapturable() && currentTile.getOwner() != me;
+
             if (unit.getType().isCanCapture() && onEnemyOrNeutralBuilding) {
                 session.tryCapture(unit, currentTile);
-            }
-            // Try to Attack
-            else if (!moved || unit.getType().isCanAttackAfterMove()) {
+            } else if (!moved || unit.getType().isCanAttackAfterMove()) {
                 Unit targetEnemy = getBestEnemyToAttack(unit, enemies);
                 if (targetEnemy != null) {
                     session.attack(unit, targetEnemy);
                 }
             }
+            return true;
         }
 
-        // 2. PRODUCTION PHASE
-        // Get all UnitTypes sorted by cost descending (buy the strongest we can)
-        List<UnitType> availableTypes = Arrays.asList(UnitType.values());
-        availableTypes.sort((a, b) -> Integer.compare(b.getCost(), a.getCost()));
+        // PHASE 2: Buy units
+        if (factoryIterator != null && factoryIterator.hasNext()) {
+            Tile t = factoryIterator.next();
+            if (!t.isEmpty())
+                return true;
 
-        // Find empty factories we own
-        board.getTilesOf(me).stream()
-                .filter(t -> t.getTerrain().isProduceUnits() && t.isEmpty())
-                .forEach(t -> {
-                    for (UnitType type : availableTypes) {
-                        if (me.canAfford(type.getCost())) {
-                            session.buyUnit(board.getPosition(t), type);
-                            break; // Stop checking types once we bought one for this factory
-                        }
-                    }
-                });
+            buySmartUnit(session, board.getPosition(t), me, enemies);
+            return true;
+        }
+
+        isTurnActive = false;
+        return false;
     }
-
-    // --- AI Heuristics ---
 
     private Position getBestMove(Unit unit, Set<Position> reachable, GameBoard board,
             List<Unit> enemies, Player me) {
         Position bestMove = unit.getPosition();
         int bestScore = Integer.MIN_VALUE;
 
+        // Determine if we are in "early game" (greedy phase)
+        boolean earlyGame = board.getUnitsOf(me).size() < 6;
+
         for (Position pos : reachable) {
-            int score = evaluatePosition(unit, pos, board, enemies, me);
+            int score = evaluatePosition(unit, pos, board, enemies, me, earlyGame);
             if (score > bestScore) {
                 bestScore = score;
                 bestMove = pos;
@@ -108,74 +139,154 @@ public class GeminiBot {
     }
 
     private int evaluatePosition(Unit unit, Position pos, GameBoard board, List<Unit> enemies,
-            Player me) {
+            Player me, boolean earlyGame) {
         int score = 0;
         Tile tile = board.getTile(pos);
 
-        // 1. Capturable Target Evaluation (Only Infantry care about this)
+        // 1. Capture Priority
         if (unit.getType().isCanCapture() && tile.getTerrain().isCapturable()
                 && tile.getOwner() != me) {
             if (tile.getTerrain() == Terrain.HQ)
-                score += 1000;
+                score += 2000;
             else if (tile.getTerrain() == Terrain.FACTORY)
-                score += 500;
+                score += 800;
             else if (tile.getTerrain() == Terrain.CITY)
-                score += 300;
+                score += earlyGame ? 600 : 300;
 
-            // Bonus if it's already partially captured
             if (tile.getCaptureHp() < 20)
-                score += 50;
+                score += 100;
         }
 
-        // 2. Defensive Terrain Bonuses (Everyone likes cover)
-        score += tile.getTerrain().getDefenseBonus() * 10;
+        // 2. Defense and Healing
+        score += tile.getTerrain().getDefenseBonus() * 15;
+        if (unit.getHp() <= 60 && tile.getTerrain().isHeals() && tile.getOwner() == me) {
+            score += 200; // Prioritize resting if hurt
+        }
 
-        // 3. Combat Positioning (Can we hit an enemy from here?)
-        // (Assuming we simulate being at 'pos' to check distances)
+        // 3. Threat Map Avoidance
+        if (threatMap.contains(pos)) {
+            // Penalize moving squishy units into danger unless capturing HQ
+            if (unit.getType() == UnitType.INFANTRY && tile.getTerrain() != Terrain.HQ) {
+                score -= 300;
+            } else if (unit.getHp() < 50) {
+                score -= 200; // Damaged units avoid danger
+            }
+        }
+
+        // 4. Attack Positioning
         if (unit.getType().isCanAttackAfterMove()) {
             for (Unit enemy : enemies) {
                 int distance = pos.distanceTo(enemy.getPosition());
                 if (unit.getType().getAttackRange().canReach(distance)) {
-                    // Bonus points for being able to shoot something
-                    score += 150;
-                    // Extra bonus if we deal good damage against this type
-                    score += unit.getType().getDamageAgainst(enemy.getType());
+                    int potentialDamage = unit.getType().getDamageAgainst(enemy.getType());
+                    score += potentialDamage * 2; // Weight high damage moves
+                    if (enemy.getHp() <= potentialDamage) {
+                        score += 300; // Bonus for securing a kill
+                    }
                 }
             }
         } else {
-            // If it's a Cannon and it moves, it can't attack this turn. 
-            // So we just want to move closer to enemies without getting into range 1.
+            // For CANNON/Rockets, try to get just outside enemy movement range
             for (Unit enemy : enemies) {
                 int distance = pos.distanceTo(enemy.getPosition());
-                if (distance == 2 || distance == 3) {
-                    score += 100; // Good positioning for next turn
+                if (unit.getType().getAttackRange().canReach(distance)) {
+                    score += 150; // Good position to shoot next turn
+                    if (!threatMap.contains(pos)) {
+                        score += 200; // Safe position to shoot next turn!
+                    }
                 }
             }
         }
 
-        // 4. Random noise to break ties and prevent infinite loops
-        score += random.nextInt(10);
+        // Move towards the general direction of enemies or neutral cities if nothing else to do
+        if (score < 100) {
+            score -= closestTargetDistance(pos, board, enemies, unit.getType().isCanCapture(), me);
+        }
 
+        score += random.nextInt(10);
         return score;
+    }
+
+    private int closestTargetDistance(Position pos, GameBoard board, List<Unit> enemies,
+            boolean canCapture, Player me) {
+        int minDistance = Integer.MAX_VALUE;
+        if (canCapture) {
+            for (Tile t : board.getAllTiles()) {
+                if (t.getTerrain().isCapturable() && t.getOwner() != me) {
+                    minDistance = Math.min(minDistance, pos.distanceTo(board.getPosition(t)));
+                }
+            }
+        } else {
+            for (Unit enemy : enemies) {
+                minDistance = Math.min(minDistance, pos.distanceTo(enemy.getPosition()));
+            }
+        }
+        return minDistance;
     }
 
     private Unit getBestEnemyToAttack(Unit attacker, List<Unit> enemies) {
         Unit bestTarget = null;
-        int maxDamage = -1;
+        int bestScore = -1;
 
         for (Unit enemy : enemies) {
             if (enemy.isAlive() && attacker.canAttackTo(enemy)) {
-                // Determine base damage against this specific target
                 int damage = attacker.getType().getDamageAgainst(enemy.getType());
+                int score = damage;
 
-                // Prioritize lower HP enemies to finish them off, or high damage targets
-                if (damage > maxDamage || (damage == maxDamage && bestTarget != null
-                        && enemy.getHp() < bestTarget.getHp())) {
-                    maxDamage = damage;
+                // Prioritize kills
+                if (damage >= enemy.getHp()) {
+                    score += 500;
+                }
+                // Prioritize expensive units
+                score += enemy.getType().getCost() / 100;
+
+                if (score > bestScore) {
+                    bestScore = score;
                     bestTarget = enemy;
                 }
             }
         }
         return bestTarget;
+    }
+
+    private void buySmartUnit(Session session, Position pos, Player me, List<Unit> enemies) {
+        int money = me.getMoney();
+
+        // Count enemy types
+        long enemyInfantry = enemies.stream().filter(u -> u.getType() == UnitType.INFANTRY).count();
+        long enemyTanks = enemies.stream()
+                .filter(u -> u.getType() == UnitType.TANK || u.getType() == UnitType.TANK)
+                .count();
+
+        UnitType toBuy = null;
+
+        // Rock-Paper-Scissors buying logic
+        if (money >= UnitType.TANK.getCost() && enemyTanks > 2) {
+            toBuy = UnitType.TANK; // Counter heavy armor
+        } else if (money >= UnitType.CANNON.getCost() && enemyInfantry > 3) {
+            toBuy = UnitType.CANNON; // Good against swarms if protected
+        } else if (money >= UnitType.TANK.getCost()) {
+            toBuy = UnitType.TANK; // Solid default
+        } else if (money >= UnitType.INFANTRY.getCost()) {
+            toBuy = UnitType.INFANTRY; // Always buy something if possible
+        }
+
+        if (toBuy != null) {
+            session.buyUnit(pos, toBuy);
+        }
+    }
+
+    // Helper to get all tiles within a specific range
+    private Set<Position> getTilesInRange(Position center, int range, GameBoard board) {
+        Set<Position> tiles = new HashSet<>();
+        for (int x = center.x() - range; x <= center.x() + range; x++) {
+            for (int y = center.y() - range; y <= center.y() + range; y++) {
+                Position p = new Position(x, y);
+                if (board.isValidPosition(p) && center.distanceTo(p) <= range) {
+                    tiles.add(p);
+                }
+            }
+        }
+        return tiles;
     }
 }
