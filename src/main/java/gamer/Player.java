@@ -2,6 +2,7 @@ package gamer;
 
 import java.util.concurrent.ThreadLocalRandom;
 import tools.Consts;
+import tools.PlayerColor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -20,12 +21,7 @@ public class Player {
 	@Getter
 	private final boolean isBot;
 	@Getter
-	private final Color color = randomColor();
-
-	private static Color randomColor() {
-		double hue = ThreadLocalRandom.current().nextDouble() * 360.0;
-		return Color.hsb(hue, 0.62, 0.92);
-	}
+	private final Color color = PlayerColor.randomColor();
 
 	public void addMoney(int amount) {
 		this.money += amount;
