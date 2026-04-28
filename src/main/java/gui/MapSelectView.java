@@ -10,6 +10,9 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 
 public class MapSelectView extends VBox {
 	private final VBox playersBox = new VBox(8);
@@ -22,14 +25,15 @@ public class MapSelectView extends VBox {
 		setFillWidth(true);
 
 		Label title = new Label("Advance Wars");
-		title.setStyle("-fx-font-size: 32px; -fx-font-weight: bold;");
+		title.setFont(Font.font(title.getFont().getFamily(), FontWeight.BOLD, 32));
+		title.setTextFill(Color.BLACK);
 
 		// map list
 		ListView<AvailableMaps.MapMetadata> mapList = new ListView<>();
 		mapList.getItems().addAll(AvailableMaps.getAvailableMaps());
 		mapList.setPrefHeight(220);
 		mapList.setPrefWidth(420);
-		mapList.setCellFactory(lv -> new ListCell<>() {
+		mapList.setCellFactory(lv -> new ListCell<AvailableMaps.MapMetadata>() {
 			@Override
 			protected void updateItem(AvailableMaps.MapMetadata item, boolean empty) {
 				super.updateItem(item, empty);
@@ -39,7 +43,9 @@ public class MapSelectView extends VBox {
 		});
 		mapList.getSelectionModel().selectFirst();
 
-		playersBox.getChildren().add(new Label("Players:"));
+		Label playersLabel = new Label("Players:");
+		playersLabel.setTextFill(Color.BLACK);
+		playersBox.getChildren().add(playersLabel);
 		mapList.getSelectionModel().selectedItemProperty().addListener((obs, oldMap, selectedMap) -> {
 			if (selectedMap != null)
 				refreshPlayerRows(selectedMap.players());
@@ -47,7 +53,7 @@ public class MapSelectView extends VBox {
 		refreshPlayerRows(mapList.getSelectionModel().getSelectedItem().players());
 
 		Button startBtn = new Button("Start Game");
-		startBtn.setStyle("-fx-font-size: 16px;");
+		startBtn.setFont(Font.font(startBtn.getFont().getFamily(), 16));
 		startBtn.setOnAction(e -> {
 			AvailableMaps.MapMetadata selected = mapList.getSelectionModel().getSelectedItem();
 			if (selected == null)
@@ -56,7 +62,7 @@ public class MapSelectView extends VBox {
 		});
 
 		Button loadReplayBtn = new Button("Load Replay");
-		loadReplayBtn.setStyle("-fx-font-size: 16px;");
+		loadReplayBtn.setFont(Font.font(loadReplayBtn.getFont().getFamily(), 16));
 		loadReplayBtn.setOnAction(e -> {
 			AvailableMaps.MapMetadata selected = mapList.getSelectionModel().getSelectedItem();
 			if (selected == null)
@@ -67,9 +73,11 @@ public class MapSelectView extends VBox {
 			app.showGame(selected, buildPlayers(), replayLog);
 		});
 
+		Label selectMapLabel = new Label("Select Map:");
+		selectMapLabel.setTextFill(Color.BLACK);
 		getChildren().addAll(
 				title,
-				new Label("Select Map:"),
+				selectMapLabel,
 				mapList,
 				playersBox,
 				startBtn,
@@ -87,7 +95,9 @@ public class MapSelectView extends VBox {
 				.toList();
 
 		playerRows = new ArrayList<>();
-		playersBox.getChildren().setAll(new Label("Players:"));
+		Label refreshedPlayersLabel = new Label("Players:");
+		refreshedPlayersLabel.setTextFill(Color.BLACK);
+		playersBox.getChildren().setAll(refreshedPlayersLabel);
 		for (int i = 0; i < count; i++) {
 			String defaultName = i < previousNames.size() && previousNames.get(i) != null
 					&& !previousNames.get(i).isBlank()
@@ -104,6 +114,7 @@ public class MapSelectView extends VBox {
 	private PlayerInputRow createPlayerRow(int index, String defaultName, boolean defaultBot) {
 		Label label = new Label("Player " + index + ":");
 		label.setMinWidth(70);
+		label.setTextFill(Color.BLACK);
 		TextField nameField = new TextField(defaultName);
 		nameField.setPrefWidth(160);
 		CheckBox botCheckBox = new CheckBox("Bot");

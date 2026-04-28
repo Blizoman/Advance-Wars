@@ -23,6 +23,7 @@ public class UnitAttackEvent implements GameEvent {
 		defenderHpBefore = defender.getHp();
 
 		game.dealDamage(attacker, defender);
+		attacker.setAttacked(true);
 		if (defender.isDead())
 			game.removeUnit(defender);
 
@@ -40,6 +41,7 @@ public class UnitAttackEvent implements GameEvent {
 			game.placeUnit(attacker);
 		attacker.setHp(attackerHpBefore);
 		defender.setHp(defenderHpBefore);
+		attacker.setAttacked(false);
 	}
 
 	public gamer.Player getPlayer() {

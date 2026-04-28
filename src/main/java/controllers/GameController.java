@@ -161,12 +161,24 @@ public class GameController {
 
 	private void runTurnLoop() {
 		if (session.getActive().isBot()) {
-			new Timeline(new KeyFrame(Duration.millis(800), e -> {
-				bot.takeTurn(session);
-				session.endTurn();
-				stateChanged();
-				runTurnLoop();
-			})).play();
+			// Using an indefinite timeline to tick actions one by one
+			Timeline botTimeline = new Timeline();
+			botTimeline.setCycleCount(Timeline.INDEFINITE);
+
+			KeyFrame frame = new KeyFrame(Duration.millis(500), e -> {
+				boolean hasMoreActions = bot.performNextAction(session);
+				stateChanged(); // Redraw screen after every single move
+
+				if (!hasMoreActions) {
+					botTimeline.stop();
+					session.endTurn();
+					stateChanged();
+					runTurnLoop(); // Move to the next player
+				}
+			});
+
+			botTimeline.getKeyFrames().add(frame);
+			botTimeline.play();
 		} else {
 			stateChanged();
 		}
@@ -255,6 +267,7 @@ public class GameController {
 
 	private boolean canSelectedUnitAttackNow() {
 		return selectedUnit != null
+				&& !selectedUnit.isAttacked()
 				&& (selectedUnit.getType().isCanAttackAfterMove()
 						|| selectedUnit.getMovesLeft() == selectedUnit.getType().getMoveRange());
 	}

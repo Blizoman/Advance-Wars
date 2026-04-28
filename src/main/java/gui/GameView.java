@@ -26,8 +26,16 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.Slider;
 import javafx.scene.control.ToolBar;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.*;
 import javafx.scene.input.MouseButton;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import unit.UnitType;
 import tools.LogFiler;
 
@@ -112,15 +120,18 @@ public class GameView extends HBox {
 		zoomSlider.valueProperty().addListener((obs, oldValue, newValue) -> applyZoom.run());
 
 		Button zoomOutBtn = new Button("-");
-		zoomOutBtn.setOnAction(e -> zoomSlider.setValue(Math.max(zoomSlider.getMin(), zoomSlider.getValue() - 0.05)));
+		zoomOutBtn.setOnAction(
+				e -> zoomSlider.setValue(Math.max(zoomSlider.getMin(), zoomSlider.getValue() - 0.05)));
 
 		Button zoomInBtn = new Button("+");
-		zoomInBtn.setOnAction(e -> zoomSlider.setValue(Math.min(zoomSlider.getMax(), zoomSlider.getValue() + 0.05)));
+		zoomInBtn.setOnAction(
+				e -> zoomSlider.setValue(Math.min(zoomSlider.getMax(), zoomSlider.getValue() + 0.05)));
 
 		Button resetZoomBtn = new Button("100%");
 		resetZoomBtn.setOnAction(e -> zoomSlider.setValue(1.0));
 
-		ToolBar mapToolbar = new ToolBar(zoomOutBtn, zoomSlider, zoomValueLabel, zoomInBtn, resetZoomBtn);
+		ToolBar mapToolbar =
+				new ToolBar(zoomOutBtn, zoomSlider, zoomValueLabel, zoomInBtn, resetZoomBtn);
 		mapToolbar.setMinHeight(36);
 		mapToolbar.setPrefHeight(36);
 		mapToolbar.setMaxWidth(Double.MAX_VALUE);
@@ -135,8 +146,7 @@ public class GameView extends HBox {
 			playerLabel.setText("Turn: " + active.getName());
 			// color the player name label with player's color
 			javafx.scene.paint.Color c = active.getColor();
-			String rgb = String.format("rgb(%d,%d,%d)", (int) Math.round(c.getRed() * 255), (int) Math.round(c.getGreen() * 255), (int) Math.round(c.getBlue() * 255));
-			playerLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: " + rgb + ";");
+			playerLabel.setTextFill(c);
 			moneyLabel.setText("Money: $" + active.getMoney());
 			refreshEventLog(controller);
 			renderer.render();
@@ -165,8 +175,10 @@ public class GameView extends HBox {
 		sidebar.setPrefWidth(520);
 		sidebar.setMinWidth(480);
 
-		playerLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-		moneyLabel.setStyle("-fx-font-size: 14px;");
+		playerLabel.setFont(Font.font(playerLabel.getFont().getFamily(), FontWeight.BOLD, 16));
+		playerLabel.setTextFill(Color.BLACK);
+		moneyLabel.setFont(Font.font(moneyLabel.getFont().getFamily(), 14));
+		moneyLabel.setTextFill(Color.BLACK);
 
 		VBox actionPanel = new VBox(8);
 		actionPanel.setPrefWidth(230);
@@ -177,29 +189,42 @@ public class GameView extends HBox {
 		logPanel.setMinWidth(230);
 
 		Label historyLabel = new Label("Event History");
-		historyLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 12px;");
+		historyLabel.setFont(Font.font(historyLabel.getFont().getFamily(), FontWeight.BOLD, 12));
+		historyLabel.setTextFill(Color.BLACK);
 		eventLogView.setPrefHeight(540);
 		eventLogView.setFocusTraversable(false);
-		eventLogView.setPlaceholder(new Label("No events yet"));
+		Label emptyPlaceholder = new Label("No events yet");
+		emptyPlaceholder.setTextFill(Color.BLACK);
+		eventLogView.setPlaceholder(emptyPlaceholder);
 		eventLogView.setCellFactory(list -> new ListCell<>() {
 			@Override
 			protected void updateItem(GameEvent event, boolean empty) {
 				super.updateItem(event, empty);
+				setOpacity(1.0);
+				setTextFill(Color.BLACK);
+				setBackground(null);
+				setFont(Font.getDefault());
 				if (empty || event == null) {
 					setText(null);
 					setGraphic(null);
-					setStyle("");
+					setBackground(null);
+					setFont(Font.getDefault());
+					setOpacity(1.0);
 					return;
 				}
 
 				int index = getIndex();
-				String marker = index == currentLogCursor - 1 ? "▶ " : index >= currentLogCursor ? "↷ " : "  ";
+				String marker =
+						index == currentLogCursor - 1 ? "▶ " : index >= currentLogCursor ? "↷ " : "  ";
 				String text = marker + (index + 1) + ". " + formatEvent(event);
 
 				// handle split-color dot for TurnChangedEvent
-				if (event instanceof event.TurnChangedEvent tce && tce.getPlayerBefore() != null && tce.getPlayerAfter() != null) {
-					javafx.scene.Group splitDot = createSplitColorDot(tce.getPlayerBefore().getColor(), tce.getPlayerAfter().getColor(), 6);
+				if (event instanceof event.TurnChangedEvent tce && tce.getPlayerBefore() != null
+						&& tce.getPlayerAfter() != null) {
+					javafx.scene.Group splitDot = createSplitColorDot(tce.getPlayerBefore().getColor(),
+							tce.getPlayerAfter().getColor(), 6);
 					Label lbl = new Label(text);
+					lbl.setTextFill(Color.BLACK);
 					HBox hb = new HBox(8, splitDot, lbl);
 					hb.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
 					setGraphic(hb);
@@ -214,19 +239,21 @@ public class GameView extends HBox {
 					else if (event instanceof event.UnitMovedEvent ume)
 						evPlayer = ume.getPlayer();
 					else if (event instanceof event.UnitDiedEvent ude)
-						evPlayer = ude.unit().getPlayer();
+						evPlayer = ude.getUnit().getPlayer();
 					else if (event instanceof event.CaptureProgressEvent cpe)
 						evPlayer = controller.getGame().getGameBoard().getUnit(cpe.position()) == null
-							? null
-							: controller.getGame().getGameBoard().getUnit(cpe.position()).getPlayer();
+								? null
+								: controller.getGame().getGameBoard().getUnit(cpe.position()).getPlayer();
 					else if (event instanceof event.CityCapturedEvent cce)
 						evPlayer = cce.getPlayer();
 					else if (event instanceof event.MultipleGameEvent mge)
 						evPlayer = mge.player();
 
 					if (evPlayer != null) {
-						javafx.scene.shape.Circle dot = new javafx.scene.shape.Circle(6, evPlayer.getColor());
+						javafx.scene.shape.Circle dot =
+								new javafx.scene.shape.Circle(6, evPlayer.getColor());
 						Label lbl = new Label(text);
+						lbl.setTextFill(Color.BLACK);
 						HBox hb = new HBox(8, dot, lbl);
 						hb.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
 						setGraphic(hb);
@@ -238,21 +265,25 @@ public class GameView extends HBox {
 				}
 
 				if (index == currentLogCursor - 1) {
-					setStyle("-fx-background-color: rgba(64, 128, 255, 0.18); -fx-font-weight: bold;");
+					setFont(Font.font(getFont().getFamily(), FontWeight.BOLD, getFont().getSize()));
 				} else if (index >= currentLogCursor) {
-					setStyle("-fx-text-fill: #808080; -fx-opacity: 0.72;");
+					setTextFill(Color.GRAY);
+					setOpacity(0.72);
 				} else {
-					setStyle("");
+					setFont(Font.getDefault());
 				}
 			}
 		});
 
 		// Action Menu (for selected unit)
 		VBox actionMenu = new VBox(5);
-		actionMenu.setStyle("-fx-border-color: #ccc; -fx-padding: 8;");
+		actionMenu.setPadding(new Insets(8));
+		actionMenu.setBorder(new Border(new BorderStroke(Color.web("#ccc"), BorderStrokeStyle.SOLID,
+				CornerRadii.EMPTY, BorderWidths.DEFAULT)));
 
 		Label actionLabel = new Label("Unit Actions:");
-		actionLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 12px;");
+		actionLabel.setFont(Font.font(actionLabel.getFont().getFamily(), FontWeight.BOLD, 12));
+		actionLabel.setTextFill(Color.BLACK);
 
 		Button attackBtn = new Button("Attack");
 		attackBtn.setPrefWidth(160);
@@ -263,7 +294,8 @@ public class GameView extends HBox {
 		captureBtn.setDisable(true);
 
 		Label buyLabel = new Label("Buy Unit:");
-		buyLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 12px;");
+		buyLabel.setFont(Font.font(buyLabel.getFont().getFamily(), FontWeight.BOLD, 12));
+		buyLabel.setTextFill(Color.BLACK);
 
 		Button buyInfantryBtn = new Button("Infantry");
 		buyInfantryBtn.setPrefWidth(160);
@@ -277,16 +309,19 @@ public class GameView extends HBox {
 		buyCannonBtn.setPrefWidth(160);
 		buyCannonBtn.setDisable(true);
 
-        
+
 
 		attackBtn.setOnAction(e -> {
 			controller.beginAttackMode();
 		});
 		captureBtn.setOnAction(e -> controller.onCapture());
-		buyInfantryBtn.setOnAction(e -> controller.onBuyUnit(UnitType.INFANTRY, controller.findBuyPosition()));
-		buyTankBtn.setOnAction(e -> controller.onBuyUnit(UnitType.TANK, controller.findBuyPosition()));
-		buyCannonBtn.setOnAction(e -> controller.onBuyUnit(UnitType.CANNON, controller.findBuyPosition()));
-        
+		buyInfantryBtn.setOnAction(
+				e -> controller.onBuyUnit(UnitType.INFANTRY, controller.findBuyPosition()));
+		buyTankBtn
+				.setOnAction(e -> controller.onBuyUnit(UnitType.TANK, controller.findBuyPosition()));
+		buyCannonBtn
+				.setOnAction(e -> controller.onBuyUnit(UnitType.CANNON, controller.findBuyPosition()));
+
 
 		actionMenu.getChildren().addAll(
 				actionLabel,
@@ -298,15 +333,15 @@ public class GameView extends HBox {
 				buyCannonBtn);
 
 		Button endTurnBtn = new Button("End Turn");
-			endTurnBtn.setPrefWidth(200);
+		endTurnBtn.setPrefWidth(200);
 		endTurnBtn.setOnAction(e -> controller.onEndTurn());
 
 		Button stepBackBtn = new Button("◀ Step Back");
-			stepBackBtn.setPrefWidth(200);
+		stepBackBtn.setPrefWidth(200);
 		stepBackBtn.setOnAction(e -> controller.onStepBackward());
 
 		Button stepFwdBtn = new Button("Step Forward ▶");
-			stepFwdBtn.setPrefWidth(200);
+		stepFwdBtn.setPrefWidth(200);
 		stepFwdBtn.setOnAction(e -> controller.onStepForward());
 
 		Button exportBtn = new Button("Export Session...");
@@ -323,7 +358,7 @@ public class GameView extends HBox {
 		});
 
 		Button menuBtn = new Button("Back to Menu");
-			menuBtn.setPrefWidth(200);
+		menuBtn.setPrefWidth(200);
 		menuBtn.setOnAction(e -> app.showMapSelect());
 
 		// Update action menu on state changes
@@ -335,7 +370,7 @@ public class GameView extends HBox {
 			buyInfantryBtn.setDisable(!factorySelected || !controller.canBuyUnit(UnitType.INFANTRY));
 			buyTankBtn.setDisable(!factorySelected || !controller.canBuyUnit(UnitType.TANK));
 			buyCannonBtn.setDisable(!factorySelected || !controller.canBuyUnit(UnitType.CANNON));
-            
+
 		});
 
 		actionPanel.getChildren().addAll(
@@ -394,19 +429,22 @@ public class GameView extends HBox {
 		}
 	}
 
-	private javafx.scene.Group createSplitColorDot(javafx.scene.paint.Color colorLeft, javafx.scene.paint.Color colorRight, double radius) {
+	private javafx.scene.Group createSplitColorDot(javafx.scene.paint.Color colorLeft,
+			javafx.scene.paint.Color colorRight, double radius) {
 		javafx.scene.Group group = new javafx.scene.Group();
-		
+
 		// Left half (left color)
-		javafx.scene.shape.Arc arcLeft = new javafx.scene.shape.Arc(0, 0, radius * 2, radius * 2, 90, 180);
+		javafx.scene.shape.Arc arcLeft =
+				new javafx.scene.shape.Arc(0, 0, radius * 2, radius * 2, 90, 180);
 		arcLeft.setFill(colorLeft);
 		arcLeft.setStroke(javafx.scene.paint.Color.TRANSPARENT);
-		
+
 		// Right half (right color)
-		javafx.scene.shape.Arc arcRight = new javafx.scene.shape.Arc(0, 0, radius * 2, radius * 2, -90, 180);
+		javafx.scene.shape.Arc arcRight =
+				new javafx.scene.shape.Arc(0, 0, radius * 2, radius * 2, -90, 180);
 		arcRight.setFill(colorRight);
 		arcRight.setStroke(javafx.scene.paint.Color.TRANSPARENT);
-		
+
 		group.getChildren().addAll(arcLeft, arcRight);
 		return group;
 	}

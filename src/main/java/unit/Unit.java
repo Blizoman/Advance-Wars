@@ -28,6 +28,9 @@ public class Unit {
 	@Getter
 	@Setter
 	private boolean captured = false;
+	@Getter
+	@Setter
+	private boolean attacked = false;
 
 	public boolean isAlive() { return hp > 0; }
 
@@ -52,5 +55,9 @@ public class Unit {
 
 	public void resetCapture() {
 		this.captured = false;
+	}
+
+	public void resetAttack() {
+		this.attacked = false;
 	}
 }

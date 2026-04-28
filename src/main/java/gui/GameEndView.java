@@ -9,6 +9,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 
 public class GameEndView extends VBox {
 	public GameEndView(App app, Player winner, Consumer<Path> onExport) {
@@ -17,7 +20,8 @@ public class GameEndView extends VBox {
 		setAlignment(Pos.CENTER);
 
 		Label winnerLabel = new Label("🏆 " + winner.getName() + " Wins!");
-		winnerLabel.setStyle("-fx-font-size: 32px; -fx-font-weight: bold;");
+		winnerLabel.setFont(Font.font(winnerLabel.getFont().getFamily(), FontWeight.BOLD, 32));
+		winnerLabel.setTextFill(Color.BLACK);
 
 		Button exportBtn = new Button("Export Session...");
 		exportBtn.setPrefWidth(180);

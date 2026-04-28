@@ -22,6 +22,7 @@ import unit.UnitType;
 public class Game {
 	@Getter
 	private final GameBoard gameBoard;
+	//TODO: .getGameBoard().getTile(unit.getPosition()) make function, as it is lot often used
 
 	@Getter
 	private final ArrayList<Player> players;
@@ -68,6 +69,7 @@ public class Game {
 		List<Unit> playerUnits = gameBoard.getUnitsOf(player);
 		playerUnits.forEach(Unit::resetMovement);
 		playerUnits.forEach(Unit::resetCapture);
+		playerUnits.forEach(Unit::resetAttack);
 		healUnits(playerUnits, player);
 	}
 
