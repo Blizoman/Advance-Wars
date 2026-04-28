@@ -4,15 +4,16 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import board.AvailableMaps;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import event.*;
-import player.Player;
+import gamer.Player;
 
 public class LogFiler {
+	public record ReplayHeader(AvailableMaps.MapMetadata map, List<String> playerNames) {}
 
 	private static Gson buildGson(List<Player> players) {
 		return new GsonBuilder()
@@ -22,18 +23,41 @@ public class LogFiler {
 				.create();
 	}
 
-	public static void save(List<GameEvent> eventLog, Path path, List<Player> players)
+	public static void save(List<GameEvent> eventLog, Path path, AvailableMaps.MapMetadata map, List<Player> players)
 			throws IOException {
 		Gson gson = buildGson(players);
-		Type listType = new TypeToken<List<GameEvent>>() {}.getType();
-		Files.writeString(path, gson.toJson(eventLog, listType));
+		JsonObject root = new JsonObject();
+		root.addProperty("map", map.fileprefix());
+		JsonArray playerArray = new JsonArray();
+		players.forEach(player -> playerArray.add(player.getName()));
+		root.add("players", playerArray);
+		root.add("events", gson.toJsonTree(eventLog, new TypeToken<List<GameEvent>>() {}.getType()));
+		Files.writeString(path, gson.toJson(root));
 	}
 
-	public static List<GameEvent> load(Path path, List<Player> players) throws IOException {
+	public static ReplayHeader loadHeader(Path path) throws IOException {
+		JsonObject object = readRoot(path);
+		if (!object.has("map") || !object.has("players"))
+			throw new IllegalArgumentException("Replay log is missing map/player header");
+
+		AvailableMaps.MapMetadata map = AvailableMaps.findByFileprefix(object.get("map").getAsString());
+		List<String> playerNames = new ArrayList<>();
+		object.getAsJsonArray("players").forEach(element -> playerNames.add(element.getAsString()));
+		return new ReplayHeader(map, playerNames);
+	}
+
+	public static List<GameEvent> loadEvents(Path path, List<Player> players) throws IOException {
 		Gson gson = buildGson(players);
-		String json = Files.readString(path);
+		JsonObject root = readRoot(path);
 		Type listType = new TypeToken<List<GameEvent>>() {}.getType();
-		return gson.fromJson(json, listType);
+		if (!root.has("events"))
+			throw new IllegalArgumentException("Replay log is missing events list");
+		return gson.fromJson(root.get("events"), listType);
+	}
+
+	private static JsonObject readRoot(Path path) throws IOException {
+		String json = Files.readString(path);
+		return JsonParser.parseString(json).getAsJsonObject();
 	}
 
 	private static class GameEventAdapter
@@ -70,10 +94,10 @@ public class LogFiler {
 
 
 	private static class PlayerAdapter implements JsonSerializer<Player>, JsonDeserializer<Player> {
-		private final Map<String, Player> byName;
+		private final List<Player> players;
 
 		PlayerAdapter(List<Player> players) {
-			this.byName = players.stream().collect(Collectors.toMap(Player::getName, p -> p));
+			this.players = players;
 		}
 
 		@Override
@@ -83,7 +107,11 @@ public class LogFiler {
 
 		@Override
 		public Player deserialize(JsonElement json, Type type, JsonDeserializationContext ctx) {
-			return byName.get(json.getAsString());
+			String name = json.getAsString();
+			return players.stream()
+					.filter(player -> player.getName().equals(name))
+					.findFirst()
+					.orElse(null);
 		}
 	}
 }

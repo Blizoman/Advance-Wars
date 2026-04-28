@@ -7,9 +7,9 @@ import board.Position;
 import board.Terrain;
 import board.Tile;
 import event.*;
+import gamer.Player;
 import lombok.Getter;
 import lombok.Setter;
-import player.Player;
 import unit.Unit;
 import unit.UnitType;
 
@@ -84,7 +84,7 @@ public class Session {
 			// capture completed - log final state
 			execute(new CityCapturedEvent(
 					game.getGameBoard().getPosition(tile),
-					previousTerrain, tile.getOwner(), originalOwner, captureHpBefore));
+					previousTerrain, tile.getOwner(), originalOwner, captureHpBefore, unit));
 
 			if (wasHq)
 				eliminatePlayer(originalOwner);
@@ -92,7 +92,7 @@ public class Session {
 			// partial capture - log progress only
 			execute(new CaptureProgressEvent(
 					game.getGameBoard().getPosition(tile),
-					captureHpBefore, tile.getCaptureHp()));
+					captureHpBefore, tile.getCaptureHp(), unit));
 		}
 	}
 
@@ -107,7 +107,7 @@ public class Session {
 		game.getGameBoard().getTilesOf(player)
 				.forEach(t -> subEvents.add(new CityCapturedEvent(
 						game.getGameBoard().getPosition(t),
-						t.getTerrain(), null, player, t.getCaptureHp())));
+						t.getTerrain(), null, player, t.getCaptureHp(), null)));
 
 		execute(new MultipleGameEvent(subEvents, player));
 

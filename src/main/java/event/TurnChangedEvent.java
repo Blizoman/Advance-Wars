@@ -1,14 +1,18 @@
 package event;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
+import board.Position;
 import game.Game;
-import player.Player;
+import gamer.Player;
 import unit.Unit;
 
 public class TurnChangedEvent implements GameEvent {
-	private Map<Player, Integer> moneyBefore = new HashMap<>();
-	private Map<Unit, Integer> hpBefore = new HashMap<>();
+	private final List<PlayerMoney> moneyBefore = new ArrayList<>();
+	private final List<UnitHp> hpBefore = new ArrayList<>();
+
+	private record PlayerMoney(Player player, int money) {}
+	private record UnitHp(Position position, int hp) {}
 
 	public GameEventType type() {
 		return GameEventType.TURN_CHANGED;
@@ -16,9 +20,11 @@ public class TurnChangedEvent implements GameEvent {
 
 	public void execute(Game game) {
 		// snapshot all players money before
-		game.getPlayers().forEach(p -> moneyBefore.put(p, p.getMoney()));
+		moneyBefore.clear();
+		game.getPlayers().forEach(p -> moneyBefore.add(new PlayerMoney(p, p.getMoney())));
 		// snapshot HP for all units before changing turn
-		game.getGameBoard().getAllUnits().forEach(u -> hpBefore.put(u, u.getHp()));
+		hpBefore.clear();
+		game.getGameBoard().getAllUnits().forEach(u -> hpBefore.add(new UnitHp(u.getPosition(), u.getHp())));
 
 		game.forwardTurn();
 		game.processIncome();
@@ -28,7 +34,11 @@ public class TurnChangedEvent implements GameEvent {
 	public void undo(Game game) {
 		// revert turn, money and HP to state before this event
 		game.previousTurn();
-		moneyBefore.forEach(Player::setMoney);
-		hpBefore.forEach(Unit::setHp);
+		moneyBefore.forEach(pm -> pm.player().setMoney(pm.money()));
+		hpBefore.forEach(uhp -> {
+			Unit unit = game.getGameBoard().getUnit(uhp.position());
+			if (unit != null)
+				unit.setHp(uhp.hp());
+		});
 	}
 }

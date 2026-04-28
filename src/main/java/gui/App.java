@@ -1,11 +1,13 @@
 package gui;
 
+import java.nio.file.Path;
 import java.util.List;
 import board.AvailableMaps;
+import gamer.Player;
 import javafx.application.Application;
+import javafx.stage.FileChooser;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import player.Player;
 
 public class App extends Application {
 	private Stage stage;
@@ -14,21 +16,44 @@ public class App extends Application {
 	public void start(Stage stage) {
 		this.stage = stage;
 		stage.setTitle("Advance Wars");
-		stage.setResizable(false);
+		stage.setResizable(true);
+		stage.setMinWidth(700);
+		stage.setMinHeight(600);
 		showMapSelect();
 		stage.show();
 	}
 
 	public void showMapSelect() {
-		stage.setScene(new Scene(new MapSelectView(this), 500, 400));
+		stage.setScene(new Scene(new MapSelectView(this), 760, 620));
 	}
 
 	public void showGame(AvailableMaps.MapMetadata map, List<Player> players) {
-		stage.setScene(new Scene(new GameView(this, map, players), 1100, 700));
+		stage.setScene(new Scene(new GameView(this, map, players), 1280, 780));
+	}
+
+	public void showGame(AvailableMaps.MapMetadata map, List<Player> players, Path replayLog) {
+		stage.setScene(new Scene(new GameView(this, map, players, replayLog), 1280, 780));
 	}
 
 	public void showGameEnd(Player winner) {
 		stage.setScene(new Scene(new GameEndView(this, winner), 400, 300));
+	}
+
+	public Path chooseLoadReplayFile() {
+		FileChooser chooser = new FileChooser();
+		chooser.setTitle("Load Replay Log");
+		chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON files", "*.json"));
+		var file = chooser.showOpenDialog(stage);
+		return file == null ? null : file.toPath();
+	}
+
+	public Path chooseSaveReplayFile() {
+		FileChooser chooser = new FileChooser();
+		chooser.setTitle("Export Replay Log");
+		chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON files", "*.json"));
+		chooser.setInitialFileName("gamelog.json");
+		var file = chooser.showSaveDialog(stage);
+		return file == null ? null : file.toPath();
 	}
 
 	public static void main(String[] args) {

@@ -1,11 +1,11 @@
 package gui;
 
+import gamer.Player;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
-import player.Player;
 
 public class GameEndView extends VBox {
 	public GameEndView(App app, Player winner) {

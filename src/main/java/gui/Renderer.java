@@ -5,12 +5,12 @@ import board.Position;
 import board.Terrain;
 import board.Tile;
 import controllers.GameController;
+import gamer.Player;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import player.Player;
 import tools.Consts;
 import unit.Unit;
 

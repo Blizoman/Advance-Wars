@@ -6,17 +6,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import board.AvailableMaps;
 import board.Position;
 import board.Tile;
-import bot.DummyBot;
 import game.Game;
 import game.PathFinder;
 import game.Session;
+import gamer.Player;
+import gamer.GeminiBot;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.util.Duration;
 import lombok.Getter;
-import player.Player;
 import unit.Unit;
 import unit.UnitType;
 
@@ -25,7 +26,7 @@ public class GameController {
 	private final Session session;
 	@Getter
 	private final Game game;
-	private final DummyBot bot;
+	private final GeminiBot bot;
 	private final PathFinder pathFinder;
 	private final List<Runnable> onStateChangedListeners = new ArrayList<>();
 	@Getter
@@ -41,7 +42,7 @@ public class GameController {
 		this.session = session;
 		this.game = game;
 		this.pathFinder = new PathFinder(game.getGameBoard());
-		this.bot = new DummyBot(pathFinder);
+		this.bot = new GeminiBot(pathFinder);
 		session.setOnGameEnd($_ -> stateChanged());
 	}
 
@@ -183,8 +184,8 @@ public class GameController {
 		stateChanged();
 	}
 
-	public void onSave(Path path) throws IOException {
-		game.saveSession(path);
+	public void onSave(Path path, AvailableMaps.MapMetadata map) throws IOException {
+		game.saveSession(path, map);
 	}
 
 	public void onLoad(Path path) throws IOException {
@@ -219,7 +220,8 @@ public class GameController {
 		if (selectedUnit == null)
 			return false;
 		Tile tile = game.getGameBoard().getTile(selectedUnit.getPosition());
-		return selectedUnit.getType().isCanCapture()
+		return !selectedUnit.isCaptured()
+				&& selectedUnit.getType().isCanCapture()
 				&& tile.getTerrain().isCapturable()
 				&& (tile.getOwner() == null || tile.getOwner() != selectedUnit.getPlayer());
 	}

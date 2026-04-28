@@ -4,8 +4,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import player.Player;
 import board.Position;
+import gamer.Player;
 import tools.Consts;
 
 @RequiredArgsConstructor
@@ -25,6 +25,9 @@ public class Unit {
 	@Getter
 	@Setter
 	private int hp = Consts.MAX_HP;
+	@Getter
+	@Setter
+	private boolean captured = false;
 
 	public boolean isAlive() { return hp > 0; }
 
@@ -46,5 +49,9 @@ public class Unit {
 
 	public void resetMovement() {
 		this.movesLeft = this.type.getMoveRange();
+	}
+
+	public void resetCapture() {
+		this.captured = false;
 	}
 }

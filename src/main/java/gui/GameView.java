@@ -3,6 +3,7 @@ package gui;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.List;
 import board.AvailableMaps;
 import board.GameBoard;
@@ -10,12 +11,14 @@ import board.GameBoardLoader;
 import board.Position;
 import controllers.GameController;
 import game.Game;
+import gamer.Player;
 import javafx.geometry.Insets;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import player.Player;
+import javafx.scene.input.MouseButton;
 import unit.UnitType;
+import tools.LogFiler;
 
 public class GameView extends HBox {
 	private final Renderer renderer;
@@ -23,13 +26,42 @@ public class GameView extends HBox {
 	private final Label moneyLabel = new Label();
 
 	public GameView(App app, AvailableMaps.MapMetadata map, List<Player> players) {
+		this(app, map, players, null);
+	}
+
+	public GameView(App app, AvailableMaps.MapMetadata map, List<Player> players, Path replayLog) {
+		AvailableMaps.MapMetadata effectiveMap = map;
+		List<Player> effectivePlayers = players;
+
+		if (replayLog != null) {
+			try {
+				LogFiler.ReplayHeader replayHeader = LogFiler.loadHeader(replayLog);
+				effectiveMap = replayHeader.map();
+				effectivePlayers = new java.util.ArrayList<>();
+				for (String playerName : replayHeader.playerNames())
+					effectivePlayers.add(new Player(playerName, false));
+			} catch (IOException e) {
+				throw new RuntimeException("Failed to load replay header", e);
+			}
+		}
+
+		final AvailableMaps.MapMetadata finalMap = effectiveMap;
+		final List<Player> finalPlayers = effectivePlayers;
+
 		Game game;
 		try {
-			game = new Game(loadMap(map, players), players);
+			game = new Game(loadMap(finalMap, finalPlayers), finalPlayers);
 		} catch (IOException e) {
 			throw new RuntimeException("Failed to load map", e);
 		}
 		game.initSession();
+		if (replayLog != null) {
+			try {
+				game.loadSession(replayLog);
+			} catch (IOException e) {
+				throw new RuntimeException("Failed to load replay", e);
+			}
+		}
 
 		GameController controller = new GameController(game.getSession(), game);
 
@@ -37,22 +69,43 @@ public class GameView extends HBox {
 		this.renderer = new Renderer(canvas, controller);
 
 		canvas.setOnMouseClicked(e -> {
+			if (e.getButton() != MouseButton.PRIMARY)
+				return;
 			Position pos = renderer.screenToGrid(e.getX(), e.getY());
 			controller.onTileClicked(pos);
 		});
 
-		controller.setOnStateChanged(() -> {
+		ContextMenu mapMenu = new ContextMenu();
+		MenuItem exportSessionItem = new MenuItem("Export Session...");
+		exportSessionItem.setOnAction(e -> {
+			Path exportPath = app.chooseSaveReplayFile();
+			if (exportPath == null)
+				return;
+			try {
+				controller.onSave(exportPath, finalMap);
+			} catch (IOException ex) {
+				throw new RuntimeException("Failed to export replay", ex);
+			}
+		});
+		mapMenu.getItems().add(exportSessionItem);
+		canvas.setOnContextMenuRequested(e -> mapMenu.show(canvas, e.getScreenX(), e.getScreenY()));
+
+		Runnable refresh = () -> {
 			Player active = controller.getActivePlayer();
 			playerLabel.setText("Turn: " + active.getName());
 			moneyLabel.setText("Money: $" + active.getMoney());
 			renderer.render();
-		});
+		};
+		controller.setOnStateChanged(refresh);
 
 		game.getSession().setOnGameEnd(winner -> app.showGameEnd(winner));
 
 		getChildren().addAll(canvas, buildSidebar(app, controller));
 
-		controller.startGame();
+		if (replayLog == null)
+			controller.startGame();
+		else
+			refresh.run();
 	}
 
 	private VBox buildSidebar(App app, GameController controller) {

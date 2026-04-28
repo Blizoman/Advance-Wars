@@ -22,9 +22,7 @@ public class UnitMovedEvent implements GameEvent {
 		Unit unit = game.getGameBoard().getUnit(from);
 		Tile fromTile = game.getGameBoard().getTile(from);
 		fromCaptureHpBeforeReset = null;
-		if (fromTile.getTerrain().isCapturable()
-				&& fromTile.getOwner() != null
-				&& fromTile.getOwner() != unit.getPlayer()) {
+		if (fromTile.getTerrain().isCapturable() && fromTile.getOwner() != unit.getPlayer()) {
 			fromCaptureHpBeforeReset = fromTile.getCaptureHp();
 			fromTile.resetCapturableHp();
 		}

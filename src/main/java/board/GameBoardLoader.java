@@ -13,7 +13,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import player.Player;
+import gamer.Player;
 import tools.Consts;
 import tools.JsonSimples;
 

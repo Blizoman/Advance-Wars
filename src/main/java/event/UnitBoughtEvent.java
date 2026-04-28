@@ -2,7 +2,7 @@ package event;
 
 import board.Position;
 import game.Game;
-import player.Player;
+import gamer.Player;
 import unit.Unit;
 import unit.UnitType;
 

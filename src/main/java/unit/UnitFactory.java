@@ -1,7 +1,7 @@
 package unit;
 
 import board.Position;
-import player.Player;
+import gamer.Player;
 
 public class UnitFactory {
 	public Unit createUnit(UnitType type, Player player, Position position) {

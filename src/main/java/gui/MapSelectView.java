@@ -2,21 +2,23 @@ package gui;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.nio.file.Path;
 import board.AvailableMaps;
+import gamer.Player;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
-import player.Player;
 
 public class MapSelectView extends VBox {
 	public MapSelectView(App app) {
 		setSpacing(12);
-		setPadding(new Insets(30));
+		setPadding(new Insets(20));
 		setAlignment(Pos.CENTER);
+		setFillWidth(true);
 
 		Label title = new Label("Advance Wars");
-		title.setStyle("-fx-font-size: 28px; -fx-font-weight: bold;");
+		title.setStyle("-fx-font-size: 32px; -fx-font-weight: bold;");
 
 		// player name fields
 		List<TextField> nameFields = List.of(
@@ -37,7 +39,8 @@ public class MapSelectView extends VBox {
 		// map list
 		ListView<AvailableMaps.MapMetadata> mapList = new ListView<>();
 		mapList.getItems().addAll(AvailableMaps.getAvailableMaps());
-		mapList.setPrefHeight(120);
+		mapList.setPrefHeight(220);
+		mapList.setPrefWidth(420);
 		mapList.setCellFactory(lv -> new ListCell<>() {
 			@Override
 			protected void updateItem(AvailableMaps.MapMetadata item, boolean empty) {
@@ -57,11 +60,26 @@ public class MapSelectView extends VBox {
 			app.showGame(selected, players);
 		});
 
+		Button loadReplayBtn = new Button("Load Replay");
+		loadReplayBtn.setStyle("-fx-font-size: 16px;");
+		loadReplayBtn.setOnAction(e -> {
+			AvailableMaps.MapMetadata selected = mapList.getSelectionModel().getSelectedItem();
+			if (selected == null)
+				return;
+			Path replayLog = app.chooseLoadReplayFile();
+			if (replayLog == null)
+				return;
+			app.showGame(selected, players, replayLog);
+		});
+
 		getChildren().addAll(
 				title,
 				new Label("Select Map:"),
 				mapList,
 				namesBox,
-				startBtn);
+				startBtn,
+				loadReplayBtn);
+
+		setMinWidth(520);
 	}
 }

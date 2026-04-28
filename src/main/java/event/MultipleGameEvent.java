@@ -1,7 +1,7 @@
 package event;
 
 import game.Game;
-import player.Player;
+import gamer.Player;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

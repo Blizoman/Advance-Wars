@@ -1,4 +1,4 @@
-package player;
+package gamer;
 
 import tools.Consts;
 import lombok.Getter;

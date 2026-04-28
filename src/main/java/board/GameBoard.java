@@ -2,9 +2,9 @@ package board;
 
 import java.util.List;
 import java.util.Map;
+import gamer.Player;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import player.Player;
 import unit.Unit;
 
 @RequiredArgsConstructor

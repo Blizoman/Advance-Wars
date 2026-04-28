@@ -10,8 +10,8 @@ import board.Position;
 import board.Terrain;
 import board.Tile;
 import event.GameEvent;
+import gamer.Player;
 import lombok.Getter;
-import player.Player;
 import tools.Consts;
 import tools.EvalDamage;
 import tools.LogFiler;
@@ -63,6 +63,7 @@ public class Game {
 		Player player = getActive();
 		List<Unit> playerUnits = gameBoard.getUnitsOf(player);
 		playerUnits.forEach(Unit::resetMovement);
+		playerUnits.forEach(Unit::resetCapture);
 		healUnits(playerUnits, player);
 	}
 
@@ -148,11 +149,11 @@ public class Game {
 	}
 
 	public void loadSession(Path path) throws IOException {
-		List<GameEvent> events = LogFiler.load(path, this.players);
+		List<GameEvent> events = LogFiler.loadEvents(path, this.players);
 		this.session = new Session(this, events);
 	}
 
-	public void saveSession(Path path) throws IOException {
-		LogFiler.save(session.getEventLog(), path, this.players);
+	public void saveSession(Path path, board.AvailableMaps.MapMetadata map) throws IOException {
+		LogFiler.save(session.getEventLog(), path, map, this.players);
 	}
 }

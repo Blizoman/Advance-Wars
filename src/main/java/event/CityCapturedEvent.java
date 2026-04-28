@@ -4,8 +4,9 @@ import board.Position;
 import board.Terrain;
 import board.Tile;
 import game.Game;
-import player.Player;
+import gamer.Player;
 import lombok.RequiredArgsConstructor;
+import unit.Unit;
 
 @RequiredArgsConstructor
 public class CityCapturedEvent implements GameEvent {
@@ -14,6 +15,7 @@ public class CityCapturedEvent implements GameEvent {
 	private final Player newOwner;
 	private final Player previousOwner;
 	private final int previousCaptureHp;
+	private final Unit unit; // nullable - null when tile lost due to player elimination
 
 	public GameEventType type() {
 		return GameEventType.CITY_CAPTURED;
@@ -28,6 +30,8 @@ public class CityCapturedEvent implements GameEvent {
 		else
 			tile.unsetOwner();
 		tile.resetCapturableHp();
+		if (unit != null)
+			unit.setCaptured(true);
 	}
 
 	public void undo(Game game) {
@@ -38,5 +42,7 @@ public class CityCapturedEvent implements GameEvent {
 		else
 			tile.setOwner(previousOwner);
 		tile.setCaptureHp(previousCaptureHp);
+		if (unit != null)
+			unit.setCaptured(false);
 	}
 }

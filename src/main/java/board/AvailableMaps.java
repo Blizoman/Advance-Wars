@@ -19,4 +19,11 @@ public class AvailableMaps {
 	public static String getFilename(MapMetadata map) {
 		return map.fileprefix + ".json";
 	}
+
+	public static MapMetadata findByFileprefix(String fileprefix) {
+		return availableMaps.stream()
+				.filter(map -> map.fileprefix().equals(fileprefix))
+				.findFirst()
+				.orElseThrow(() -> new IllegalArgumentException("Unknown map: " + fileprefix));
+	}
 }

@@ -1,10 +1,10 @@
 package board;
 
+import gamer.Player;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import player.Player;
 import tools.Consts;
 import unit.Unit;
 
