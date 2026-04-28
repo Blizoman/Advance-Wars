@@ -154,8 +154,6 @@ public class GameController {
 	}
 
 	private void runTurnLoop() {
-		System.out.println(
-				"Turn: " + session.getActive().getName() + " isBot: " + session.getActive().isBot());
 		if (session.getActive().isBot()) {
 			new Timeline(new KeyFrame(Duration.millis(800), e -> {
 				bot.takeTurn(session);

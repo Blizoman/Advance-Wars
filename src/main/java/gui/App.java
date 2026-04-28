@@ -28,11 +28,11 @@ public class App extends Application {
 	}
 
 	public void showGame(AvailableMaps.MapMetadata map, List<Player> players) {
-		stage.setScene(new Scene(new GameView(this, map, players), 1280, 780));
+		stage.setScene(new Scene(new GameView(this, map, players), 1500, 860));
 	}
 
 	public void showGame(AvailableMaps.MapMetadata map, List<Player> players, Path replayLog) {
-		stage.setScene(new Scene(new GameView(this, map, players, replayLog), 1280, 780));
+		stage.setScene(new Scene(new GameView(this, map, players, replayLog), 1500, 860));
 	}
 
 	public void showGameEnd(Player winner) {

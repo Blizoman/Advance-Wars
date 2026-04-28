@@ -18,6 +18,7 @@ public class Session {
 
 	@Getter
 	private final List<GameEvent> eventLog = new ArrayList<>();
+	@Getter
 	private int logCursor = 0;
 
 	@Setter

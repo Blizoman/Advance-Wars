@@ -10,6 +10,7 @@ import board.GameBoard;
 import board.GameBoardLoader;
 import board.Position;
 import controllers.GameController;
+import event.GameEvent;
 import game.Game;
 import gamer.Player;
 import javafx.geometry.Insets;
@@ -22,8 +23,11 @@ import tools.LogFiler;
 
 public class GameView extends HBox {
 	private final Renderer renderer;
+	private final AvailableMaps.MapMetadata mapMetadata;
 	private final Label playerLabel = new Label();
 	private final Label moneyLabel = new Label();
+	private final ListView<GameEvent> eventLogView = new ListView<>();
+	private int currentLogCursor = 0;
 
 	public GameView(App app, AvailableMaps.MapMetadata map, List<Player> players) {
 		this(app, map, players, null);
@@ -47,6 +51,7 @@ public class GameView extends HBox {
 
 		final AvailableMaps.MapMetadata finalMap = effectiveMap;
 		final List<Player> finalPlayers = effectivePlayers;
+		this.mapMetadata = finalMap;
 
 		Game game;
 		try {
@@ -75,25 +80,13 @@ public class GameView extends HBox {
 			controller.onTileClicked(pos);
 		});
 
-		ContextMenu mapMenu = new ContextMenu();
-		MenuItem exportSessionItem = new MenuItem("Export Session...");
-		exportSessionItem.setOnAction(e -> {
-			Path exportPath = app.chooseSaveReplayFile();
-			if (exportPath == null)
-				return;
-			try {
-				controller.onSave(exportPath, finalMap);
-			} catch (IOException ex) {
-				throw new RuntimeException("Failed to export replay", ex);
-			}
-		});
-		mapMenu.getItems().add(exportSessionItem);
-		canvas.setOnContextMenuRequested(e -> mapMenu.show(canvas, e.getScreenX(), e.getScreenY()));
+		canvas.setOnContextMenuRequested(null);
 
 		Runnable refresh = () -> {
 			Player active = controller.getActivePlayer();
 			playerLabel.setText("Turn: " + active.getName());
 			moneyLabel.setText("Money: $" + active.getMoney());
+			refreshEventLog(controller);
 			renderer.render();
 		};
 		controller.setOnStateChanged(refresh);
@@ -108,13 +101,51 @@ public class GameView extends HBox {
 			refresh.run();
 	}
 
-	private VBox buildSidebar(App app, GameController controller) {
-		VBox sidebar = new VBox(10);
+	private HBox buildSidebar(App app, GameController controller) {
+		HBox sidebar = new HBox(12);
 		sidebar.setPadding(new Insets(10));
-		sidebar.setPrefWidth(200);
+		sidebar.setPrefWidth(520);
+		sidebar.setMinWidth(480);
 
 		playerLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 		moneyLabel.setStyle("-fx-font-size: 14px;");
+
+		VBox actionPanel = new VBox(8);
+		actionPanel.setPrefWidth(230);
+		actionPanel.setMinWidth(210);
+
+		VBox logPanel = new VBox(8);
+		logPanel.setPrefWidth(250);
+		logPanel.setMinWidth(230);
+
+		Label historyLabel = new Label("Event History");
+		historyLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 12px;");
+		eventLogView.setPrefHeight(540);
+		eventLogView.setFocusTraversable(false);
+		eventLogView.setPlaceholder(new Label("No events yet"));
+		eventLogView.setCellFactory(list -> new ListCell<>() {
+			@Override
+			protected void updateItem(GameEvent event, boolean empty) {
+				super.updateItem(event, empty);
+				if (empty || event == null) {
+					setText(null);
+					setStyle("");
+					return;
+				}
+
+				int index = getIndex();
+				String marker = index == currentLogCursor - 1 ? "▶ " : index >= currentLogCursor ? "↷ " : "  ";
+				setText(marker + (index + 1) + ". " + formatEvent(event));
+
+				if (index == currentLogCursor - 1) {
+					setStyle("-fx-background-color: rgba(64, 128, 255, 0.18); -fx-font-weight: bold;");
+				} else if (index >= currentLogCursor) {
+					setStyle("-fx-text-fill: #808080; -fx-opacity: 0.72;");
+				} else {
+					setStyle("");
+				}
+			}
+		});
 
 		// Action Menu (for selected unit)
 		VBox actionMenu = new VBox(5);
@@ -167,19 +198,32 @@ public class GameView extends HBox {
 				buyCannonBtn);
 
 		Button endTurnBtn = new Button("End Turn");
-		endTurnBtn.setPrefWidth(180);
+			endTurnBtn.setPrefWidth(200);
 		endTurnBtn.setOnAction(e -> controller.onEndTurn());
 
 		Button stepBackBtn = new Button("◀ Step Back");
-		stepBackBtn.setPrefWidth(180);
+			stepBackBtn.setPrefWidth(200);
 		stepBackBtn.setOnAction(e -> controller.onStepBackward());
 
 		Button stepFwdBtn = new Button("Step Forward ▶");
-		stepFwdBtn.setPrefWidth(180);
+			stepFwdBtn.setPrefWidth(200);
 		stepFwdBtn.setOnAction(e -> controller.onStepForward());
 
+		Button exportBtn = new Button("Export Session...");
+		exportBtn.setPrefWidth(200);
+		exportBtn.setOnAction(e -> {
+			Path exportPath = app.chooseSaveReplayFile();
+			if (exportPath == null)
+				return;
+			try {
+				controller.onSave(exportPath, mapMetadata);
+			} catch (IOException ex) {
+				throw new RuntimeException("Failed to export replay", ex);
+			}
+		});
+
 		Button menuBtn = new Button("Back to Menu");
-		menuBtn.setPrefWidth(180);
+			menuBtn.setPrefWidth(200);
 		menuBtn.setOnAction(e -> app.showMapSelect());
 
 		// Update action menu on state changes
@@ -194,17 +238,50 @@ public class GameView extends HBox {
             
 		});
 
-		sidebar.getChildren().addAll(
-				playerLabel, moneyLabel,
+		actionPanel.getChildren().addAll(
+				playerLabel,
+				moneyLabel,
 				new Separator(),
 				actionMenu,
 				new Separator(),
 				endTurnBtn,
 				new Separator(),
-				stepBackBtn, stepFwdBtn,
+				stepBackBtn,
+				stepFwdBtn,
+				new Separator(),
+				exportBtn,
 				new Separator(),
 				menuBtn);
+		VBox.setVgrow(actionMenu, Priority.ALWAYS);
+
+		logPanel.getChildren().addAll(historyLabel, eventLogView);
+		VBox.setVgrow(eventLogView, Priority.ALWAYS);
+
+		sidebar.getChildren().addAll(actionPanel, logPanel);
 		return sidebar;
+	}
+
+	private void refreshEventLog(GameController controller) {
+		currentLogCursor = controller.getSession().getLogCursor();
+		eventLogView.getItems().setAll(controller.getSession().getEventLog());
+		eventLogView.refresh();
+		if (currentLogCursor > 0 && currentLogCursor - 1 < eventLogView.getItems().size())
+			eventLogView.scrollTo(currentLogCursor - 1);
+		else if (!eventLogView.getItems().isEmpty())
+			eventLogView.scrollTo(0);
+	}
+
+	private String formatEvent(GameEvent event) {
+		return switch (event.type()) {
+			case UNIT_BOUGHT -> "Unit bought";
+			case UNIT_MOVED -> "Unit moved";
+			case UNIT_ATTACKED -> "Unit attacked";
+			case UNIT_DIED -> "Unit died";
+			case CITY_CAPTURED -> "City captured";
+			case CAPTURE_PROGRESS -> "Capture progress";
+			case PLAYER_ELIMINATED -> "Player eliminated";
+			case TURN_CHANGED -> "Turn changed";
+		};
 	}
 
 	private GameBoard loadMap(AvailableMaps.MapMetadata map, List<Player> players)
