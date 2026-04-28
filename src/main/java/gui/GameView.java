@@ -14,8 +14,17 @@ import event.GameEvent;
 import game.Game;
 import gamer.Player;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Separator;
+import javafx.scene.control.Slider;
+import javafx.scene.control.ToolBar;
 import javafx.scene.layout.*;
 import javafx.scene.input.MouseButton;
 import unit.UnitType;
@@ -72,6 +81,7 @@ public class GameView extends HBox {
 
 		Canvas canvas = new Canvas(880, 700);
 		this.renderer = new Renderer(canvas, controller);
+		renderer.resizeCanvasToBoard();
 
 		canvas.setOnMouseClicked(e -> {
 			if (e.getButton() != MouseButton.PRIMARY)
@@ -79,6 +89,44 @@ public class GameView extends HBox {
 			Position pos = renderer.screenToGrid(e.getX(), e.getY());
 			controller.onTileClicked(pos);
 		});
+
+		Group mapGroup = new Group(canvas);
+		ScrollPane mapScrollPane = new ScrollPane(mapGroup);
+		mapScrollPane.setPannable(true);
+		mapScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+		mapScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+		mapScrollPane.setFitToWidth(false);
+		mapScrollPane.setFitToHeight(false);
+
+		Slider zoomSlider = new Slider(0.3, 1.0, renderer.getZoom());
+		zoomSlider.setPrefWidth(160);
+		Label zoomValueLabel = new Label("100%");
+		zoomValueLabel.setMinWidth(48);
+		zoomValueLabel.setAlignment(Pos.CENTER_RIGHT);
+
+		Runnable applyZoom = () -> {
+			renderer.setZoom(zoomSlider.getValue());
+			zoomValueLabel.setText((int) Math.round(renderer.getZoom() * 100) + "%");
+			renderer.render();
+		};
+		zoomSlider.valueProperty().addListener((obs, oldValue, newValue) -> applyZoom.run());
+
+		Button zoomOutBtn = new Button("-");
+		zoomOutBtn.setOnAction(e -> zoomSlider.setValue(Math.max(zoomSlider.getMin(), zoomSlider.getValue() - 0.05)));
+
+		Button zoomInBtn = new Button("+");
+		zoomInBtn.setOnAction(e -> zoomSlider.setValue(Math.min(zoomSlider.getMax(), zoomSlider.getValue() + 0.05)));
+
+		Button resetZoomBtn = new Button("100%");
+		resetZoomBtn.setOnAction(e -> zoomSlider.setValue(1.0));
+
+		ToolBar mapToolbar = new ToolBar(zoomOutBtn, zoomSlider, zoomValueLabel, zoomInBtn, resetZoomBtn);
+		mapToolbar.setMinHeight(36);
+		mapToolbar.setPrefHeight(36);
+		mapToolbar.setMaxWidth(Double.MAX_VALUE);
+
+		VBox mapPanel = new VBox(8, mapToolbar, mapScrollPane);
+		VBox.setVgrow(mapScrollPane, Priority.ALWAYS);
 
 		canvas.setOnContextMenuRequested(null);
 
@@ -93,7 +141,7 @@ public class GameView extends HBox {
 
 		game.getSession().setOnGameEnd(winner -> app.showGameEnd(winner));
 
-		getChildren().addAll(canvas, buildSidebar(app, controller));
+		getChildren().addAll(mapPanel, buildSidebar(app, controller));
 
 		if (replayLog == null)
 			controller.startGame();

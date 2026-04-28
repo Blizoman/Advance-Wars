@@ -15,113 +15,142 @@ import tools.Consts;
 import unit.Unit;
 
 public class Renderer {
-	private static final int TILE_SIZE = 80;
+	private static final double BASE_TILE_SIZE = 80.0;
 
 	private final Canvas canvas;
 	private final GameController controller;
+	private double zoom = 1.0;
 
 	public Renderer(Canvas canvas, GameController controller) {
 		this.canvas = canvas;
 		this.controller = controller;
 	}
 
+	public void setZoom(double zoom) {
+		this.zoom = Math.max(0.3, Math.min(1.0, zoom));
+		applyZoom();
+	}
+
+	public double getZoom() {
+		return zoom;
+	}
+
+	private double tileSize() {
+		return BASE_TILE_SIZE * zoom;
+	}
+
+	public void resizeCanvasToBoard() {
+		GameBoard board = controller.getGame().getGameBoard();
+		canvas.setWidth(board.getWidth() * BASE_TILE_SIZE);
+		canvas.setHeight(board.getHeight() * BASE_TILE_SIZE);
+		applyZoom();
+	}
+
+	private void applyZoom() {
+		canvas.setScaleX(zoom);
+		canvas.setScaleY(zoom);
+	}
+
 	public void render() {
+		resizeCanvasToBoard();
 		GraphicsContext gc = canvas.getGraphicsContext2D();
 		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
 		GameBoard board = controller.getGame().getGameBoard();
+		double tileSize = tileSize();
 
 		for (int y = 0; y < board.getHeight(); y++) {
 			for (int x = 0; x < board.getWidth(); x++) {
 				Position pos = new Position(x, y);
 				Tile tile = board.getTile(pos);
-				drawTile(gc, tile, x, y);
+				drawTile(gc, tile, x, y, tileSize);
 			}
 		}
 
 		gc.setFill(Color.color(0, 1, 0, 0.35));
 		controller.getMoveCosts().keySet().forEach(
-				pos -> gc.fillRect(pos.x() * TILE_SIZE, pos.y() * TILE_SIZE, TILE_SIZE, TILE_SIZE));
+				pos -> gc.fillRect(pos.x() * tileSize, pos.y() * tileSize, tileSize, tileSize));
 
 		Unit selected = controller.getSelectedUnit();
 		if (selected != null) {
 			gc.setFill(Color.color(1, 1, 0, 0.5));
 			gc.fillRect(
-					selected.getPosition().x() * TILE_SIZE,
-					selected.getPosition().y() * TILE_SIZE,
-					TILE_SIZE, TILE_SIZE);
+					selected.getPosition().x() * tileSize,
+					selected.getPosition().y() * tileSize,
+					tileSize, tileSize);
 		}
 
 		if (controller.isAttackMode()) {
 			gc.setFill(Color.color(1, 0, 0, 0.45));
 			controller.getAttackTargets().forEach(target -> gc.fillRect(
-					target.getPosition().x() * TILE_SIZE,
-					target.getPosition().y() * TILE_SIZE,
-					TILE_SIZE, TILE_SIZE));
+					target.getPosition().x() * tileSize,
+					target.getPosition().y() * tileSize,
+					tileSize, tileSize));
 		}
 
 		Position selectedFactoryTile = controller.getSelectedFactoryTile();
 		if (selectedFactoryTile != null) {
 			gc.setFill(Color.color(0.3, 0.6, 1.0, 0.35));
 			gc.fillRect(
-					selectedFactoryTile.x() * TILE_SIZE,
-					selectedFactoryTile.y() * TILE_SIZE,
-					TILE_SIZE, TILE_SIZE);
+					selectedFactoryTile.x() * tileSize,
+					selectedFactoryTile.y() * tileSize,
+					tileSize, tileSize);
 		}
 
 		board.getAllUnits().forEach(u -> drawUnit(gc, u));
 	}
 
-	private void drawTile(GraphicsContext gc, Tile tile, int x, int y) {
-		int px = x * TILE_SIZE;
-		int py = y * TILE_SIZE;
+	private void drawTile(GraphicsContext gc, Tile tile, int x, int y, double tileSize) {
+		double px = x * tileSize;
+		double py = y * tileSize;
 
 		Image img = AssetLoader.terrain(tile.getTerrain());
 		if (img != null) {
-			gc.drawImage(img, px, py, TILE_SIZE, TILE_SIZE);
+			gc.drawImage(img, px, py, tileSize, tileSize);
 		} else {
 			gc.setFill(fallbackColor(tile.getTerrain()));
-			gc.fillRect(px, py, TILE_SIZE, TILE_SIZE);
+			gc.fillRect(px, py, tileSize, tileSize);
 		}
 
 		if (tile.getTerrain().isCapturable()) {
 			Color foreground = tile.getOwner() == null ? Color.LIGHTGRAY : playerColor(tile.getOwner());
-			drawBar(gc, px, py + TILE_SIZE - 6, TILE_SIZE, 6,
+			drawBar(gc, px, py + tileSize - 6, tileSize, 6,
 					tile.getCaptureHp() / (double) Consts.CAPTURE_HP,
 					foreground,
 					Color.color(0, 0, 0, 0.35));
 		}
 
 		gc.setStroke(Color.color(0, 0, 0, 0.15));
-		gc.strokeRect(px, py, TILE_SIZE, TILE_SIZE);
+		gc.strokeRect(px, py, tileSize, tileSize);
 	}
 
 	private void drawUnit(GraphicsContext gc, Unit unit) {
-		int px = unit.getPosition().x() * TILE_SIZE;
-		int py = unit.getPosition().y() * TILE_SIZE;
+		double tileSize = tileSize();
+		double px = unit.getPosition().x() * tileSize;
+		double py = unit.getPosition().y() * tileSize;
 		int barHeight = 6;
 		int bottomBarsHeight = barHeight * 2;
-		int unitBodyHeight = TILE_SIZE - bottomBarsHeight;
+		double unitBodyHeight = tileSize - bottomBarsHeight;
 
 		Image img = AssetLoader.unit(unit.getType());
 		if (img != null) {
-			gc.drawImage(img, px, py, TILE_SIZE, unitBodyHeight);
+			gc.drawImage(img, px, py, tileSize, unitBodyHeight);
 		} else {
 			gc.setFill(playerColor(unit.getPlayer()));
-			gc.fillOval(px + 4, py + 4, TILE_SIZE - 8, unitBodyHeight - 8);
+			gc.fillOval(px + 4, py + 4, tileSize - 8, unitBodyHeight - 8);
 		}
 
 		gc.setStroke(playerColor(unit.getPlayer()));
 		gc.setLineWidth(2);
-		gc.strokeRect(px + 1, py + 1, TILE_SIZE - 2, unitBodyHeight - 2);
+		gc.strokeRect(px + 1, py + 1, tileSize - 2, unitBodyHeight - 2);
 
-		drawBar(gc, px, py + unitBodyHeight, TILE_SIZE, barHeight,
+		drawBar(gc, px, py + unitBodyHeight, tileSize, barHeight,
 				unit.getHp() / 100.0,
 				Color.LIME,
 				Color.RED);
 
 		gc.setFill(Color.WHITE);
-		gc.setFont(Font.font(9));
+		gc.setFont(Font.font(Math.max(9, tileSize / 9)));
 		gc.fillText(String.valueOf(unit.getHp()), px + 2, py + unitBodyHeight - 1);
 	}
 
@@ -146,7 +175,7 @@ public class Renderer {
 		};
 	}
 
-	private void drawBar(GraphicsContext gc, int x, int y, int width, int height,
+	private void drawBar(GraphicsContext gc, double x, double y, double width, double height,
 			double ratio, Color fillColor, Color backgroundColor) {
 		ratio = Math.max(0.0, Math.min(1.0, ratio));
 		gc.setFill(backgroundColor);
@@ -156,6 +185,7 @@ public class Renderer {
 	}
 
 	public Position screenToGrid(double x, double y) {
-		return new Position((int) (x / TILE_SIZE), (int) (y / TILE_SIZE));
+		double size = tileSize();
+		return new Position((int) (x / size), (int) (y / size));
 	}
 }
