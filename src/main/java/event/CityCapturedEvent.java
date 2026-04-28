@@ -15,7 +15,6 @@ public class CityCapturedEvent implements GameEvent {
 	private final Player newOwner;
 	private final Player previousOwner;
 	private final int previousCaptureHp;
-	private final Unit unit; // nullable - null when tile lost due to player elimination
 
 	public GameEventType type() {
 		return GameEventType.CITY_CAPTURED;
@@ -30,8 +29,9 @@ public class CityCapturedEvent implements GameEvent {
 		else
 			tile.unsetOwner();
 		tile.resetCapturableHp();
-		if (unit != null)
-			unit.setCaptured(true);
+		Unit liveUnit = game.getGameBoard().getUnit(position);
+		if (liveUnit != null)
+			liveUnit.setCaptured(true);
 	}
 
 	public void undo(Game game) {
@@ -42,13 +42,12 @@ public class CityCapturedEvent implements GameEvent {
 		else
 			tile.setOwner(previousOwner);
 		tile.setCaptureHp(previousCaptureHp);
-		if (unit != null)
-			unit.setCaptured(false);
+		Unit liveUnit = game.getGameBoard().getUnit(position);
+		if (liveUnit != null)
+			liveUnit.setCaptured(false);
 	}
 
 	public Player getPlayer() {
-		if (unit != null)
-			return unit.getPlayer();
-		return previousOwner;
+		return newOwner != null ? newOwner : previousOwner;
 	}
 }

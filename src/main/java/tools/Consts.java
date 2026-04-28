@@ -7,7 +7,7 @@ public class Consts {
 	public final static int CAPTURE_HP = 20;
 	public final static int CITY_INCOME = 1000;
 
-	public class GameBoard {
+	public static class GameBoard {
 		public final static String WIDTH = "width";
 		public final static String HEIGHT = "height";
 		public final static String MAP = "map";

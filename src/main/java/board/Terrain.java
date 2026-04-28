@@ -25,10 +25,6 @@ public enum Terrain {
 	private final boolean generateIncome;
 	private final Map<MovementType, Integer> movementCosts;
 
-	public static Terrain fromString(String from) {
-		return Terrain.valueOf(from);
-	}
-
 	Terrain(int defenseBonus, boolean generateIncome, Map<MovementType, Integer> movementCosts) {
 		this(defenseBonus, false, false, false, generateIncome, movementCosts);
 	}

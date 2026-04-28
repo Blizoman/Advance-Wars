@@ -18,6 +18,7 @@ public record MultipleGameEvent(List<GameEvent> events, Player player) implement
 
 	public void undo(Game game) {
 		game.restorePlayer(player);
+
 		List<GameEvent> reversed = new ArrayList<>(events);
 		Collections.reverse(reversed);
 		reversed.forEach(e -> e.undo(game));

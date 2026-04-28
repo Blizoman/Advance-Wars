@@ -10,6 +10,7 @@ import board.GameBoard;
 import board.GameBoardLoader;
 import board.Position;
 import controllers.GameController;
+import com.google.gson.JsonObject;
 import event.GameEvent;
 import game.Game;
 import gamer.Player;
@@ -45,10 +46,12 @@ public class GameView extends HBox {
 	public GameView(App app, AvailableMaps.MapMetadata map, List<Player> players, Path replayLog) {
 		AvailableMaps.MapMetadata effectiveMap = map;
 		List<Player> effectivePlayers = players;
+		JsonObject replayData = null;
 
 		if (replayLog != null) {
 			try {
-				LogFiler.ReplayHeader replayHeader = LogFiler.loadHeader(replayLog);
+				replayData = LogFiler.readReplay(replayLog);
+				LogFiler.ReplayHeader replayHeader = LogFiler.loadHeader(replayData);
 				effectiveMap = replayHeader.map();
 				effectivePlayers = new java.util.ArrayList<>();
 				for (String playerName : replayHeader.playerNames())
@@ -70,11 +73,8 @@ public class GameView extends HBox {
 		}
 		game.initSession();
 		if (replayLog != null) {
-			try {
-				game.loadSession(replayLog);
-			} catch (IOException e) {
-				throw new RuntimeException("Failed to load replay", e);
-			}
+			List<GameEvent> events = LogFiler.loadEvents(replayData, finalPlayers);
+			game.loadSession(events);
 		}
 
 		GameController controller = new GameController(game.getSession(), game);
@@ -216,7 +216,9 @@ public class GameView extends HBox {
 					else if (event instanceof event.UnitDiedEvent ude)
 						evPlayer = ude.unit().getPlayer();
 					else if (event instanceof event.CaptureProgressEvent cpe)
-						evPlayer = cpe.unit() == null ? null : cpe.unit().getPlayer();
+						evPlayer = controller.getGame().getGameBoard().getUnit(cpe.position()) == null
+							? null
+							: controller.getGame().getGameBoard().getUnit(cpe.position()).getPlayer();
 					else if (event instanceof event.CityCapturedEvent cce)
 						evPlayer = cce.getPlayer();
 					else if (event instanceof event.MultipleGameEvent mge)

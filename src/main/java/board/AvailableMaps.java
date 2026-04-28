@@ -18,7 +18,7 @@ public class AvailableMaps {
 			new MapMetadata("ASYMETRIC", "map2", 3));
 
 	public static String getFilename(MapMetadata map) {
-		return map.fileprefix + ".json";
+		return map.fileprefix() + ".json";
 	}
 
 	public static MapMetadata findByFileprefix(String fileprefix) {

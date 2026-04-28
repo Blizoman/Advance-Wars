@@ -43,8 +43,7 @@ public class Unit {
 
 	public boolean canAttackTo(Unit defender) {
 		int distance = this.position.distanceTo(defender.getPosition());
-		AttackRange range = this.type.getAttackRange();
-		return range.min() <= distance && distance <= range.max();
+		return this.type.getAttackRange().canReach(distance);
 	}
 
 	public void resetMovement() {

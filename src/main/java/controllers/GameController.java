@@ -18,6 +18,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.util.Duration;
 import lombok.Getter;
+import tools.LogFiler;
 import unit.Unit;
 import unit.UnitType;
 
@@ -37,6 +38,7 @@ public class GameController {
 	private boolean attackMode;
 	@Getter
 	private Map<Position, Integer> moveCosts = Collections.emptyMap();
+	private List<Unit> attackTargets;
 
 	public GameController(Session session, Game game) {
 		this.session = session;
@@ -65,6 +67,7 @@ public class GameController {
 			selectedUnit = null;
 			attackMode = false;
 			moveCosts = Collections.emptyMap();
+			attackTargets = null;
 			stateChanged();
 			return;
 		}
@@ -74,6 +77,7 @@ public class GameController {
 				selectedUnit = clickedUnit;
 				attackMode = false;
 				moveCosts = pathFinder.findReachableTiles(clickedUnit);
+				attackTargets = null;
 				stateChanged();
 			}
 			return;
@@ -106,6 +110,7 @@ public class GameController {
 			selectedUnit = clickedUnit;
 			attackMode = false;
 			moveCosts = pathFinder.findReachableTiles(clickedUnit);
+			attackTargets = null;
 			stateChanged();
 			return;
 		}
@@ -113,6 +118,7 @@ public class GameController {
 		if (moveCosts.containsKey(position)) {
 			session.moveUnit(selectedUnit, position, moveCosts.get(position));
 			moveCosts = pathFinder.findReachableTiles(selectedUnit);
+			attackTargets = null;
 			stateChanged();
 			return;
 		}
@@ -174,11 +180,13 @@ public class GameController {
 
 	public void onStepForward() {
 		session.stepForward();
+		attackTargets = null;
 		stateChanged();
 	}
 
 	public void onStepBackward() {
 		session.stepBackward();
+		attackTargets = null;
 		stateChanged();
 	}
 
@@ -187,7 +195,8 @@ public class GameController {
 	}
 
 	public void onLoad(Path path) throws IOException {
-		game.loadSession(path);
+		game.loadSession(LogFiler.loadEvents(path, game.getPlayers()));
+		attackTargets = null;
 		stateChanged();
 	}
 
@@ -196,22 +205,12 @@ public class GameController {
 		selectedFactoryTile = null;
 		attackMode = false;
 		moveCosts = Collections.emptyMap();
+		attackTargets = null;
 		stateChanged();
 	}
 
 	public boolean canAttack() {
 		return canSelectedUnitAttackNow() && !getAttackTargets().isEmpty();
-	}
-
-	public List<Unit> getAttackTargets() {
-		List<Unit> targets = new ArrayList<>();
-		if (!canSelectedUnitAttackNow())
-			return targets;
-		for (Unit target : game.getGameBoard().getAllUnits()) {
-			if (target.getPlayer() != selectedUnit.getPlayer() && selectedUnit.canAttackTo(target))
-				targets.add(target);
-		}
-		return targets;
 	}
 
 	public boolean canCapture() {
@@ -258,5 +257,21 @@ public class GameController {
 		return selectedUnit != null
 				&& (selectedUnit.getType().isCanAttackAfterMove()
 						|| selectedUnit.getMovesLeft() == selectedUnit.getType().getMoveRange());
+	}
+
+	public List<Unit> getAttackTargets() {
+		if (attackTargets == null)
+			attackTargets = computeAttackTargets();
+		return attackTargets;
+	}
+
+	private List<Unit> computeAttackTargets() {
+		if (!canSelectedUnitAttackNow())
+			return List.of();
+
+		return game.getGameBoard().getAllUnits().stream()
+				.filter(target -> target.getPlayer() != selectedUnit.getPlayer()
+						&& selectedUnit.canAttackTo(target))
+				.toList();
 	}
 }

@@ -152,8 +152,7 @@ public class Game {
 		this.session = new Session(this);
 	}
 
-	public void loadSession(Path path) throws IOException {
-		List<GameEvent> events = LogFiler.loadEvents(path, this.players);
+	public void loadSession(List<GameEvent> events) {
 		this.session = new Session(this, events);
 	}
 

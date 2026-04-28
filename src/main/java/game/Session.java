@@ -3,6 +3,7 @@ package game;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import board.GameBoard;
 import board.Position;
 import board.Terrain;
 import board.Tile;
@@ -85,7 +86,7 @@ public class Session {
 			// capture completed - log final state
 			execute(new CityCapturedEvent(
 					game.getGameBoard().getPosition(tile),
-					previousTerrain, tile.getOwner(), originalOwner, captureHpBefore, unit));
+					previousTerrain, tile.getOwner(), originalOwner, captureHpBefore));
 
 			if (wasHq)
 				eliminatePlayer(originalOwner);
@@ -93,7 +94,7 @@ public class Session {
 			// partial capture - log progress only
 			execute(new CaptureProgressEvent(
 					game.getGameBoard().getPosition(tile),
-					captureHpBefore, tile.getCaptureHp(), unit));
+					captureHpBefore, tile.getCaptureHp()));
 		}
 	}
 
@@ -108,7 +109,7 @@ public class Session {
 		game.getGameBoard().getTilesOf(player)
 				.forEach(t -> subEvents.add(new CityCapturedEvent(
 						game.getGameBoard().getPosition(t),
-						t.getTerrain(), null, player, t.getCaptureHp(), null)));
+						t.getTerrain(), null, player, t.getCaptureHp())));
 
 		execute(new MultipleGameEvent(subEvents, player));
 
@@ -120,5 +121,5 @@ public class Session {
 
 	public List<Player> getPlayers() { return game.getPlayers(); }
 
-	public board.GameBoard getGameBoard() { return game.getGameBoard(); }
+	public GameBoard getGameBoard() { return game.getGameBoard(); }
 }

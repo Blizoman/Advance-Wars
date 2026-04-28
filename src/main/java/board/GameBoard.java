@@ -10,6 +10,7 @@ import unit.Unit;
 @RequiredArgsConstructor
 public class GameBoard {
 	private final Map<Position, Tile> map;
+	private List<Tile> allTilesCache;
 	@Getter
 	private final int width;
 	@Getter
@@ -31,12 +32,16 @@ public class GameBoard {
 				.orElseThrow(() -> new IllegalStateException("Invalid tile"));
 	}
 
-	public List<Tile> getAllTiles() { return this.map.values().stream().toList(); }
+	public List<Tile> getAllTiles() {
+		if (allTilesCache == null)
+			allTilesCache = List.copyOf(map.values());
+		return allTilesCache;
+	}
 
 	public List<Unit> getAllUnits() {
 		return map.values().stream()
 				.filter(t -> t.getUnit() != null)
-				.map(p -> p.getUnit())
+				.map(Tile::getUnit)
 				.toList();
 	}
 
