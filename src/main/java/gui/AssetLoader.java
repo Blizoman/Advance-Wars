@@ -1,5 +1,8 @@
 package gui;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import javafx.scene.image.Image;
 import unit.UnitType;
 import java.util.HashMap;
@@ -19,8 +22,14 @@ public class AssetLoader {
 
 	private static Image load(String name) {
 		return loaded.computeIfAbsent(name, key -> {
-			var stream = AssetLoader.class.getResourceAsStream("/assets/" + key + ".png");
-			return (stream == null) ? null : new Image(stream);
+			Path path = Path.of("lib/assets/" + key + ".png");
+			if (!Files.exists(path))
+				return null;
+			try (var stream = Files.newInputStream(path)) {
+				return new Image(stream);
+			} catch (IOException e) {
+				return null;
+			}
 		});
 	}
 }

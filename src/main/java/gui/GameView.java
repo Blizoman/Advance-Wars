@@ -3,6 +3,7 @@ package gui;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import board.AvailableMaps;
@@ -422,9 +423,10 @@ public class GameView extends HBox {
 	private GameBoard loadMap(AvailableMaps.MapMetadata map, List<Player> players)
 			throws IOException {
 		String filename = AvailableMaps.getFilename(map);
-		try (InputStream is = getClass().getClassLoader().getResourceAsStream(filename)) {
-			if (is == null)
-				throw new FileNotFoundException(filename);
+		Path path = Path.of(filename);
+		if (!Files.exists(path))
+			throw new FileNotFoundException(filename);
+		try (InputStream is = Files.newInputStream(path)) {
 			return GameBoardLoader.loadFromStream(is, players);
 		}
 	}

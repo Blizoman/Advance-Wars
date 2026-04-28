@@ -14,6 +14,7 @@ public class GeminiBot {
     private final PathFinder pathFinder;
     private final Random random = new Random();
 
+    // State trackers to allow step-by-step turns
     private Iterator<Unit> unitIterator;
     private Iterator<Tile> factoryIterator;
     private boolean isTurnActive = false;
@@ -29,21 +30,26 @@ public class GeminiBot {
         Player me = session.getActive();
         GameBoard board = session.getGameBoard();
 
+        // Take a snapshot of units and factories at the beginning of the turn
         unitIterator = new ArrayList<>(board.getUnitsOf(me)).iterator();
         factoryIterator = board.getTilesOf(me).stream()
                 .filter(t -> t.getTerrain().isProduceUnits() && t.isEmpty())
                 .toList()
                 .iterator();
 
-        // Calculate threat map at the start of the turn
+        // Calculate threat map safely at the start of the turn
         threatMap.clear();
         List<Unit> enemies = board.getAllUnits().stream()
                 .filter(u -> u.getPlayer() != me && u.isAlive())
                 .toList();
+
         for (Unit enemy : enemies) {
+            // SAFETY CHECK: Skip units that cannot attack (like Transports) to prevent NullPointerException
+            if (enemy.getType().getAttackRange() == null)
+                continue;
+
             Map<Position, Integer> enemyReach = pathFinder.findReachableTiles(enemy);
             for (Position reachablePos : enemyReach.keySet()) {
-                // Add tiles the enemy can reach to attack
                 int attackRange = enemy.getType().getAttackRange().max();
                 threatMap.addAll(getTilesInRange(reachablePos, attackRange, board));
             }
@@ -63,11 +69,14 @@ public class GeminiBot {
                 .filter(u -> u.getPlayer() != me && u.isAlive())
                 .toList();
 
-        // PHASE 1: Move and attack
+        // PHASE 1: Move and attack with units
         if (unitIterator != null && unitIterator.hasNext()) {
             Unit unit = unitIterator.next();
-            if (!unit.isAlive())
+
+            // Skip units that might have died since the turn started
+            if (!unit.isAlive()) {
                 return true;
+            }
 
             Position startPos = unit.getPosition();
             Map<Position, Integer> reachableMoves = pathFinder.findReachableTiles(unit);
@@ -88,34 +97,55 @@ public class GeminiBot {
             }
 
             int cost = reachableMoves.getOrDefault(bestTarget, 0);
-            session.moveUnit(unit, bestTarget, cost);
+            boolean moved = !startPos.equals(bestTarget);
 
-            boolean moved = !startPos.equals(unit.getPosition());
+            // GUI RULE: Only move if target tile is completely empty, or we are staying still
+            if (moved && board.getTile(bestTarget).isEmpty()) {
+                session.moveUnit(unit, bestTarget, cost);
+            } else if (moved) {
+                // If the tile got occupied (should be stopped by PathFinder, but just in case)
+                bestTarget = startPos;
+                moved = false;
+            }
+
             Tile currentTile = board.getTile(unit.getPosition());
-            boolean onEnemyOrNeutralBuilding =
-                    currentTile.getTerrain().isCapturable() && currentTile.getOwner() != me;
 
-            if (unit.getType().isCanCapture() && onEnemyOrNeutralBuilding) {
+            // GUI RULE: Same conditions as GameController.canCapture()
+            boolean canCapture = !unit.isCaptured()
+                    && unit.getType().isCanCapture()
+                    && currentTile.getTerrain().isCapturable()
+                    && (currentTile.getOwner() == null || currentTile.getOwner() != me);
+
+            // GUI RULE: Same conditions as GameController.canSelectedUnitAttackNow()
+            boolean canAttackNow = !unit.isAttacked()
+                    && (unit.getType().isCanAttackAfterMove() || !moved);
+
+            if (canCapture) {
                 session.tryCapture(unit, currentTile);
-            } else if (!moved || unit.getType().isCanAttackAfterMove()) {
+            } else if (canAttackNow) {
                 Unit targetEnemy = getBestEnemyToAttack(unit, enemies);
-                if (targetEnemy != null) {
+                // GUI RULE: Ensure target is valid and in range
+                if (targetEnemy != null && unit.canAttackTo(targetEnemy)) {
                     session.attack(unit, targetEnemy);
                 }
             }
-            return true;
+            return true; // We performed an action!
         }
 
-        // PHASE 2: Buy units
+        // PHASE 2: Buy units from factories
         if (factoryIterator != null && factoryIterator.hasNext()) {
             Tile t = factoryIterator.next();
-            if (!t.isEmpty())
+
+            // Skip if the factory got occupied during the current turn
+            if (!t.isEmpty()) {
                 return true;
+            }
 
             buySmartUnit(session, board.getPosition(t), me, enemies);
-            return true;
+            return true; // We performed an action!
         }
 
+        // PHASE 3: Everything is finished
         isTurnActive = false;
         return false;
     }
@@ -221,7 +251,9 @@ public class GeminiBot {
                 minDistance = Math.min(minDistance, pos.distanceTo(enemy.getPosition()));
             }
         }
-        return minDistance;
+
+        // SAFETY CHECK: Prevent integer underflow if no targets are found
+        return minDistance == Integer.MAX_VALUE ? 0 : minDistance;
     }
 
     private Unit getBestEnemyToAttack(Unit attacker, List<Unit> enemies) {
@@ -272,11 +304,17 @@ public class GeminiBot {
         }
 
         if (toBuy != null) {
-            session.buyUnit(pos, toBuy);
+            // GUI RULE: Same conditions as GameController.canBuyUnit()
+            boolean canAfford = me.canAfford(toBuy.getCost());
+            boolean isFactoryEmpty = session.getGameBoard().getTile(pos).isEmpty();
+
+            if (canAfford && isFactoryEmpty) {
+                session.buyUnit(pos, toBuy);
+            }
         }
     }
 
-    // Helper to get all tiles within a specific range
+    // Helper to get all tiles within a specific range for the threat map
     private Set<Position> getTilesInRange(Position center, int range, GameBoard board) {
         Set<Position> tiles = new HashSet<>();
         for (int x = center.x() - range; x <= center.x() + range; x++) {
