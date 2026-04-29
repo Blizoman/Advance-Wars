@@ -1,3 +1,9 @@
+/**
+ * Tracks that Unit died
+ * 
+ * @author: xpruzir00
+ */
+
 package event;
 
 import board.Tile;

@@ -1,3 +1,9 @@
+/**
+ * Tracks that Unit moved
+ * 
+ * @author: xpruzir00
+ */
+
 package event;
 
 import board.Position;
@@ -23,6 +29,8 @@ public class UnitMovedEvent implements GameEvent {
 
 	public void execute(Game game) {
 		Unit unit = game.getGameBoard().getUnit(from);
+		if (from.equals(to))
+			return;
 		Tile fromTile = game.getGameBoard().getTile(from);
 		fromCaptureHpBeforeReset = null;
 		if (fromTile.getTerrain().isCapturable() && fromTile.getOwner() != unit.getPlayer()) {
@@ -34,6 +42,8 @@ public class UnitMovedEvent implements GameEvent {
 	}
 
 	public void undo(Game game) {
+		if (from.equals(to))
+			return;
 		Unit unit = game.getGameBoard().getUnit(to);
 		game.moveUnit(unit, from);
 		if (fromCaptureHpBeforeReset != null)

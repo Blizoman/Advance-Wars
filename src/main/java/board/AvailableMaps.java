@@ -1,3 +1,9 @@
+/**
+ * List of playable maps
+ * 
+ * @author: xpruzir00
+ */
+
 package board;
 
 import java.util.List;

@@ -1,3 +1,9 @@
+/**
+ * Tile on board behavior and state
+ * 
+ * @author: xpruzir00
+ */
+
 package board;
 
 import gamer.Player;

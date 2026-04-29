@@ -1,3 +1,9 @@
+/**
+ * Interface for tracked events
+ * 
+ * @author: xpruzir00
+ */
+
 package event;
 
 import game.Game;

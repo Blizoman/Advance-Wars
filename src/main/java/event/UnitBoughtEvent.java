@@ -1,3 +1,9 @@
+/**
+ * Tracks that unit has been bought
+ * 
+ * @author: xpruzir00
+ */
+
 package event;
 
 import board.Position;

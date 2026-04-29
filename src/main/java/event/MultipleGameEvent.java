@@ -1,3 +1,9 @@
+/**
+ * Tracks Player elimination
+ * 
+ * @author: xpruzir00
+ */
+
 package event;
 
 import game.Game;

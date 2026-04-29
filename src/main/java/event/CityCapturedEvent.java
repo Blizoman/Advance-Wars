@@ -1,3 +1,9 @@
+/**
+ * Tracks that city (or HQ or Factory) has been captured
+ * 
+ * @author: xpruzir00
+ */
+
 package event;
 
 import board.Position;

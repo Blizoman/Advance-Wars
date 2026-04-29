@@ -1,3 +1,9 @@
+/**
+ * Current game session (game manager)
+ * 
+ * @author: xpruzir00
+ */
+
 package game;
 
 import java.util.ArrayList;

@@ -1,3 +1,9 @@
+/**
+ * Game API
+ * 
+ * @author: xpruzir00
+ */
+
 package game;
 
 import java.util.ArrayList;

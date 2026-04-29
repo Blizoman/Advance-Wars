@@ -1,3 +1,9 @@
+/**
+ * Tracks that Unit partially captured
+ * 
+ * @author: xpruzir00
+ */
+
 package event;
 
 import board.Position;

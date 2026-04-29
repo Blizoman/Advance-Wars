@@ -1,3 +1,9 @@
+/**
+ * Position representation
+ * 
+ * @author: xpruzir00
+ */
+
 package board;
 
 // Starting at [0,0] in TOP-LEFT corner

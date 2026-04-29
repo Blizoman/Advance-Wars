@@ -1,3 +1,9 @@
+/**
+ * Terrain behaviour
+ * 
+ * @author: xpruzir00
+ */
+
 package board;
 
 import java.util.Map;

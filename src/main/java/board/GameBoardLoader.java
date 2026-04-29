@@ -1,3 +1,9 @@
+/**
+ * Loads wanted map
+ * 
+ * @author: xpruzir00
+ */
+
 package board;
 
 import java.io.IOException;

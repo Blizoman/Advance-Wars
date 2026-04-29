@@ -1,3 +1,9 @@
+/**
+ * Types of events
+ * 
+ * @author: xpruzir00
+ */
+
 package event;
 
 public enum GameEventType {

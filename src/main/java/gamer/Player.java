@@ -1,3 +1,9 @@
+/**
+ * Player state
+ * 
+ * @author: xpruzir00
+ */
+
 package gamer;
 
 import tools.Consts;

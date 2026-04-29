@@ -1,3 +1,9 @@
+/**
+ * Tracks that Unit attacked
+ * 
+ * @author: xpruzir00
+ */
+
 package event;
 
 import game.Game;

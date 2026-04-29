@@ -1,3 +1,9 @@
+/**
+ * Controller between GUI and BE
+ * 
+ * @author: xpruzir00
+ */
+
 package controllers;
 
 import java.io.IOException;
@@ -41,6 +47,7 @@ public class GameController {
 
 	@Getter
 	private boolean isAttacking;
+	private boolean unitMoved = false;
 
 	private List<Unit> attackTargets;
 	private Map<Position, Integer> abailableMoveCosts = null;
@@ -72,6 +79,7 @@ public class GameController {
 		selectedUnit = null;
 		selectedFactory = null;
 		isAttacking = false;
+		unitMoved = false;
 		abailableMoveCosts = null;
 		attackTargets = null;
 		stateChanged();
@@ -86,6 +94,7 @@ public class GameController {
 	private void deselectExceptUnit() {
 		selectedFactory = null;
 		isAttacking = false;
+		unitMoved = false;
 		abailableMoveCosts = null;
 		attackTargets = null;
 		stateChanged();
@@ -195,8 +204,7 @@ public class GameController {
 	private boolean canSelectedDoAttack() {
 		return selectedUnit != null
 				&& !selectedUnit.isUsed()
-				&& (selectedUnit.getType().isCanAttackAfterMove()
-						|| selectedUnit.getMovesLeft() == selectedUnit.getType().getMoveRange());
+				&& (selectedUnit.getType().isCanAttackAfterMove() || selectedUnit.getMovesLeft() > 0);
 	}
 
 	/////////////////// ATTACK ///////////////////
@@ -266,12 +274,14 @@ public class GameController {
 
 	private boolean trySwitchUnit(Position position) {
 		Unit clicked = this.game.getGameBoard().getUnit(position);
+
 		if (clicked == null // Invalid
 				|| clicked.getPlayer() != selectedUnit.getPlayer() // Not mine player
 				|| clicked == selectedUnit) // Clicked at same unit, do tryMove
 			return false;
 
-		if (clicked.isUsed()) // Already used, consume click
+		// Disable switching to other unit if this already moved
+		if (clicked.isUsed() || unitMoved)
 			return true;
 
 		selectedUnit = clicked;
@@ -282,9 +292,18 @@ public class GameController {
 	private boolean tryMove(Position position) {
 		if (!getAbailableMoveCosts().containsKey(position)) // Not reachable
 			return false;
+		if (unitMoved) // Loglessly allow
+			return true;
 
 		this.session.moveUnit(selectedUnit, position);
-		deselectExceptUnit();
+
+		selectedFactory = null;
+		isAttacking = false;
+		unitMoved = true;
+		abailableMoveCosts = null;
+		attackTargets = null;
+		stateChanged();
+
 		return true;
 	}
 
@@ -293,6 +312,9 @@ public class GameController {
 	//////////////////// LAZY ////////////////////
 
 	public Map<Position, Integer> getAbailableMoveCosts() {
+		if (unitMoved)
+			return Map.of();
+
 		if (abailableMoveCosts == null && selectedUnit != null)
 			abailableMoveCosts = this.pathFinder.findReachableTiles(selectedUnit);
 		return abailableMoveCosts;

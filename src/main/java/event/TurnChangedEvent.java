@@ -1,3 +1,9 @@
+/**
+ * Tracks that turn changed
+ * 
+ * @author: xpruzir00
+ */
+
 package event;
 
 import java.util.ArrayList;
