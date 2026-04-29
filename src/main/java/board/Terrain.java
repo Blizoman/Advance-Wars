@@ -1,9 +1,11 @@
 package board;
 
 import java.util.Map;
+import lombok.AccessLevel;
 import lombok.Getter;
 import unit.MovementType;
 
+@Getter
 public enum Terrain {
 	PLAIN(1, false, Map.of(MovementType.FOOT, 1, MovementType.VEHICLE, 1)),
 	FOREST(2, false, Map.of(MovementType.FOOT, 1, MovementType.VEHICLE, 2)),
@@ -13,16 +15,12 @@ public enum Terrain {
 	FACTORY(3, true, true, true, false, Map.of(MovementType.FOOT, 1, MovementType.VEHICLE, 1)),
 	HQ(4, true, true, false, false, Map.of(MovementType.FOOT, 1, MovementType.VEHICLE, 1));
 
-	@Getter
 	private final int defenseBonus;
-	@Getter
 	private final boolean capturable;
-	@Getter
 	private final boolean heals;
-	@Getter
 	private final boolean produceUnits;
-	@Getter
 	private final boolean generateIncome;
+	@Getter(AccessLevel.NONE)
 	private final Map<MovementType, Integer> movementCosts;
 
 	Terrain(int defenseBonus, boolean generateIncome, Map<MovementType, Integer> movementCosts) {

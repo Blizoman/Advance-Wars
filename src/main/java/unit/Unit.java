@@ -8,32 +8,24 @@ import board.Position;
 import gamer.Player;
 import tools.Consts;
 
+@Getter
+@Setter
 @RequiredArgsConstructor
 public class Unit {
 
-	@Getter
 	private final Player player;
-	@Getter
 	private final UnitType type;
-	@Getter
-	@Setter
 	@NonNull
 	private Position position;
-	@Getter
-	@Setter
 	private int movesLeft;
-	@Getter
-	@Setter
 	private int hp = Consts.MAX_HP;
-	@Getter
-	@Setter
 	private boolean captured = false;
-	@Getter
-	@Setter
 	private boolean used = false;
-	@Getter
-	@Setter
 	private boolean attacked = false;
+
+	//////////////// VALUES ////////////////
+	////////////////////////////////////////
+	//////////////// MISCS /////////////////
 
 	public boolean isAlive() { return hp > 0; }
 
@@ -52,6 +44,10 @@ public class Unit {
 		return this.type.getAttackRange().canReach(distance);
 	}
 
+	//////////////// MISCS /////////////////
+	////////////////////////////////////////
+	//////////////// RESETS ////////////////
+
 	public void resetMovement() {
 		this.movesLeft = this.type.getMoveRange();
 	}
@@ -67,4 +63,7 @@ public class Unit {
 	public void resetAttack() {
 		this.attacked = false;
 	}
+
+	//////////////// RESETS ////////////////
+	////////////////////////////////////////
 }

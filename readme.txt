@@ -19,7 +19,6 @@ TODO: hlavicky suborov
 TODO: TR: validate code
 controllers
 event
-unit
 
 analyze what code can be reused (JsonSimples, consts, ...)
 

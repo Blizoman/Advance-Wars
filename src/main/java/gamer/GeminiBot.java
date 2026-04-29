@@ -205,8 +205,7 @@ public class GeminiBot {
         // 4. Attack Positioning
         if (unit.getType().isCanAttackAfterMove()) {
             for (Unit enemy : enemies) {
-                int distance = pos.distanceTo(enemy.getPosition());
-                if (unit.getType().getAttackRange().canReach(distance)) {
+                if (unit.canAttackTo(enemy)) {
                     int potentialDamage = unit.getType().getDamageAgainst(enemy.getType());
                     score += potentialDamage * 2; // Weight high damage moves
                     if (enemy.getHp() <= potentialDamage) {
@@ -217,8 +216,7 @@ public class GeminiBot {
         } else {
             // For CANNON/Rockets, try to get just outside enemy movement range
             for (Unit enemy : enemies) {
-                int distance = pos.distanceTo(enemy.getPosition());
-                if (unit.getType().getAttackRange().canReach(distance)) {
+                if (unit.canAttackTo(enemy)) {
                     score += 150; // Good position to shoot next turn
                     if (!threatMap.contains(pos)) {
                         score += 200; // Safe position to shoot next turn!

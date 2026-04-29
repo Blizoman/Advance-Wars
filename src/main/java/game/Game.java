@@ -19,19 +19,14 @@ import unit.Unit;
 import unit.UnitFactory;
 import unit.UnitType;
 
+@Getter
 public class Game {
-	@Getter
 	private final GameBoard gameBoard;
 	//TODO: .getGameBoard().getTile(unit.getPosition()) make function, as it is lot often used
-
-	@Getter
 	private final ArrayList<Player> players;
-
-	@Getter
 	private final List<Player> initialPlayers;
-
-	@Getter
 	private int currentPlayerIndex = 0;
+	private Session session;
 
 	private final UnitFactory unitFactory = new UnitFactory();
 
@@ -147,9 +142,6 @@ public class Game {
 	public void previousTurn() {
 		currentPlayerIndex = (currentPlayerIndex - 1 + players.size()) % players.size();
 	}
-
-	@Getter
-	private Session session;
 
 	public void initSession() {
 		this.session = new Session(this);
