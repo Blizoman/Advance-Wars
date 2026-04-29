@@ -68,7 +68,7 @@ public class Session {
 	/////////////////// EVENTS ///////////////////
 
 	public void moveUnit(Unit unit, Position to) {
-		execute(new UnitMovedEvent(unit.getPosition(), to, unit.getMovesLeft()));
+		execute(new UnitMovedEvent(unit.getPosition(), to, unit.getMovesLeft(), unit.getPlayer()));
 	}
 
 	public void attack(Unit attacker, Unit defender) {

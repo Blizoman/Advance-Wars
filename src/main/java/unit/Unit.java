@@ -21,7 +21,6 @@ public class Unit {
 	private int hp = Consts.MAX_HP;
 	private boolean captured = false;
 	private boolean used = false;
-	private boolean attacked = false;
 
 	//////////////// VALUES ////////////////
 	////////////////////////////////////////
@@ -58,10 +57,6 @@ public class Unit {
 
 	public void resetCapture() {
 		this.captured = false;
-	}
-
-	public void resetAttack() {
-		this.attacked = false;
 	}
 
 	//////////////// RESETS ////////////////

@@ -21,8 +21,7 @@ public class UnitBoughtEvent implements GameEvent {
 	}
 
 	public void execute(Game game) {
-		game.buyUnit(position, unitType);
-		createdUnit = game.getGameBoard().getUnit(position);
+		createdUnit = game.buyUnit(position, unitType);
 	}
 
 	public void undo(Game game) {

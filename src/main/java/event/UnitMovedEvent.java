@@ -13,10 +13,9 @@ public class UnitMovedEvent implements GameEvent {
 	private final Position from;
 	private final Position to;
 	private final int movesLeftBefore;
-	// private final int actualCost;
 	private Integer fromCaptureHpBeforeReset;
 	@Getter
-	private Player player;
+	private final Player player;
 
 	public GameEventType type() {
 		return GameEventType.UNIT_MOVED;
@@ -24,7 +23,6 @@ public class UnitMovedEvent implements GameEvent {
 
 	public void execute(Game game) {
 		Unit unit = game.getGameBoard().getUnit(from);
-		this.player = unit.getPlayer();
 		Tile fromTile = game.getGameBoard().getTile(from);
 		fromCaptureHpBeforeReset = null;
 		if (fromTile.getTerrain().isCapturable() && fromTile.getOwner() != unit.getPlayer()) {
@@ -32,7 +30,6 @@ public class UnitMovedEvent implements GameEvent {
 			fromTile.resetCapturableHp();
 		}
 		unit.setMovesLeft(0);
-		// unit.setMovesLeft(movesLeftBefore - actualCost);
 		game.moveUnit(unit, to);
 	}
 

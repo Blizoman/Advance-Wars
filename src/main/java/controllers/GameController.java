@@ -194,7 +194,7 @@ public class GameController {
 
 	private boolean canSelectedDoAttack() {
 		return selectedUnit != null
-				&& !selectedUnit.isAttacked()
+				&& !selectedUnit.isUsed()
 				&& (selectedUnit.getType().isCanAttackAfterMove()
 						|| selectedUnit.getMovesLeft() == selectedUnit.getType().getMoveRange());
 	}

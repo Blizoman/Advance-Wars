@@ -12,11 +12,5 @@ TODO: @ado
 
 vsetky checky treby robit v GUIku, robil som to stylom ze BE veri ze GUI mu nic zle neposle (inak by som mal tak 3× viac kodu)
 
-
 TODO: hlavicky suborov
-
-
-TODO: TR: validate code
-event
-
-AI
+TODO: AI

@@ -116,7 +116,7 @@ public class GeminiBot {
                     && (currentTile.getOwner() == null || currentTile.getOwner() != me);
 
             // GUI RULE: Same conditions as GameController.canSelectedUnitAttackNow()
-            boolean canAttackNow = !unit.isAttacked()
+            boolean canAttackNow = !unit.isUsed()
                     && (unit.getType().isCanAttackAfterMove() || !moved);
 
             if (canCapture) {

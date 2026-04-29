@@ -92,7 +92,6 @@ public class Game {
 		List<Unit> playerUnits = this.gameBoard.getUnitsOf(player);
 		playerUnits.forEach(Unit::resetMovement);
 		playerUnits.forEach(Unit::resetCapture);
-		playerUnits.forEach(Unit::resetAttack);
 		playerUnits.forEach(Unit::resetUsed);
 		healUnits(playerUnits, player);
 	}
@@ -135,10 +134,12 @@ public class Game {
 		this.gameBoard.placeUnit(unit);
 	}
 
-	public void buyUnit(Position position, UnitType unitType) {
+	public Unit buyUnit(Position position, UnitType unitType) {
 		Player player = getActive();
-		placeUnit(this.unitFactory.createUnit(unitType, player, position));
+		Unit newUnit = this.unitFactory.createUnit(unitType, player, position);
+		placeUnit(newUnit);
 		player.removeMoney(unitType.getCost());
+		return newUnit;
 	}
 
 	//////////////////// UNIT ////////////////////
