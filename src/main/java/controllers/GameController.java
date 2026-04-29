@@ -17,6 +17,8 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.util.Duration;
 import lombok.Getter;
+import tools.Consts;
+import tools.LogFiler;
 import unit.Unit;
 import unit.UnitType;
 
@@ -100,19 +102,18 @@ public class GameController {
 
 	private void runTurnLoop() {
 		if (getActivePlayer().isBot()) {
-			// Using an indefinite timeline to tick actions one by one
 			Timeline botTimeline = new Timeline();
 			botTimeline.setCycleCount(Timeline.INDEFINITE);
 
-			KeyFrame frame = new KeyFrame(Duration.millis(500), e -> {
+			KeyFrame frame = new KeyFrame(Duration.millis(Consts.BOT_ACTION_DELAY), e -> {
 				boolean hasMoreActions = this.bot.performNextAction(this.session);
-				stateChanged(); // Redraw screen after every single move
+				stateChanged();
 
 				if (!hasMoreActions) {
 					botTimeline.stop();
+					deselect();
 					this.session.endTurn();
-					stateChanged();
-					runTurnLoop(); // Move to the next player
+					runTurnLoop(); // Move to next player
 				}
 			});
 
@@ -131,14 +132,12 @@ public class GameController {
 
 	public void onStepForward() {
 		this.session.stepForward();
-		attackTargets = null;
-		stateChanged();
+		deselect();
 	}
 
 	public void onStepBackward() {
 		this.session.stepBackward();
-		attackTargets = null;
-		stateChanged();
+		deselect();
 	}
 
 	//////////////////// TURN ////////////////////
@@ -326,7 +325,7 @@ public class GameController {
 	public Player getActivePlayer() { return this.session.getActive(); }
 
 	public void onSave(Path path, AvailableMaps.MapMetadata map) throws IOException {
-		this.game.saveSession(path, map);
+		LogFiler.save(this.session.getEventLog(), path, map, this.game.getInitialPlayers());
 	}
 
 	/////////////////// MISCS ////////////////////

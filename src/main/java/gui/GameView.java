@@ -11,6 +11,7 @@ import controllers.GameController;
 import com.google.gson.JsonObject;
 import event.GameEvent;
 import game.Game;
+import game.Session;
 import gamer.Player;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -72,13 +73,13 @@ public class GameView extends HBox {
 		} catch (IOException e) {
 			throw new RuntimeException("Failed to load map", e);
 		}
-		game.initSession();
-		if (replayLog != null) {
-			List<GameEvent> events = LogFiler.loadEvents(replayData, finalPlayers);
-			game.loadSession(events);
-		}
+		Session session;
+		if (replayLog != null)
+			session = new Session(game, LogFiler.loadEvents(replayData, finalPlayers));
+		else
+			session = new Session(game);
 
-		GameController controller = new GameController(game.getSession(), game);
+		GameController controller = new GameController(session, game);
 
 		Canvas canvas = new Canvas(880, 700);
 		this.renderer = new Renderer(canvas, controller);
@@ -151,7 +152,7 @@ public class GameView extends HBox {
 		};
 		controller.setOnStateChanged(refresh);
 
-		game.getSession().setOnGameEnd(winner -> app.showGameEnd(winner, exportPath -> {
+		session.setOnGameEnd(winner -> app.showGameEnd(winner, exportPath -> {
 			try {
 				controller.onSave(exportPath, finalMap);
 			} catch (IOException ex) {

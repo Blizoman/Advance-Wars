@@ -10,10 +10,12 @@ import board.Tile;
 import event.*;
 import gamer.Player;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import unit.Unit;
 import unit.UnitType;
 
+@RequiredArgsConstructor
 public class Session {
 	private final Game game;
 
@@ -25,50 +27,52 @@ public class Session {
 	@Setter
 	private Consumer<Player> onGameEnd;
 
-	public Session(Game game) {
-		this.game = game;
-	}
-
 	public Session(Game game, List<GameEvent> loadedLog) {
 		this.game = game;
 		this.eventLog.addAll(loadedLog);
 	}
 
+	/////////////////// VALUES ///////////////////
+	//////////////////////////////////////////////
+	//////////////////// TURN ////////////////////
+
 	public void stepForward() {
-		if (logCursor < eventLog.size())
-			eventLog.get(logCursor++).execute(game);
+		if (this.logCursor < this.eventLog.size())
+			this.eventLog.get(this.logCursor++).execute(this.game);
 	}
 
 	public void stepBackward() {
-		if (logCursor > 0)
-			eventLog.get(--logCursor).undo(game);
+		if (this.logCursor > 0)
+			this.eventLog.get(--this.logCursor).undo(this.game);
 	}
 
 	private void execute(GameEvent event) {
-		if (logCursor < eventLog.size())
-			eventLog.subList(logCursor, eventLog.size()).clear();
-		event.execute(game);
-		eventLog.add(event);
-		logCursor++;
+		if (this.logCursor < this.eventLog.size()) // Clear future
+			this.eventLog.subList(this.logCursor, this.eventLog.size()).clear();
+		event.execute(this.game);
+		this.eventLog.add(event);
+		this.logCursor++;
 	}
 
 	public void startTurn() {
-		game.processIncome();
-		game.processUnits();
+		this.game.processIncome();
+		this.game.processUnits();
 	}
 
 	public void endTurn() {
 		execute(new TurnChangedEvent());
 	}
 
+	//////////////////// TURN ////////////////////
+	//////////////////////////////////////////////
+	/////////////////// EVENTS ///////////////////
+
 	public void moveUnit(Unit unit, Position to) {
-		Position from = unit.getPosition();
-		execute(new UnitMovedEvent(from, to, unit.getMovesLeft()));
+		execute(new UnitMovedEvent(unit.getPosition(), to, unit.getMovesLeft()));
 	}
 
 	public void attack(Unit attacker, Unit defender) {
-		UnitAttackEvent event = new UnitAttackEvent(attacker, defender);
-		execute(event);
+		execute(new UnitAttackEvent(attacker, defender));
 	}
 
 	public void tryCapture(Unit unit, Tile tile) {
@@ -77,46 +81,52 @@ public class Session {
 		int captureHpBefore = tile.getCaptureHp();
 		boolean wasHq = previousTerrain == Terrain.HQ;
 
-		game.capture(tile, unit); // execute action directly
-
-		if (tile.getOwner() != originalOwner) {
-			// capture completed - log final state
+		tile.evalCapture(unit); // Execute action firstly
+		// Then set states
+		if (tile.getOwner() != originalOwner) { // Captured
 			execute(new CityCapturedEvent(
-					game.getGameBoard().getPosition(tile),
+					this.game.getGameBoard().getPosition(tile),
 					previousTerrain, tile.getOwner(), originalOwner, captureHpBefore));
-
 			if (wasHq)
 				eliminatePlayer(originalOwner);
-		} else {
-			// partial capture - log progress only
+		} else { // Progress only
 			execute(new CaptureProgressEvent(
-					game.getGameBoard().getPosition(tile),
+					this.game.getGameBoard().getPosition(tile),
 					captureHpBefore, tile.getCaptureHp()));
 		}
 	}
 
 	public void buyUnit(Position position, UnitType unitType) {
-		execute(new UnitBoughtEvent(position, unitType, game.getActive()));
+		execute(new UnitBoughtEvent(position, unitType, this.game.getActive()));
 	}
 
 	public void eliminatePlayer(Player player) {
+		int eliminatedIndex = game.getPlayers().indexOf(player);
 		List<GameEvent> subEvents = new ArrayList<>();
-		game.getGameBoard().getUnitsOf(player)
+
+		this.game.getGameBoard().getUnitsOf(player)
 				.forEach(u -> subEvents.add(new UnitDiedEvent(u)));
-		game.getGameBoard().getTilesOf(player)
+		this.game.getGameBoard().getTilesOf(player)
 				.forEach(t -> subEvents.add(new CityCapturedEvent(
-						game.getGameBoard().getPosition(t),
+						this.game.getGameBoard().getPosition(t),
 						t.getTerrain(), null, player, t.getCaptureHp())));
 
-		execute(new MultipleGameEvent(subEvents, player));
+		execute(new MultipleGameEvent(subEvents, player, eliminatedIndex));
 
-		if (game.getPlayers().size() == 1 && onGameEnd != null)
-			onGameEnd.accept(game.getPlayers().get(0));
+		if (this.game.getPlayers().size() == 1 && onGameEnd != null)
+			onGameEnd.accept(this.game.getPlayers().get(0));
 	}
 
-	public Player getActive() { return game.getActive(); }
+	/////////////////// EVENTS ///////////////////
+	//////////////////////////////////////////////
+	//////////////// GAME GETTERS ////////////////
 
-	public List<Player> getPlayers() { return game.getPlayers(); }
+	public Player getActive() { return this.game.getActive(); }
 
-	public GameBoard getGameBoard() { return game.getGameBoard(); }
+	public List<Player> getPlayers() { return this.game.getPlayers(); }
+
+	public GameBoard getGameBoard() { return this.game.getGameBoard(); }
+
+	//////////////// GAME GETTERS ////////////////
+	//////////////////////////////////////////////
 }

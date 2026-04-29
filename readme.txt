@@ -18,9 +18,5 @@ TODO: hlavicky suborov
 
 TODO: TR: validate code
 event
-game
 
-analyze what code can be reused (JsonSimples, consts, ...)
-
-
-Unit sa nemoze pohnut na captured factory
+AI

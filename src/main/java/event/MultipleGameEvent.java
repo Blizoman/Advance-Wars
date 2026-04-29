@@ -6,18 +6,20 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public record MultipleGameEvent(List<GameEvent> events, Player player) implements GameEvent {
+public record MultipleGameEvent(List<GameEvent> events, Player player, int eliminatedIndex)
+		implements GameEvent {
 	public GameEventType type() {
 		return GameEventType.PLAYER_ELIMINATED;
 	}
 
 	public void execute(Game game) {
 		events.forEach(e -> e.execute(game));
+
 		game.eliminatePlayer(player);
 	}
 
 	public void undo(Game game) {
-		game.restorePlayer(player);
+		game.restorePlayer(player, eliminatedIndex);
 
 		List<GameEvent> reversed = new ArrayList<>(events);
 		Collections.reverse(reversed);
