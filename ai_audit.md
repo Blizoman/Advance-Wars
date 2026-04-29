@@ -19,68 +19,58 @@
 * **Nástroj:** Gemini 3
 * **Datum:** 20. 04. 2026
 * **Prompt:**
-  > fill terrainTypeName with values from terrain.tsv, use same style as UnitTypeName (also COnsts etc)
+  > fill terrainTypeName with values from terrain.tsv, use same style as UnitTypeName (also Consts etc)
   
   > Now generate TerrainType (similarly to UnitType) with parameters from terrain.tsv, create inheritance (with english naming from file) with predefined v alues from terrain.tsv
 
-try to keep as close coding style as unit/type/
+  > try to keep as close coding style as unit/type/
 * **Úprava studentem:**
   Už som vytvoril OOP návrh pre celú časť unit/, teraz som nechal vygenerovať podľa mojej predlohy terrainType
 * **Míra generování:** 40%
 
 ---
 
----
-
-## 3. [NÁZEV DALŠÍ KOMPONENTY]
+## 3. Json IO - map
 * **Nástroj:** Gemini 3
-* **Datum:** DD. MM. 2026
+* **Datum:** 21. 04. 2026
 * **Prompt:**
-  > 
+  > I need to read these data (inserted generated json for map) into GameBoard constructor. Implement it into GameBoardLoader and JsonSimples blank methods
 * **Úprava studentem:**
-  ...
-* **Míra generování:** X%
+  Vytvoril som hlavičky funkcií a prispôsobil konštanty a vygenerovanú logiku
+* **Míra generování:** 40%
 
 ---
 
----
-
-## 4. [NÁZEV DALŠÍ KOMPONENTY]
+## 4. Json IO - logs
 * **Nástroj:** Gemini 3
-* **Datum:** DD. MM. 2026
+* **Datum:** 27. 04. 2026
 * **Prompt:**
-  > 
+  > Write and read jsons for events logging, use JsonSimples if possible, implement into prepared LogFiler, for Player/Unit storing, as it cannot be stored in json, use adapters
 * **Úprava studentem:**
-  ...
-* **Míra generování:** X%
+  Vytvoril som hlavičky funkcií a prispôsobil konštanty a vygenerovanú logiku
+* **Míra generování:** 40%
 
 ---
 
----
-
-## 5. [NÁZEV DALŠÍ KOMPONENTY]
-* **Nástroj:** Gemini 3
-* **Datum:** DD. MM. 2026
+## 5. Game/Session splitting
+* **Nástroj:** Claude Sonnet 4.6
+* **Datum:** 27. 04. 2026
 * **Prompt:**
-  > 
+  > I have Game logic, but need to track steps logs etc, and Game.java keeps getting larger, how to split it?
 * **Úprava studentem:**
-  ...
-* **Míra generování:** X%
+  Logika bola vytvorená, AI iba navrhlo rozdeliť to na Game a Session (vyššia vrstva), s tým že Game bude iba "hlúpe API" a Session but volať Game z Controllera
+* **Míra generování:** 10%
 
 ---
 
----
-
-## 6. [NÁZEV DALŠÍ KOMPONENTY]
-* **Nástroj:** Gemini 3
-* **Datum:** DD. MM. 2026
+## 6. Zlepšovanie
+* **Nástroj:** Gemini 3 / Claude Sonnet 4.6 / GPT-5.4-mini
+* **Datum:** 29. 04. 2026
 * **Prompt:**
-  > 
+  > (Pasted my project files) Check these files and say what can be optimalized/betterized/shortened/simplified, also focus on dead code and reusable methods
 * **Úprava studentem:**
-  ...
-* **Míra generování:** X%
-
----
+  Na konci som nechal skontrolovať celý projekt rôzymi AI a implementoval návrhy ktoré odporúčali (väčšinou sa to týkalo zjednodušenia cyklov či podmienok)
+* **Míra generování:** 5%
 
 ---
 
@@ -95,8 +85,6 @@ try to keep as close coding style as unit/type/
 
 ---
 
----
-
 ## 8. [NÁZEV DALŠÍ KOMPONENTY]
 * **Nástroj:** Gemini 3
 * **Datum:** DD. MM. 2026
@@ -108,8 +96,6 @@ try to keep as close coding style as unit/type/
 
 ---
 
----
-
 ## 9. [NÁZEV DALŠÍ KOMPONENTY]
 * **Nástroj:** Gemini 3
 * **Datum:** DD. MM. 2026
@@ -118,8 +104,6 @@ try to keep as close coding style as unit/type/
 * **Úprava studentem:**
   ...
 * **Míra generování:** X%
-
----
 
 ---
 
