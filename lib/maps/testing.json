@@ -1,0 +1,59 @@
+{
+  "width": 5,
+  "height": 3,
+  "map": [
+    [
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      }
+    ],
+    [
+      {
+        "terrain": "FACTORY"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "FACTORY"
+      }
+    ],
+    [
+      {
+        "terrain": "HQ",
+        "owner": 0
+      },
+      {
+        "terrain": "CITY"
+      },
+      {
+        "terrain": "PLAIN"
+      },
+      {
+        "terrain": "CITY"
+      },
+      {
+        "terrain": "HQ",
+        "owner": 1
+      }
+    ]
+  ]
+}
