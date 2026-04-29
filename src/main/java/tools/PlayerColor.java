@@ -4,6 +4,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import javafx.scene.paint.Color;
 
 public class PlayerColor {
+	private PlayerColor() { /* Prevent instantiation */ }
+
 	private static double currentHue = ThreadLocalRandom.current().nextDouble() * 360.0;
 	private static final double GOLDEN_RATIO_DEG = 222.4922359499622;
 

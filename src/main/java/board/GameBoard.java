@@ -9,41 +9,37 @@ import unit.Unit;
 
 @RequiredArgsConstructor
 public class GameBoard {
+
 	private final Map<Position, Tile> map;
 	private List<Tile> allTilesCache;
+
 	@Getter
 	private final int width;
 	@Getter
 	private final int height;
 
+	////////////////////////////////////////////////////
+	///////////////////// POSITION /////////////////////
+
 	public Tile getTile(Position position) {
-		return map.get(position);
+		return this.map.get(position);
 	}
 
 	public boolean isValidPosition(Position position) {
-		return map.containsKey(position);
+		return getTile(position) != null;
 	}
 
 	public Position getPosition(Tile tile) {
 		return this.map.entrySet().stream()
 				.filter(e -> e.getValue() == tile)
-				.map(Map.Entry::getKey)
 				.findFirst()
-				.orElseThrow(() -> new IllegalStateException("Invalid tile"));
+				.orElseThrow(() -> new IllegalStateException("Invalid tile"))
+				.getKey();
 	}
 
-	public List<Tile> getAllTiles() {
-		if (allTilesCache == null)
-			allTilesCache = List.copyOf(map.values());
-		return allTilesCache;
-	}
-
-	public List<Unit> getAllUnits() {
-		return map.values().stream()
-				.filter(t -> t.getUnit() != null)
-				.map(Tile::getUnit)
-				.toList();
-	}
+	///////////////////// POSITION /////////////////////
+	////////////////////////////////////////////////////
+	/////////////////////// UNIT ///////////////////////
 
 	public Unit getUnit(Position position) {
 		Tile tile = getTile(position);
@@ -61,7 +57,7 @@ public class GameBoard {
 			throw new IllegalStateException("No unit found at " + from);
 
 		fromTile.removeUnit();
-		toTile.placeUnit(unit);
+		toTile.setUnit(unit);
 		unit.setPosition(to);
 	}
 
@@ -76,7 +72,24 @@ public class GameBoard {
 	}
 
 	public void placeUnit(Unit unit) {
-		getTile(unit.getPosition()).placeUnit(unit);
+		getTile(unit.getPosition()).setUnit(unit);
+	}
+
+	/////////////////////// UNIT ///////////////////////
+	////////////////////////////////////////////////////
+	//////////////////// GET ALL/OF ////////////////////
+
+	public List<Tile> getAllTiles() {
+		if (this.allTilesCache == null)
+			this.allTilesCache = List.copyOf(this.map.values());
+		return this.allTilesCache;
+	}
+
+	public List<Unit> getAllUnits() {
+		return map.values().stream()
+				.filter(t -> t.getUnit() != null)
+				.map(Tile::getUnit)
+				.toList();
 	}
 
 	public List<Tile> getTilesOf(Player player) {
@@ -90,4 +103,7 @@ public class GameBoard {
 				.filter(u -> u.getPlayer() == player)
 				.toList();
 	}
+
+	//////////////////// GET ALL/OF ////////////////////
+	////////////////////////////////////////////////////
 }

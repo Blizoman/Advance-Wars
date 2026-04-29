@@ -1,3 +1,5 @@
+// for exe
+
 package tools;
 
 import gui.App;

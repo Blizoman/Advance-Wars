@@ -4,6 +4,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 public class JsonSimples {
+	private JsonSimples() { /* Prevent instantiation */ }
+
 	public static String getString(JsonObject data, String key) {
 		return data.has(key) ? data.get(key).getAsString() : null;
 	}

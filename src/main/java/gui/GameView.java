@@ -1,9 +1,6 @@
 package gui;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import board.AvailableMaps;
@@ -54,7 +51,7 @@ public class GameView extends HBox {
 
 		if (replayLog != null) {
 			try {
-				replayData = LogFiler.readReplay(replayLog);
+				replayData = LogFiler.loadReplay(replayLog);
 				LogFiler.ReplayHeader replayHeader = LogFiler.loadHeader(replayData);
 				effectiveMap = replayHeader.map();
 				effectivePlayers = new java.util.ArrayList<>();
@@ -429,13 +426,7 @@ public class GameView extends HBox {
 
 	private GameBoard loadMap(AvailableMaps.MapMetadata map, List<Player> players)
 			throws IOException {
-		String filename = AvailableMaps.getFilename(map);
-		Path path = Path.of(filename);
-		if (!Files.exists(path))
-			throw new FileNotFoundException(filename);
-		try (InputStream is = Files.newInputStream(path)) {
-			return GameBoardLoader.loadFromStream(is, players);
-		}
+		return GameBoardLoader.loadMap(map, players);
 	}
 
 	private javafx.scene.Group createSplitColorDot(javafx.scene.paint.Color colorLeft,

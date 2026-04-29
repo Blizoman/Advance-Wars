@@ -8,5 +8,6 @@ public record Position(int x, int y) {
 	}
 
 	public int distanceTo(Position to) {
-		return Math.abs(this.x - to.x()) + Math.abs(this.y - to.y());	}
+		return Math.abs(this.x - to.x()) + Math.abs(this.y - to.y());
+	}
 }

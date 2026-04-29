@@ -3,6 +3,8 @@ package tools;
 import unit.Unit;
 
 public class EvalDamage {
+	private EvalDamage() { /* Prevent instantiation */ }
+
 	public static int evalDamage(Unit attacker, Unit defender, int terrainBonus) {
 		int baseDamage = attacker.getType().getDamageAgainst(defender.getType());
 		int hpAttacker = attacker.getHp();

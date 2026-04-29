@@ -11,3 +11,17 @@ TODO: @ado
 - - - in control., i validate valid moves, views etc, but bot dont have access to them, so maybe create duplicate checks for it
 
 vsetky checky treby robit v GUIku, robil som to stylom ze BE veri ze GUI mu nic zle neposle (inak by som mal tak 3× viac kodu)
+
+
+TODO: hlavicky suborov
+
+
+TODO: TR: validate code
+controllers
+event
+unit
+
+analyze what code can be reused (JsonSimples, consts, ...)
+
+
+Unit sa nemoze pohnut na captured factory

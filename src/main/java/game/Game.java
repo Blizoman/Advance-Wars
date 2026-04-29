@@ -51,7 +51,7 @@ public class Game {
 					.orElseThrow(() -> new IllegalStateException("No HQ for " + player.getName()));
 			Position hqPosition = this.gameBoard.getPosition(hqTile);
 			Unit startingUnit = unitFactory.createUnit(UnitType.INFANTRY, player, hqPosition);
-			hqTile.placeUnit(startingUnit);
+			hqTile.setUnit(startingUnit);
 		}
 	}
 
@@ -116,7 +116,7 @@ public class Game {
 	public void buyUnit(Position position, UnitType unitType) {
 		Player player = getActive();
 		Unit unit = unitFactory.createUnit(unitType, player, position);
-		gameBoard.getTile(position).placeUnit(unit);
+		gameBoard.getTile(position).setUnit(unit);
 		player.removeMoney(unitType.getCost());
 	}
 

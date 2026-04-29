@@ -6,7 +6,7 @@ import lombok.Getter;
 public class AvailableMaps {
 	public record MapMetadata(
 			String title,
-			String fileprefix,
+			String fileName,
 			int players
 	) {
 	}
@@ -21,13 +21,13 @@ public class AvailableMaps {
 	);
 
 	public static String getFilename(MapMetadata map) {
-		return "lib/maps/" + map.fileprefix() + ".json";
+		return "lib/maps/" + map.fileName() + ".json";
 	}
 
-	public static MapMetadata findByFileprefix(String fileprefix) {
+	public static MapMetadata getMapByName(String fileName) {
 		return availableMaps.stream()
-				.filter(map -> map.fileprefix().equals(fileprefix))
+				.filter(map -> map.fileName().equals(fileName))
 				.findFirst()
-				.orElseThrow(() -> new IllegalArgumentException("Unknown map: " + fileprefix));
+				.orElseThrow(() -> new IllegalArgumentException("Unknown map: " + fileName));
 	}
 }

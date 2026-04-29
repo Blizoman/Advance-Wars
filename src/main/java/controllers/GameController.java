@@ -18,7 +18,6 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.util.Duration;
 import lombok.Getter;
-import tools.LogFiler;
 import unit.Unit;
 import unit.UnitType;
 
@@ -209,12 +208,6 @@ public class GameController {
 
 	public void onSave(Path path, AvailableMaps.MapMetadata map) throws IOException {
 		game.saveSession(path, map);
-	}
-
-	public void onLoad(Path path) throws IOException {
-		game.loadSession(LogFiler.loadEvents(path, game.getPlayers()));
-		attackTargets = null;
-		stateChanged();
 	}
 
 	private void deselect() {

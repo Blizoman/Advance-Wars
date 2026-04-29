@@ -30,12 +30,12 @@ public class Player {
 		this.money -= amount;
 	}
 
-	public void kill() {
-		this.isAlive = false;
-	}
-
 	public boolean canAfford(int cost) {
 		return this.money >= cost;
+	}
+
+	public void kill() {
+		this.isAlive = false;
 	}
 
 	public void realive() {

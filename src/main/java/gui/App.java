@@ -36,10 +36,6 @@ public class App extends Application {
 		stage.setScene(new Scene(new GameView(this, map, players, replayLog), 1500, 860));
 	}
 
-	public void showGameEnd(Player winner) {
-		showGameEnd(winner, null);
-	}
-
 	public void showGameEnd(Player winner, Consumer<Path> onExport) {
 		stage.setScene(new Scene(new GameEndView(this, winner, onExport), 400, 340));
 	}

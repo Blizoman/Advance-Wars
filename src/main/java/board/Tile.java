@@ -8,34 +8,21 @@ import lombok.Setter;
 import tools.Consts;
 import unit.Unit;
 
+@Getter
+@Setter
 @RequiredArgsConstructor
 public class Tile {
 
-    @Getter
     @NonNull
     private Terrain terrain;
-    @Getter
     private Player owner = null;
-    @Getter
     private Unit unit = null;
-    @Getter
-    @Setter
     private int captureHp = Consts.CAPTURE_HP;
 
     public boolean isEmpty() { return this.unit == null; }
 
-    public void placeUnit(Unit unit) {
-        this.unit = unit;
-    }
-
     public void removeUnit() {
         this.unit = null;
-    }
-
-    public void setOwner(Player player) {
-        if (!terrain.isCapturable())
-            throw new IllegalStateException("Cannot own non-capturable terrain");
-        this.owner = player;
     }
 
     public void unsetOwner() {
@@ -54,11 +41,4 @@ public class Tile {
             resetCapturableHp();
         }
     }
-
-    public void convertHqToCity() {
-        if (this.terrain == Terrain.HQ)
-            setTerrain(Terrain.CITY);
-    }
-
-    public void setTerrain(Terrain to) { this.terrain = to; }
 }
