@@ -1,3 +1,9 @@
+/**
+ * Json reading helpers
+ * 
+ * @author: xpruzir00
+ */
+
 package tools;
 
 import com.google.gson.JsonArray;

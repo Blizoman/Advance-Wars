@@ -1,3 +1,9 @@
+/**
+ * Damage evaluation
+ * 
+ * @author: xpruzir00
+ */
+
 package tools;
 
 import unit.Unit;

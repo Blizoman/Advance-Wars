@@ -12,5 +12,7 @@ TODO: @ado
 
 vsetky checky treby robit v GUIku, robil som to stylom ze BE veri ze GUI mu nic zle neposle (inak by som mal tak 3× viac kodu)
 
-TODO: hlavicky suborov
+keby sa ti chce, budem rad ked skontrolujes riesenie na konci a skompilujes .jar (makefile by uz mal byt takmer nastaveny na to)
+
+TODO: hlavicky suborov, autori obsah
 TODO: AI

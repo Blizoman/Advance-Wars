@@ -1,3 +1,9 @@
+/**
+ * Color generation for Player
+ * 
+ * @author: xpruzir00
+ */
+
 package tools;
 
 import java.util.concurrent.ThreadLocalRandom;

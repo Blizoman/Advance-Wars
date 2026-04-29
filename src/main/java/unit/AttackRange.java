@@ -1,3 +1,9 @@
+/**
+ * Possible attack ranges
+ * 
+ * @author: xpruzir00
+ */
+
 package unit;
 
 public record AttackRange(

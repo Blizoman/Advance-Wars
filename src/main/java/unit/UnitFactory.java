@@ -1,3 +1,9 @@
+/**
+ * Factory for Unit
+ * 
+ * @author: xpruzir00
+ */
+
 package unit;
 
 import board.Position;

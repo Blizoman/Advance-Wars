@@ -1,3 +1,9 @@
+/**
+ * Constants for settings
+ * 
+ * @author: xpruzir00
+ */
+
 package tools;
 
 public class Consts {

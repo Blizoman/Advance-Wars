@@ -1,3 +1,9 @@
+/**
+ * Unit behaviour and state
+ * 
+ * @author: xpruzir00
+ */
+
 package unit;
 
 import lombok.Getter;

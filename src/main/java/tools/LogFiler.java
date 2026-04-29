@@ -1,3 +1,9 @@
+/**
+ * Log writer/reader
+ * 
+ * @author: xpruzir00
+ */
+
 package tools;
 
 import java.io.IOException;

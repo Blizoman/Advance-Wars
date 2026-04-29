@@ -1,4 +1,8 @@
-// for exe
+/**
+ * Launcher for executable file
+ * 
+ * @author: xpruzir00
+ */
 
 package tools;
 
