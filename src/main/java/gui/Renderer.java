@@ -31,9 +31,7 @@ public class Renderer {
 		applyZoom();
 	}
 
-	public double getZoom() {
-		return zoom;
-	}
+	public double getZoom() { return zoom; }
 
 	private double tileSize() {
 		return BASE_TILE_SIZE * zoom;
@@ -68,8 +66,10 @@ public class Renderer {
 		}
 
 		gc.setFill(Color.color(0, 1, 0, 0.35));
-		controller.getMoveCosts().keySet().forEach(
-				pos -> gc.fillRect(pos.x() * tileSize, pos.y() * tileSize, tileSize, tileSize));
+		var moveCosts = controller.getAbailableMoveCosts();
+		if (moveCosts != null)
+			moveCosts.keySet().forEach(
+					pos -> gc.fillRect(pos.x() * tileSize, pos.y() * tileSize, tileSize, tileSize));
 
 		Unit selected = controller.getSelectedUnit();
 		if (selected != null) {
@@ -80,7 +80,7 @@ public class Renderer {
 					tileSize, tileSize);
 		}
 
-		if (controller.isAttackMode()) {
+		if (controller.isAttacking()) {
 			gc.setFill(Color.color(1, 0, 0, 0.45));
 			controller.getAttackTargets().forEach(target -> gc.fillRect(
 					target.getPosition().x() * tileSize,
@@ -88,7 +88,7 @@ public class Renderer {
 					tileSize, tileSize));
 		}
 
-		Position selectedFactoryTile = controller.getSelectedFactoryTile();
+		Position selectedFactoryTile = controller.getSelectedFactory();
 		if (selectedFactoryTile != null) {
 			gc.setFill(Color.color(0.3, 0.6, 1.0, 0.35));
 			gc.fillRect(
@@ -113,7 +113,8 @@ public class Renderer {
 		}
 
 		if (tile.getTerrain().isCapturable()) {
-			Color foreground = tile.getOwner() == null ? Color.LIGHTGRAY : playerColor(tile.getOwner());
+			Color foreground =
+					tile.getOwner() == null ? Color.LIGHTGRAY : playerColor(tile.getOwner());
 			drawBar(gc, px, py + tileSize - 6, tileSize, 6,
 					tile.getCaptureHp() / (double) Consts.CAPTURE_HP,
 					foreground,
@@ -121,7 +122,8 @@ public class Renderer {
 		}
 
 		// colored border for buildings owned by a player
-		if (tile.getOwner() != null && (tile.getTerrain() == Terrain.CITY || tile.getTerrain() == Terrain.FACTORY || tile.getTerrain() == Terrain.HQ)) {
+		if (tile.getOwner() != null && (tile.getTerrain() == Terrain.CITY
+				|| tile.getTerrain() == Terrain.FACTORY || tile.getTerrain() == Terrain.HQ)) {
 			Color c = playerColor(tile.getOwner());
 			gc.setStroke(c);
 			gc.setLineWidth(Math.max(2, tileSize * 0.04));
@@ -153,9 +155,9 @@ public class Renderer {
 		gc.strokeRect(px + 1, py + 1, tileSize - 2, unitBodyHeight - 2);
 
 		drawBar(gc, px, py + unitBodyHeight, tileSize, barHeight,
-			unit.getHp() / 100.0,
-			playerColor(unit.getPlayer()),
-			Color.color(0.45, 0.45, 0.45));
+				unit.getHp() / 100.0,
+				playerColor(unit.getPlayer()),
+				Color.color(0.45, 0.45, 0.45));
 
 		gc.setFill(Color.WHITE);
 		gc.setFont(Font.font(Math.max(9, tileSize / 9)));

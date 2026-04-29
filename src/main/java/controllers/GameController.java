@@ -3,7 +3,6 @@ package controllers;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import board.AvailableMaps;
@@ -22,160 +21,96 @@ import unit.Unit;
 import unit.UnitType;
 
 public class GameController {
+
 	@Getter
 	private final Session session;
 	@Getter
 	private final Game game;
+
 	private final GeminiBot bot;
 	private final PathFinder pathFinder;
-	private final List<Runnable> onStateChangedListeners = new ArrayList<>();
+
+	private final List<Runnable> stateListeners = new ArrayList<>();
+
+	@Getter
+	private Position selectedFactory;
 	@Getter
 	private Unit selectedUnit;
+
 	@Getter
-	private Position selectedFactoryTile;
-	@Getter
-	private boolean attackMode;
-	@Getter
-	private Map<Position, Integer> moveCosts = Collections.emptyMap();
+	private boolean isAttacking;
+
 	private List<Unit> attackTargets;
+	private Map<Position, Integer> abailableMoveCosts = null;
+	//TODO: ADO can simplify to List<Position> (availablePositions) if needed
 
 	public GameController(Session session, Game game) {
 		this.session = session;
 		this.game = game;
 		this.pathFinder = new PathFinder(game.getGameBoard());
-		this.bot = new GeminiBot(pathFinder);
-		session.setOnGameEnd($_ -> stateChanged());
+		this.bot = new GeminiBot(this.pathFinder);
+		this.session.setOnGameEnd(ignored -> stateChanged());
 	}
 
+	/////////////////// VALUES ///////////////////
+	//////////////////////////////////////////////
+	/////////////////// STATE ////////////////////
+
 	private void stateChanged() {
-		for (Runnable listener : onStateChangedListeners)
+		for (Runnable listener : this.stateListeners)
 			listener.run();
 	}
 
 	public void setOnStateChanged(Runnable onStateChanged) {
 		if (onStateChanged != null)
-			onStateChangedListeners.add(onStateChanged);
+			this.stateListeners.add(onStateChanged);
 	}
 
-	public void onTileClicked(Position position) {
-		Unit clickedUnit = game.getGameBoard().getUnit(position);
-		Tile clickedTile = game.getGameBoard().getTile(position);
-
-		if (isSelectableFactoryTile(clickedTile, position)) {
-			selectedFactoryTile = position;
-			selectedUnit = null;
-			attackMode = false;
-			moveCosts = Collections.emptyMap();
-			attackTargets = null;
-			stateChanged();
-			return;
-		}
-
-		if (selectedUnit == null) {
-			if (clickedUnit != null && clickedUnit.getPlayer() == session.getActive()
-					&& !clickedUnit.isUsed()) {
-				selectedUnit = clickedUnit;
-				attackMode = false;
-				moveCosts = pathFinder.findReachableTiles(clickedUnit);
-				attackTargets = null;
-				stateChanged();
-			}
-			return;
-		}
-
-		if (attackMode) {
-			if (clickedUnit != null && getAttackTargets().contains(clickedUnit)) {
-				session.attack(selectedUnit, clickedUnit);
-				deselect();
-				return;
-			}
-			attackMode = false;
-		}
-
-		if (position.equals(selectedUnit.getPosition()) && canCapture()) {
-			session.tryCapture(selectedUnit, game.getGameBoard().getTile(position));
-			deselect();
-			return;
-		}
-
-		if (clickedUnit != null && clickedUnit.getPlayer() != selectedUnit.getPlayer()
-				&& canSelectedUnitAttackNow()
-				&& selectedUnit.canAttackTo(clickedUnit)) {
-			session.attack(selectedUnit, clickedUnit);
-			deselect();
-			return;
-		}
-
-		if (clickedUnit != null && clickedUnit.getPlayer() == selectedUnit.getPlayer()) {
-			if (clickedUnit.isUsed())
-				return;
-			selectedUnit = clickedUnit;
-			attackMode = false;
-			moveCosts = pathFinder.findReachableTiles(clickedUnit);
-			attackTargets = null;
-			stateChanged();
-			return;
-		}
-
-		if (moveCosts.containsKey(position)) {
-			session.moveUnit(selectedUnit, position);
-			moveCosts = pathFinder.findReachableTiles(selectedUnit);
-			attackTargets = null;
-			stateChanged();
-			return;
-		}
-
-		deselect();
+	private void deselect() {
+		selectedUnit = null;
+		selectedFactory = null;
+		isAttacking = false;
+		abailableMoveCosts = null;
+		attackTargets = null;
+		stateChanged();
 	}
 
-	public void onAttack(Unit target) {
-		session.attack(selectedUnit, target);
-		deselect();
-	}
-
-	public void beginAttackMode() {
-		if (selectedUnit != null && canAttack()) {
-			attackMode = true;
-			stateChanged();
-		}
-	}
-
-	public void onCapture() {
-		session.tryCapture(selectedUnit, game.getGameBoard().getTile(selectedUnit.getPosition()));
-		deselect();
-	}
-
-	public void onWait() {
+	private void deselectAsWait() {
 		if (selectedUnit != null)
 			selectedUnit.setUsed(true);
 		deselect();
 	}
 
-	public void onBuyUnit(UnitType type, Position position) {
-		if (position != null && game.getActive().canAfford(type.getCost())
-				&& game.getGameBoard().getTile(position).isEmpty())
-			session.buyUnit(position, type);
-		deselect();
+	private void deselectExceptUnit() {
+		selectedFactory = null;
+		isAttacking = false;
+		abailableMoveCosts = null;
+		attackTargets = null;
+		stateChanged();
 	}
 
+	/////////////////// STATE ////////////////////
+	//////////////////////////////////////////////
+	//////////////////// TURN ////////////////////
+
 	public void startGame() {
-		session.startTurn();
+		this.session.startTurn();
 		runTurnLoop();
 	}
 
 	private void runTurnLoop() {
-		if (session.getActive().isBot()) {
+		if (getActivePlayer().isBot()) {
 			// Using an indefinite timeline to tick actions one by one
 			Timeline botTimeline = new Timeline();
 			botTimeline.setCycleCount(Timeline.INDEFINITE);
 
 			KeyFrame frame = new KeyFrame(Duration.millis(500), e -> {
-				boolean hasMoreActions = bot.performNextAction(session);
+				boolean hasMoreActions = this.bot.performNextAction(this.session);
 				stateChanged(); // Redraw screen after every single move
 
 				if (!hasMoreActions) {
 					botTimeline.stop();
-					session.endTurn();
+					this.session.endTurn();
 					stateChanged();
 					runTurnLoop(); // Move to the next player
 				}
@@ -190,84 +125,178 @@ public class GameController {
 
 	public void onEndTurn() {
 		deselect();
-		session.endTurn();
+		this.session.endTurn();
 		runTurnLoop();
 	}
 
 	public void onStepForward() {
-		session.stepForward();
+		this.session.stepForward();
 		attackTargets = null;
 		stateChanged();
 	}
 
 	public void onStepBackward() {
-		session.stepBackward();
+		this.session.stepBackward();
 		attackTargets = null;
 		stateChanged();
 	}
 
-	public void onSave(Path path, AvailableMaps.MapMetadata map) throws IOException {
-		game.saveSession(path, map);
+	//////////////////// TURN ////////////////////
+	//////////////////////////////////////////////
+	////////////////// CAPTURE ///////////////////
+
+	public void onCapture() {
+		this.session.tryCapture(selectedUnit,
+				this.game.getGameBoard().getTile(selectedUnit.getPosition()));
+		deselect();
 	}
 
-	private void deselect() {
-		selectedUnit = null;
-		selectedFactoryTile = null;
-		attackMode = false;
-		moveCosts = Collections.emptyMap();
-		attackTargets = null;
-		stateChanged();
-	}
-
-	public boolean canAttack() {
-		return canSelectedUnitAttackNow() && !getAttackTargets().isEmpty();
-	}
-
-	public boolean canCapture() {
+	public boolean canCaptureSelected() {
 		if (selectedUnit == null)
 			return false;
-		Tile tile = game.getGameBoard().getTile(selectedUnit.getPosition());
+		Tile tile = this.game.getGameBoard().getTile(selectedUnit.getPosition());
 		return !selectedUnit.isCaptured()
 				&& selectedUnit.getType().isCanCapture()
 				&& tile.getTerrain().isCapturable()
 				&& (tile.getOwner() == null || tile.getOwner() != selectedUnit.getPlayer());
 	}
 
-	public boolean canBuyUnit() {
-		return findBuyPosition() != null;
+	////////////////// CAPTURE ///////////////////
+	//////////////////////////////////////////////
+	//////////////////// BUY /////////////////////
+
+	public void onBuyUnit(UnitType type) {
+		if (selectedFactory != null // Selected factory
+				&& getActivePlayer().canAfford(type.getCost()) // Can afford
+				&& this.game.getGameBoard().getTile(selectedFactory).isEmpty()) // Can place new unit
+			this.session.buyUnit(selectedFactory, type);
+		deselect();
 	}
 
 	public boolean canBuyUnit(UnitType type) {
-		return findBuyPosition() != null && game.getActive().canAfford(type.getCost());
+		return selectedFactory != null && getActivePlayer().canAfford(type.getCost());
 	}
 
-	public Position findBuyPosition() {
-		if (selectedFactoryTile == null)
-			return null;
+	//////////////////// BUY /////////////////////
+	//////////////////////////////////////////////
+	/////////////////// ATTACK ///////////////////
 
-		Tile tile = game.getGameBoard().getTile(selectedFactoryTile);
-		if (tile == null)
-			return null;
-		if (!isSelectableFactoryTile(tile, selectedFactoryTile))
-			return null;
-		return selectedFactoryTile;
+	public void beginAttackMode() {
+		if (canAttack()) {
+			isAttacking = true;
+			abailableMoveCosts = null;
+			stateChanged();
+		}
 	}
 
-	private boolean isSelectableFactoryTile(Tile tile, Position position) {
-		return tile != null
-				&& tile.getTerrain().isProduceUnits()
-				&& tile.getOwner() == session.getActive()
-				&& tile.isEmpty()
-				&& position != null;
+	public boolean canAttack() {
+		return canSelectedDoAttack() && !getAttackTargets().isEmpty();
 	}
 
-	public Player getActivePlayer() { return session.getActive(); }
-
-	private boolean canSelectedUnitAttackNow() {
+	private boolean canSelectedDoAttack() {
 		return selectedUnit != null
 				&& !selectedUnit.isAttacked()
 				&& (selectedUnit.getType().isCanAttackAfterMove()
 						|| selectedUnit.getMovesLeft() == selectedUnit.getType().getMoveRange());
+	}
+
+	/////////////////// ATTACK ///////////////////
+	//////////////////////////////////////////////
+	/////////////////// CLICK ////////////////////
+
+	public void onTileClicked(Position clickedPosition) {
+		if (trySelectFactory(clickedPosition))
+			return;
+		if (trySelectUnit(clickedPosition))
+			return;
+		if (selectedUnit == null)
+			return; // next calls are unit-only
+		if (tryAttack(clickedPosition))
+			return;
+		if (trySwitchUnit(clickedPosition))
+			return;
+		if (tryMove(clickedPosition))
+			return;
+		deselectAsWait();
+	}
+
+	private boolean trySelectFactory(Position position) {
+		if (selectedUnit != null && getAbailableMoveCosts().containsKey(position)) // selected unit can move to factory
+			return false;
+
+		if (!canSelectFactory(position))
+			return false;
+
+		deselectAsWait();
+		selectedFactory = position;
+		stateChanged();
+		return true;
+	}
+
+	private boolean canSelectFactory(Position position) {
+		Tile tile = this.game.getGameBoard().getTile(position);
+		return tile.getTerrain().isProduceUnits()
+				&& tile.getOwner() == getActivePlayer()
+				&& tile.isEmpty();
+	}
+
+	private boolean trySelectUnit(Position position) {
+		if (selectedUnit != null)
+			return false;
+
+		Unit clicked = this.game.getGameBoard().getUnit(position);
+		if (clicked == null || clicked.getPlayer() != getActivePlayer() || clicked.isUsed())
+			return false;
+
+		selectedUnit = clicked;
+		deselectExceptUnit();
+		return true;
+	}
+
+	private boolean tryAttack(Position position) {
+		if (!isAttacking)
+			return false;
+		Unit clicked = this.game.getGameBoard().getUnit(position);
+		if (getAttackTargets().contains(clicked)) {
+			this.session.attack(selectedUnit, clicked);
+			deselect();
+		} else
+			deselectAsWait();
+		return true;
+	}
+
+	private boolean trySwitchUnit(Position position) {
+		Unit clicked = this.game.getGameBoard().getUnit(position);
+		if (clicked == null // Invalid
+				|| clicked.getPlayer() != selectedUnit.getPlayer() // Not mine player
+				|| clicked == selectedUnit) // Clicked at same unit, do tryMove
+			return false;
+
+		if (clicked.isUsed()) // Already used, consume click
+			return true;
+
+		selectedUnit = clicked;
+		deselectExceptUnit();
+		return true;
+	}
+
+	private boolean tryMove(Position position) {
+		if (!getAbailableMoveCosts().containsKey(position)) // Not reachable
+			return false;
+
+		this.session.moveUnit(selectedUnit, position);
+		deselectExceptUnit();
+		return true;
+	}
+
+	/////////////////// CLICK ////////////////////
+	//////////////////////////////////////////////
+	//////////////////// LAZY ////////////////////
+
+	public Map<Position, Integer> getAbailableMoveCosts() {
+		if (abailableMoveCosts == null && selectedUnit != null)
+			abailableMoveCosts = this.pathFinder.findReachableTiles(selectedUnit);
+		return abailableMoveCosts;
 	}
 
 	public List<Unit> getAttackTargets() {
@@ -277,12 +306,29 @@ public class GameController {
 	}
 
 	private List<Unit> computeAttackTargets() {
-		if (!canSelectedUnitAttackNow())
+		if (!canSelectedDoAttack())
 			return List.of();
 
-		return game.getGameBoard().getAllUnits().stream()
+		return this.game.getGameBoard().getAllUnits().stream()
 				.filter(target -> target.getPlayer() != selectedUnit.getPlayer()
 						&& selectedUnit.canAttackTo(target))
 				.toList();
 	}
+
+	//////////////////// LAZY ////////////////////
+	//////////////////////////////////////////////
+	/////////////////// MISCS ////////////////////
+
+	public void onWait() {
+		deselectAsWait();
+	}
+
+	public Player getActivePlayer() { return this.session.getActive(); }
+
+	public void onSave(Path path, AvailableMaps.MapMetadata map) throws IOException {
+		this.game.saveSession(path, map);
+	}
+
+	/////////////////// MISCS ////////////////////
+	//////////////////////////////////////////////
 }

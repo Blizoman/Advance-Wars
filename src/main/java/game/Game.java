@@ -22,7 +22,6 @@ import unit.UnitType;
 @Getter
 public class Game {
 	private final GameBoard gameBoard;
-	//TODO: .getGameBoard().getTile(unit.getPosition()) make function, as it is lot often used
 	private final ArrayList<Player> players;
 	private final List<Player> initialPlayers;
 	private int currentPlayerIndex = 0;

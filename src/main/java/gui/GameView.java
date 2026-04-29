@@ -319,11 +319,11 @@ public class GameView extends HBox {
 		});
 		captureBtn.setOnAction(e -> controller.onCapture());
 		buyInfantryBtn.setOnAction(
-				e -> controller.onBuyUnit(UnitType.INFANTRY, controller.findBuyPosition()));
+				e -> controller.onBuyUnit(UnitType.INFANTRY));
 		buyTankBtn
-				.setOnAction(e -> controller.onBuyUnit(UnitType.TANK, controller.findBuyPosition()));
+				.setOnAction(e -> controller.onBuyUnit(UnitType.TANK));
 		buyCannonBtn
-				.setOnAction(e -> controller.onBuyUnit(UnitType.CANNON, controller.findBuyPosition()));
+				.setOnAction(e -> controller.onBuyUnit(UnitType.CANNON));
 
 
 		actionMenu.getChildren().addAll(
@@ -368,9 +368,9 @@ public class GameView extends HBox {
 		// Update action menu on state changes
 		controller.setOnStateChanged(() -> {
 			boolean unitSelected = controller.getSelectedUnit() != null;
-			boolean factorySelected = controller.getSelectedFactoryTile() != null;
+			boolean factorySelected = controller.getSelectedFactory() != null;
 			attackBtn.setDisable(!unitSelected || !controller.canAttack());
-			captureBtn.setDisable(!unitSelected || !controller.canCapture());
+			captureBtn.setDisable(!unitSelected || !controller.canCaptureSelected());
 			waitBtn.setDisable(!unitSelected);
 			buyInfantryBtn.setDisable(!factorySelected || !controller.canBuyUnit(UnitType.INFANTRY));
 			buyTankBtn.setDisable(!factorySelected || !controller.canBuyUnit(UnitType.TANK));

@@ -63,9 +63,6 @@ public class Session {
 
 	public void moveUnit(Unit unit, Position to) {
 		Position from = unit.getPosition();
-		if (from.equals(to))
-			return;
-
 		execute(new UnitMovedEvent(from, to, unit.getMovesLeft()));
 	}
 

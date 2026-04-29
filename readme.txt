@@ -17,8 +17,8 @@ TODO: hlavicky suborov
 
 
 TODO: TR: validate code
-controllers
 event
+game
 
 analyze what code can be reused (JsonSimples, consts, ...)
 
