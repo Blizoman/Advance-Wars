@@ -20,6 +20,8 @@ public class AvailableMaps {
 	@Getter
 	private static final List<MapMetadata> availableMaps = List.of(
 			new MapMetadata("TESTING", "testing", 2),
+			new MapMetadata("SYMETRIC 2", "symetric2", 2),
+			new MapMetadata("ASYMETRIC 2", "asymetric2", 2),
 			new MapMetadata("ASYMETRIC", "asymetric", 3),
 			new MapMetadata("BOT - ADVANTAGE", "botAdvantage", 2),
 			new MapMetadata("2 BOTS - ADVANTAGE", "2botsAdvantage", 3),
