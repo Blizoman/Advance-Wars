@@ -67,6 +67,7 @@ public class Session {
 
 	public void endTurn() {
 		execute(new TurnChangedEvent());
+		evaluateEliminations();
 	}
 
 	//////////////////// TURN ////////////////////
@@ -79,6 +80,7 @@ public class Session {
 
 	public void attack(Unit attacker, Unit defender) {
 		execute(new UnitAttackEvent(attacker, defender));
+		evaluateEliminations();
 	}
 
 	public void tryCapture(Unit unit, Tile tile) {
@@ -100,6 +102,7 @@ public class Session {
 					this.game.getGameBoard().getPosition(tile),
 					captureHpBefore, tile.getCaptureHp()));
 		}
+		evaluateEliminations();
 	}
 
 	public void buyUnit(Position position, UnitType unitType) {
@@ -121,6 +124,18 @@ public class Session {
 
 		if (this.game.getPlayers().size() == 1 && onGameEnd != null)
 			onGameEnd.accept(this.game.getPlayers().get(0));
+	}
+
+	private void evaluateEliminations() {
+		List<Player> playersSnapshot = new ArrayList<>(this.game.getPlayers());
+		for (Player player : playersSnapshot) {
+			if (!this.game.getGameBoard().getUnitsOf(player).isEmpty())
+				continue;
+			boolean hasFactory = this.game.getGameBoard().getTilesOf(player).stream()
+					.anyMatch(t -> t.getTerrain().isProduceUnits());
+			if (!hasFactory)
+				eliminatePlayer(player);
+		}
 	}
 
 	/////////////////// EVENTS ///////////////////
