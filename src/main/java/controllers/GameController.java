@@ -224,7 +224,8 @@ public class GameController {
 			return;
 		if (tryMove(clickedPosition))
 			return;
-		deselectAsWait();
+		// deselectAsWait();
+		deselect();
 	}
 
 	private boolean trySelectFactory(Position position) {
@@ -268,7 +269,9 @@ public class GameController {
 			this.session.attack(selectedUnit, clicked);
 			deselect();
 		} else
-			deselectAsWait();
+			isAttacking = false;
+			stateChanged();
+			// deselectAsWait();
 		return true;
 	}
 
