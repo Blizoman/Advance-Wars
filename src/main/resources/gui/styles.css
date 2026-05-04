@@ -1,0 +1,156 @@
+/* Global */
+.root-view {
+  -fx-font-family: "Noto Sans", "DejaVu Sans", "Verdana", sans-serif;
+  -fx-background-color: linear-gradient(to bottom right, #f6fbff 0%, #e9f3ff 45%, #dcecff 100%);
+}
+
+.title-label {
+  -fx-text-fill: #1b2b4a;
+  -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 12, 0.25, 0, 2);
+}
+
+.section-title {
+  -fx-text-fill: #203256;
+}
+
+.separator {
+  -fx-background-color: rgba(20,40,70,0.12);
+}
+
+.winner-header {
+  -fx-background-color: rgba(255,255,255,0.7);
+  -fx-background-radius: 12;
+  -fx-border-radius: 12;
+  -fx-border-color: rgba(26,49,88,0.18);
+  -fx-padding: 10 16;
+}
+
+/* Map area */
+.map-panel {
+  -fx-background-color: linear-gradient(to bottom, #f9fcff 0%, #eaf4ff 100%);
+  -fx-background-radius: 14;
+  -fx-border-radius: 14;
+  -fx-border-color: rgba(26,49,88,0.18);
+  -fx-padding: 10;
+  -fx-effect: dropshadow(three-pass-box, rgba(20,40,70,0.14), 12, 0.2, 0, 3);
+}
+
+.map-toolbar {
+  -fx-background-color: linear-gradient(to right, #e9f3ff 0%, #d9e9ff 100%);
+  -fx-background-radius: 10;
+  -fx-border-radius: 10;
+  -fx-border-color: rgba(26,49,88,0.16);
+  -fx-padding: 6 8 6 8;
+}
+
+.map-scroll {
+  -fx-background-color: transparent;
+  -fx-background: transparent;
+  -fx-border-color: rgba(26,49,88,0.14);
+  -fx-border-radius: 10;
+  -fx-background-radius: 10;
+  -fx-padding: 4;
+}
+
+.map-scroll .viewport {
+  -fx-background-color: transparent;
+}
+
+/* Sidebar */
+.sidebar {
+  -fx-background-color: linear-gradient(to bottom, #f4f8ff 0%, #e5effb 100%);
+  -fx-background-radius: 14;
+  -fx-border-radius: 14;
+  -fx-border-color: rgba(26,49,88,0.18);
+  -fx-padding: 10;
+  -fx-effect: dropshadow(three-pass-box, rgba(20,40,70,0.14), 10, 0.2, 0, 2);
+}
+
+.panel-card {
+  -fx-background-color: rgba(255,255,255,0.75);
+  -fx-background-radius: 10;
+  -fx-border-radius: 10;
+  -fx-border-color: rgba(26,49,88,0.14);
+  -fx-padding: 10;
+}
+
+.log-list {
+  -fx-background-color: transparent;
+  -fx-control-inner-background: rgba(255,255,255,0.75);
+  -fx-background-radius: 10;
+  -fx-border-radius: 10;
+  -fx-border-color: rgba(26,49,88,0.14);
+}
+
+.log-list .list-cell {
+  -fx-background-color: transparent;
+  -fx-text-fill: #1e2a44;
+}
+
+/* Map select list */
+.map-list {
+  -fx-background-color: rgba(255,255,255,0.8);
+  -fx-control-inner-background: rgba(255,255,255,0.8);
+  -fx-background-radius: 10;
+  -fx-border-radius: 10;
+  -fx-border-color: rgba(26,49,88,0.14);
+}
+
+.map-list .list-cell {
+  -fx-text-fill: #1e2a44;
+}
+
+/* Buttons */
+.button {
+  -fx-background-radius: 8;
+  -fx-border-radius: 8;
+  -fx-font-weight: bold;
+  -fx-cursor: hand;
+}
+
+.btn-primary {
+  -fx-background-color: linear-gradient(to bottom, #3a78c2 0%, #2b5fa8 100%);
+  -fx-text-fill: #f7fbff;
+  -fx-border-color: rgba(30,60,100,0.35);
+}
+
+.btn-secondary {
+  -fx-background-color: linear-gradient(to bottom, #e6f1ff 0%, #cfe1f9 100%);
+  -fx-text-fill: #1e2a44;
+  -fx-border-color: rgba(30,60,100,0.25);
+}
+
+.btn-ghost {
+  -fx-background-color: transparent;
+  -fx-text-fill: #2a3c5e;
+  -fx-border-color: rgba(30,60,100,0.35);
+}
+
+.btn-icon {
+  -fx-background-color: #e8f1ff;
+  -fx-text-fill: #2a3c5e;
+  -fx-border-color: rgba(30,60,100,0.2);
+}
+
+/* Context menu */
+.context-menu,
+.action-menu {
+  -fx-background-color: linear-gradient(to bottom, #f8fbff 0%, #e6f0ff 100%);
+  -fx-background-radius: 10;
+  -fx-border-radius: 10;
+  -fx-border-color: rgba(30,60,100,0.25);
+  -fx-padding: 6;
+}
+
+.menu-item {
+  -fx-background-color: transparent;
+}
+
+.menu-item:focused {
+  -fx-background-color: rgba(58,120,194,0.18);
+}
+
+.menu-item > .label {
+  -fx-text-fill: #1f2f4d;
+  -fx-font-weight: bold;
+}

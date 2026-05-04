@@ -13,9 +13,12 @@ import event.GameEvent;
 import game.Game;
 import game.Session;
 import gamer.Player;
+import javafx.animation.FadeTransition;
+import javafx.animation.Interpolator;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
@@ -32,11 +35,13 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.util.Duration;
 import unit.Unit;
 import unit.UnitType;
 import tools.LogFiler;
 
 public class GameView extends HBox {
+	private static final String UI_FONT = "Noto Sans";
 	private final Renderer renderer;
 	private final Canvas canvas;
 	private final AvailableMaps.MapMetadata mapMetadata;
@@ -76,6 +81,9 @@ public class GameView extends HBox {
 		final AvailableMaps.MapMetadata finalMap = effectiveMap;
 		final List<Player> finalPlayers = effectivePlayers;
 		this.mapMetadata = finalMap;
+		getStyleClass().add("root-view");
+		setSpacing(12);
+		setPadding(new Insets(12));
 		Game game;
 		try {
 			game = new Game(loadMap(finalMap, finalPlayers), finalPlayers);
@@ -93,6 +101,7 @@ public class GameView extends HBox {
 		renderer.resizeCanvasToBoard();
 
 		ContextMenu contextMenu = new ContextMenu();
+		contextMenu.getStyleClass().add("action-menu");
 
 		canvas.setOnMouseClicked(e -> {
 			contextMenu.hide();
@@ -146,22 +155,28 @@ public class GameView extends HBox {
 		};
 		zoomSlider.valueProperty().addListener((obs, oldValue, newValue) -> applyZoom.run());
 		Button zoomOutBtn = new Button("-");
+		zoomOutBtn.getStyleClass().add("btn-icon");
 		zoomOutBtn.setOnAction(
 				e -> zoomSlider.setValue(Math.max(zoomSlider.getMin(), zoomSlider.getValue() - 0.05)));
 		Button zoomInBtn = new Button("+");
+		zoomInBtn.getStyleClass().add("btn-icon");
 		zoomInBtn.setOnAction(
 				e -> zoomSlider.setValue(Math.min(zoomSlider.getMax(), zoomSlider.getValue() + 0.05)));
 		Button resetZoomBtn = new Button("100%");
+		resetZoomBtn.getStyleClass().add("btn-ghost");
 		resetZoomBtn.setOnAction(e -> zoomSlider.setValue(1.0));
 		ToolBar mapToolbar =
 				new ToolBar(zoomOutBtn, zoomSlider, zoomValueLabel, zoomInBtn, resetZoomBtn);
+		mapToolbar.getStyleClass().add("map-toolbar");
 		mapToolbar.setMinHeight(36);
 		mapToolbar.setPrefHeight(36);
 		mapToolbar.setMaxWidth(Double.MAX_VALUE);
 		VBox mapPanel = new VBox(8, mapToolbar, mapScrollPane);
+		mapPanel.getStyleClass().add("map-panel");
 		mapPanel.setMaxWidth(Double.MAX_VALUE);
 		HBox.setHgrow(mapPanel, Priority.ALWAYS);
 		VBox.setVgrow(mapScrollPane, Priority.ALWAYS);
+		mapScrollPane.getStyleClass().add("map-scroll");
 		canvas.setOnContextMenuRequested(null);
 		Runnable refresh = () -> {
 			Player active = controller.getActivePlayer();
@@ -180,7 +195,9 @@ public class GameView extends HBox {
 				throw new RuntimeException("Failed to export replay", ex);
 			}
 		}));
-		getChildren().addAll(mapPanel, buildSidebar(app, controller));
+		HBox sidebar = buildSidebar(app, controller);
+		getChildren().addAll(mapPanel, sidebar);
+		playIntro(mapPanel, sidebar);
 		if (replayLog == null)
 			controller.startGame();
 		else
@@ -229,26 +246,46 @@ public class GameView extends HBox {
 		contextMenu.show(canvas, screenX, screenY);
 	}
 
+	private void playIntro(Node... nodes) {
+		for (int i = 0; i < nodes.length; i++) {
+			Node node = nodes[i];
+			node.setOpacity(0);
+			FadeTransition ft = new FadeTransition(Duration.millis(220), node);
+			ft.setFromValue(0);
+			ft.setToValue(1);
+			ft.setDelay(Duration.millis(70L * i));
+			ft.setInterpolator(Interpolator.EASE_OUT);
+			ft.play();
+		}
+	}
+
 	private HBox buildSidebar(App app, GameController controller) {
 		HBox sidebar = new HBox(12);
+		sidebar.getStyleClass().add("sidebar");
 		sidebar.setPadding(new Insets(10));
 		sidebar.setPrefWidth(520);
 		sidebar.setMinWidth(480);
-		playerLabel.setFont(Font.font(playerLabel.getFont().getFamily(), FontWeight.BOLD, 16));
+		playerLabel.setFont(Font.font(UI_FONT, FontWeight.BOLD, 16));
 		playerLabel.setTextFill(Color.BLACK);
-		moneyLabel.setFont(Font.font(moneyLabel.getFont().getFamily(), 14));
+		playerLabel.getStyleClass().add("player-label");
+		moneyLabel.setFont(Font.font(UI_FONT, 14));
 		moneyLabel.setTextFill(Color.BLACK);
+		moneyLabel.getStyleClass().add("money-label");
 		VBox actionPanel = new VBox(8);
+		actionPanel.getStyleClass().add("panel-card");
 		actionPanel.setPrefWidth(230);
 		actionPanel.setMinWidth(210);
 		VBox logPanel = new VBox(8);
+		logPanel.getStyleClass().add("panel-card");
 		logPanel.setPrefWidth(250);
 		logPanel.setMinWidth(230);
 		Label historyLabel = new Label("Event History");
-		historyLabel.setFont(Font.font(historyLabel.getFont().getFamily(), FontWeight.BOLD, 12));
+		historyLabel.setFont(Font.font(UI_FONT, FontWeight.BOLD, 12));
 		historyLabel.setTextFill(Color.BLACK);
+		historyLabel.getStyleClass().add("section-title");
 		eventLogView.setPrefHeight(540);
 		eventLogView.setFocusTraversable(false);
+		eventLogView.getStyleClass().add("log-list");
 		Label emptyPlaceholder = new Label("No events yet");
 		emptyPlaceholder.setTextFill(Color.BLACK);
 		eventLogView.setPlaceholder(emptyPlaceholder);
@@ -259,12 +296,12 @@ public class GameView extends HBox {
 				setOpacity(1.0);
 				setTextFill(Color.BLACK);
 				setBackground(null);
-				setFont(Font.getDefault());
+				setFont(Font.font(UI_FONT, 12));
 				if (empty || event == null) {
 					setText(null);
 					setGraphic(null);
 					setBackground(null);
-					setFont(Font.getDefault());
+					setFont(Font.font(UI_FONT, 12));
 					setOpacity(1.0);
 					return;
 				}
@@ -316,36 +353,38 @@ public class GameView extends HBox {
 					}
 				}
 				if (index == currentLogCursor - 1) {
-					setFont(Font.font(getFont().getFamily(), FontWeight.BOLD, getFont().getSize()));
+					setFont(Font.font(UI_FONT, FontWeight.BOLD, getFont().getSize()));
 				} else if (index >= currentLogCursor) {
 					setTextFill(Color.GRAY);
 					setOpacity(0.72);
 				} else {
-					setFont(Font.getDefault());
+					setFont(Font.font(UI_FONT, 12));
 				}
 			}
 		});
 		
 		VBox actionMenu = new VBox(5);
-		actionMenu.setPadding(new Insets(8));
-		actionMenu.setBorder(new Border(new BorderStroke(Color.web("#ccc"), BorderStrokeStyle.SOLID,
-				CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+		actionMenu.getStyleClass().add("panel-card");
 		
 		Label buyLabel = new Label("Buy Unit:");
-		buyLabel.setFont(Font.font(buyLabel.getFont().getFamily(), FontWeight.BOLD, 12));
+		buyLabel.setFont(Font.font(UI_FONT, FontWeight.BOLD, 12));
 		buyLabel.setTextFill(Color.BLACK);
+		buyLabel.getStyleClass().add("section-title");
 		
 		Button buyInfantryBtn = new Button("Infantry");
 		buyInfantryBtn.setPrefWidth(160);
 		buyInfantryBtn.setDisable(true);
+		buyInfantryBtn.getStyleClass().add("btn-secondary");
 		
 		Button buyTankBtn = new Button("Tank");
 		buyTankBtn.setPrefWidth(160);
 		buyTankBtn.setDisable(true);
+		buyTankBtn.getStyleClass().add("btn-secondary");
 		
 		Button buyCannonBtn = new Button("Cannon");
 		buyCannonBtn.setPrefWidth(160);
 		buyCannonBtn.setDisable(true);
+		buyCannonBtn.getStyleClass().add("btn-secondary");
 		
 		buyInfantryBtn.setOnAction(e -> controller.onBuyUnit(UnitType.INFANTRY));
 		buyTankBtn.setOnAction(e -> controller.onBuyUnit(UnitType.TANK));
@@ -360,14 +399,17 @@ public class GameView extends HBox {
 		Button endTurnBtn = new Button("End Turn");
 		endTurnBtn.setPrefWidth(200);
 		endTurnBtn.setOnAction(e -> controller.onEndTurn());
+		endTurnBtn.getStyleClass().add("btn-primary");
 		
 		Button stepBackBtn = new Button("◀ Step Back");
 		stepBackBtn.setPrefWidth(200);
 		stepBackBtn.setOnAction(e -> controller.onStepBackward());
+		stepBackBtn.getStyleClass().add("btn-secondary");
 		
 		Button stepFwdBtn = new Button("Step Forward ▶");
 		stepFwdBtn.setPrefWidth(200);
 		stepFwdBtn.setOnAction(e -> controller.onStepForward());
+		stepFwdBtn.getStyleClass().add("btn-secondary");
 		
 		Button exportBtn = new Button("Export Session...");
 		exportBtn.setPrefWidth(200);
@@ -381,10 +423,12 @@ public class GameView extends HBox {
 				throw new RuntimeException("Failed to export replay", ex);
 			}
 		});
+		exportBtn.getStyleClass().add("btn-secondary");
 		
 		Button menuBtn = new Button("Back to Menu");
 		menuBtn.setPrefWidth(200);
 		menuBtn.setOnAction(e -> app.showMapSelect());
+		menuBtn.getStyleClass().add("btn-ghost");
 		
 		controller.setOnStateChanged(() -> {
 			boolean factorySelected = controller.getSelectedFactory() != null;

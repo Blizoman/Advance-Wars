@@ -5,34 +5,42 @@ import java.util.List;
 import java.nio.file.Path;
 import board.AvailableMaps;
 import gamer.Player;
+import javafx.animation.FadeTransition;
+import javafx.animation.Interpolator;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.util.Duration;
 
 public class MapSelectView extends VBox {
+	private static final String UI_FONT = "Noto Sans";
 	private final VBox playersBox = new VBox(8);
 	private List<PlayerInputRow> playerRows = new ArrayList<>();
 
 	public MapSelectView(App app) {
+		getStyleClass().add("root-view");
 		setSpacing(12);
 		setPadding(new Insets(20));
 		setAlignment(Pos.CENTER);
 		setFillWidth(true);
 
 		Label title = new Label("Advance Wars");
-		title.setFont(Font.font(title.getFont().getFamily(), FontWeight.BOLD, 32));
+		title.setFont(Font.font(UI_FONT, FontWeight.BOLD, 32));
 		title.setTextFill(Color.BLACK);
+		title.getStyleClass().add("title-label");
 
 		// map list
 		ListView<AvailableMaps.MapMetadata> mapList = new ListView<>();
 		mapList.getItems().addAll(AvailableMaps.getAvailableMaps());
 		mapList.setPrefHeight(220);
 		mapList.setPrefWidth(420);
+		mapList.getStyleClass().add("map-list");
 		mapList.setCellFactory(lv -> new ListCell<AvailableMaps.MapMetadata>() {
 			@Override
 			protected void updateItem(AvailableMaps.MapMetadata item, boolean empty) {
@@ -45,7 +53,10 @@ public class MapSelectView extends VBox {
 
 		Label playersLabel = new Label("Players:");
 		playersLabel.setTextFill(Color.BLACK);
+		playersLabel.getStyleClass().add("section-title");
 		playersBox.getChildren().add(playersLabel);
+		playersBox.setPadding(new Insets(10));
+		playersBox.getStyleClass().add("panel-card");
 		mapList.getSelectionModel().selectedItemProperty().addListener((obs, oldMap, selectedMap) -> {
 			if (selectedMap != null)
 				refreshPlayerRows(selectedMap.players());
@@ -53,7 +64,8 @@ public class MapSelectView extends VBox {
 		refreshPlayerRows(mapList.getSelectionModel().getSelectedItem().players());
 
 		Button startBtn = new Button("Start Game");
-		startBtn.setFont(Font.font(startBtn.getFont().getFamily(), 16));
+		startBtn.setFont(Font.font(UI_FONT, 16));
+		startBtn.getStyleClass().add("btn-primary");
 		startBtn.setOnAction(e -> {
 			AvailableMaps.MapMetadata selected = mapList.getSelectionModel().getSelectedItem();
 			if (selected == null)
@@ -62,7 +74,8 @@ public class MapSelectView extends VBox {
 		});
 
 		Button loadReplayBtn = new Button("Load Replay");
-		loadReplayBtn.setFont(Font.font(loadReplayBtn.getFont().getFamily(), 16));
+		loadReplayBtn.setFont(Font.font(UI_FONT, 16));
+		loadReplayBtn.getStyleClass().add("btn-secondary");
 		loadReplayBtn.setOnAction(e -> {
 			AvailableMaps.MapMetadata selected = mapList.getSelectionModel().getSelectedItem();
 			if (selected == null)
@@ -75,6 +88,7 @@ public class MapSelectView extends VBox {
 
 		Label selectMapLabel = new Label("Select Map:");
 		selectMapLabel.setTextFill(Color.BLACK);
+		selectMapLabel.getStyleClass().add("section-title");
 		getChildren().addAll(
 				title,
 				selectMapLabel,
@@ -84,6 +98,20 @@ public class MapSelectView extends VBox {
 				loadReplayBtn);
 
 		setMinWidth(520);
+		playIntro(title, selectMapLabel, mapList, playersBox, startBtn, loadReplayBtn);
+	}
+
+	private void playIntro(Node... nodes) {
+		for (int i = 0; i < nodes.length; i++) {
+			Node node = nodes[i];
+			node.setOpacity(0);
+			FadeTransition ft = new FadeTransition(Duration.millis(200), node);
+			ft.setFromValue(0);
+			ft.setToValue(1);
+			ft.setDelay(Duration.millis(70L * i));
+			ft.setInterpolator(Interpolator.EASE_OUT);
+			ft.play();
+		}
 	}
 
 	private void refreshPlayerRows(int count) {
@@ -97,6 +125,7 @@ public class MapSelectView extends VBox {
 		playerRows = new ArrayList<>();
 		Label refreshedPlayersLabel = new Label("Players:");
 		refreshedPlayersLabel.setTextFill(Color.BLACK);
+		refreshedPlayersLabel.getStyleClass().add("section-title");
 		playersBox.getChildren().setAll(refreshedPlayersLabel);
 		for (int i = 0; i < count; i++) {
 			String defaultName = i < previousNames.size() && previousNames.get(i) != null

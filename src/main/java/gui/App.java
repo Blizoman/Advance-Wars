@@ -25,19 +25,31 @@ public class App extends Application {
 	}
 
 	public void showMapSelect() {
-		stage.setScene(new Scene(new MapSelectView(this), 760, 620));
+		Scene scene = new Scene(new MapSelectView(this), 760, 620);
+		applyTheme(scene);
+		stage.setScene(scene);
 	}
 
 	public void showGame(AvailableMaps.MapMetadata map, List<Player> players) {
-		stage.setScene(new Scene(new GameView(this, map, players), 1500, 860));
+		Scene scene = new Scene(new GameView(this, map, players), 1500, 860);
+		applyTheme(scene);
+		stage.setScene(scene);
 	}
 
 	public void showGame(AvailableMaps.MapMetadata map, List<Player> players, Path replayLog) {
-		stage.setScene(new Scene(new GameView(this, map, players, replayLog), 1500, 860));
+		Scene scene = new Scene(new GameView(this, map, players, replayLog), 1500, 860);
+		applyTheme(scene);
+		stage.setScene(scene);
 	}
 
 	public void showGameEnd(Player winner, Consumer<Path> onExport) {
-		stage.setScene(new Scene(new GameEndView(this, winner, onExport), 400, 340));
+		Scene scene = new Scene(new GameEndView(this, winner, onExport), 400, 340);
+		applyTheme(scene);
+		stage.setScene(scene);
+	}
+
+	private void applyTheme(Scene scene) {
+		scene.getStylesheets().add(getClass().getResource("/gui/styles.css").toExternalForm());
 	}
 
 	public Path chooseLoadReplayFile() {
