@@ -132,8 +132,8 @@ public class GameView extends HBox {
 		mapScrollPane.setPannable(true);
 		mapScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
 		mapScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-		mapScrollPane.setFitToWidth(false);
-		mapScrollPane.setFitToHeight(false);
+		mapScrollPane.setFitToWidth(true);
+		mapScrollPane.setFitToHeight(true);
 		Slider zoomSlider = new Slider(0.3, 1.0, renderer.getZoom());
 		zoomSlider.setPrefWidth(160);
 		Label zoomValueLabel = new Label("100%");
@@ -159,6 +159,8 @@ public class GameView extends HBox {
 		mapToolbar.setPrefHeight(36);
 		mapToolbar.setMaxWidth(Double.MAX_VALUE);
 		VBox mapPanel = new VBox(8, mapToolbar, mapScrollPane);
+		mapPanel.setMaxWidth(Double.MAX_VALUE);
+		HBox.setHgrow(mapPanel, Priority.ALWAYS);
 		VBox.setVgrow(mapScrollPane, Priority.ALWAYS);
 		canvas.setOnContextMenuRequested(null);
 		Runnable refresh = () -> {
