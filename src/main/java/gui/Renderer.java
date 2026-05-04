@@ -28,7 +28,7 @@ public class Renderer {
 
 	public void setZoom(double zoom) {
 		this.zoom = Math.max(0.3, Math.min(1.0, zoom));
-		applyZoom();
+		resizeCanvasToBoard();
 	}
 
 	public double getZoom() { return zoom; }
@@ -39,14 +39,9 @@ public class Renderer {
 
 	public void resizeCanvasToBoard() {
 		GameBoard board = controller.getGame().getGameBoard();
-		canvas.setWidth(board.getWidth() * BASE_TILE_SIZE);
-		canvas.setHeight(board.getHeight() * BASE_TILE_SIZE);
-		applyZoom();
-	}
-
-	private void applyZoom() {
-		canvas.setScaleX(zoom);
-		canvas.setScaleY(zoom);
+		double tileSize = tileSize();
+		canvas.setWidth(board.getWidth() * tileSize);
+		canvas.setHeight(board.getHeight() * tileSize);
 	}
 
 	public void render() {

@@ -38,11 +38,20 @@ import tools.LogFiler;
 
 public class GameView extends HBox {
 	private final Renderer renderer;
+	private final Canvas canvas;
 	private final AvailableMaps.MapMetadata mapMetadata;
 	private final Label playerLabel = new Label();
 	private final Label moneyLabel = new Label();
 	private final ListView<GameEvent> eventLogView = new ListView<>();
 	private int currentLogCursor = 0;
+
+	private enum UiState {
+		IDLE,
+		UNIT_SELECTED,
+		UNIT_MOVED,
+		ATTACK_MODE,
+		FACTORY_SELECTED
+	}
 
 	public GameView(App app, AvailableMaps.MapMetadata map, List<Player> players) {
 		this(app, map, players, null);
@@ -79,7 +88,7 @@ public class GameView extends HBox {
 		else
 			session = new Session(game);
 		GameController controller = new GameController(session, game);
-		Canvas canvas = new Canvas(880, 700);
+		this.canvas = new Canvas(880, 700);
 		this.renderer = new Renderer(canvas, controller);
 		renderer.resizeCanvasToBoard();
 
@@ -91,63 +100,30 @@ public class GameView extends HBox {
 			if (e.getButton() != MouseButton.PRIMARY)
 				return;
 			Position pos = renderer.screenToGrid(e.getX(), e.getY());
-			
-			// Handle clicks outside the map or on invalid positions
-			if (!controller.getGame().getGameBoard().isValidPosition(pos)) {
-				// If a unit moved but no action was selected, clicking outside means "cancel move"
-				if (controller.getSelectedUnit() != null && controller.getAbailableMoveCosts() != null && controller.getAbailableMoveCosts().isEmpty()) {
-					controller.onStepBackward(); // Undo the move
-				} else if (controller.getSelectedUnit() != null) {
-					controller.onWait(); // Deselect unit if it hasn't moved
-				}
+
+			if (!controller.getGame().getGameBoard().isValidPosition(pos))
+				return;
+
+			UiState before = getUiState(controller);
+			Unit selected = controller.getSelectedUnit();
+			if (before == UiState.UNIT_MOVED) {
+				showActionMenu(contextMenu, controller, e.getScreenX(), e.getScreenY());
+				return;
+			}
+			if (before == UiState.ATTACK_MODE
+					&& selected != null
+					&& pos.equals(selected.getPosition())) {
+				if (before == UiState.ATTACK_MODE)
+					controller.onTileClicked(pos);
+				showActionMenu(contextMenu, controller, e.getScreenX(), e.getScreenY());
 				return;
 			}
 
-			boolean unitMovedBefore = controller.getAbailableMoveCosts() != null && controller.getAbailableMoveCosts().isEmpty();
-			Unit selectedUnitBefore = controller.getSelectedUnit();
-
-			// 1. If a moved unit is selected and the user clicks ELSEWHERE
-			// (selecting another tile or unit), treat it as a CANCEL action for the move.
-			if (selectedUnitBefore != null && unitMovedBefore && !pos.equals(selectedUnitBefore.getPosition())) {
-				// Keep the turn active if we are currently targeting an enemy
-				if (!controller.isAttacking()) {
-					controller.onStepBackward();
-					return; // Stop processing, unit is returned to original position
-				}
-			}
-
-			// Process the click via controller logic
 			controller.onTileClicked(pos);
+			UiState after = getUiState(controller);
 
-			boolean unitMovedAfter = controller.getAbailableMoveCosts() != null && controller.getAbailableMoveCosts().isEmpty();
-			Unit selectedUnitAfter = controller.getSelectedUnit();
-
-			// 2. Show context menu if the unit just moved, or if clicking the already moved unit again
-			if (selectedUnitAfter != null && unitMovedAfter) {
-				contextMenu.getItems().clear();
-				
-				if (controller.canAttack()) {
-					MenuItem attackItem = new MenuItem("Attack");
-					attackItem.setOnAction(ev -> controller.beginAttackMode());
-					contextMenu.getItems().add(attackItem);
-				}
-				
-				if (controller.canCaptureSelected()) {
-					MenuItem captureItem = new MenuItem("Capture");
-					captureItem.setOnAction(ev -> controller.onCapture());
-					contextMenu.getItems().add(captureItem);
-				}
-				
-				MenuItem waitItem = new MenuItem("Wait");
-				waitItem.setOnAction(ev -> controller.onWait());
-				contextMenu.getItems().add(waitItem);
-				
-				// Optional cancel button for better UX
-				MenuItem cancelItem = new MenuItem("Cancel");
-				cancelItem.setOnAction(ev -> controller.onStepBackward());
-				contextMenu.getItems().add(cancelItem);
-				
-				contextMenu.show(canvas, e.getScreenX(), e.getScreenY());
+			if (after == UiState.UNIT_MOVED) {
+				showActionMenu(contextMenu, controller, e.getScreenX(), e.getScreenY());
 			}
 		});
 
@@ -207,6 +183,48 @@ public class GameView extends HBox {
 			controller.startGame();
 		else
 			refresh.run();
+	}
+
+	private UiState getUiState(GameController controller) {
+		if (controller.isAttacking())
+			return UiState.ATTACK_MODE;
+		if (controller.getSelectedFactory() != null)
+			return UiState.FACTORY_SELECTED;
+		Unit selected = controller.getSelectedUnit();
+		if (selected != null) {
+			var moves = controller.getAbailableMoveCosts();
+			if (moves != null && moves.isEmpty())
+				return UiState.UNIT_MOVED;
+			return UiState.UNIT_SELECTED;
+		}
+		return UiState.IDLE;
+	}
+
+	private void showActionMenu(ContextMenu contextMenu, GameController controller,
+			double screenX, double screenY) {
+		contextMenu.getItems().clear();
+
+		if (controller.canAttack()) {
+			MenuItem attackItem = new MenuItem("Attack");
+			attackItem.setOnAction(ev -> controller.beginAttackMode());
+			contextMenu.getItems().add(attackItem);
+		}
+
+		if (controller.canCaptureSelected()) {
+			MenuItem captureItem = new MenuItem("Capture");
+			captureItem.setOnAction(ev -> controller.onCapture());
+			contextMenu.getItems().add(captureItem);
+		}
+
+		MenuItem waitItem = new MenuItem("Wait");
+		waitItem.setOnAction(ev -> controller.onWait());
+		contextMenu.getItems().add(waitItem);
+
+		MenuItem cancelItem = new MenuItem("Cancel");
+		cancelItem.setOnAction(ev -> controller.onStepBackward());
+		contextMenu.getItems().add(cancelItem);
+
+		contextMenu.show(canvas, screenX, screenY);
 	}
 
 	private HBox buildSidebar(App app, GameController controller) {
