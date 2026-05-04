@@ -16,6 +16,8 @@ import unit.Unit;
 
 public class Renderer {
 	private static final double BASE_TILE_SIZE = 80.0;
+	private static final double MIN_ZOOM = 0.3;
+	private static final double MAX_ZOOM = 2.0;
 
 	private final Canvas canvas;
 	private final GameController controller;
@@ -27,7 +29,7 @@ public class Renderer {
 	}
 
 	public void setZoom(double zoom) {
-		this.zoom = Math.max(0.3, Math.min(1.0, zoom));
+		this.zoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, zoom));
 		resizeCanvasToBoard();
 	}
 

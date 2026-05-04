@@ -32,6 +32,7 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.*;
 import javafx.scene.input.MouseButton;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -143,7 +144,7 @@ public class GameView extends HBox {
 		mapScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
 		mapScrollPane.setFitToWidth(true);
 		mapScrollPane.setFitToHeight(true);
-		Slider zoomSlider = new Slider(0.3, 1.0, renderer.getZoom());
+		Slider zoomSlider = new Slider(0.3, 2.0, renderer.getZoom());
 		zoomSlider.setPrefWidth(160);
 		Label zoomValueLabel = new Label("100%");
 		zoomValueLabel.setMinWidth(48);
@@ -153,6 +154,25 @@ public class GameView extends HBox {
 			zoomValueLabel.setText((int) Math.round(renderer.getZoom() * 100) + "%");
 			renderer.render();
 		};
+		mapScrollPane.addEventFilter(ScrollEvent.SCROLL, e -> {
+			if (!e.isControlDown())
+				return;
+			double step = 0.05;
+			double raw = e.getDeltaY();
+			if (raw == 0)
+				raw = e.getTextDeltaY();
+			if (raw == 0)
+				raw = e.getDeltaX();
+			if (raw == 0)
+				return;
+			double delta = Math.signum(raw) * step;
+			if (e.isShiftDown())
+				delta = -delta;
+			double next = Math.max(zoomSlider.getMin(),
+					Math.min(zoomSlider.getMax(), zoomSlider.getValue() + delta));
+			zoomSlider.setValue(next);
+			e.consume();
+		});
 		zoomSlider.valueProperty().addListener((obs, oldValue, newValue) -> applyZoom.run());
 		Button zoomOutBtn = new Button("-");
 		zoomOutBtn.getStyleClass().add("btn-icon");
