@@ -142,6 +142,13 @@ public class Renderer {
 		int bottomBarsHeight = barHeight * 2;
 		double unitBodyHeight = tileSize - bottomBarsHeight;
 
+		if (unit.isUsed()) {
+			javafx.scene.effect.ColorAdjust grayscale = new javafx.scene.effect.ColorAdjust();
+			grayscale.setSaturation(-1.0);
+			grayscale.setBrightness(-0.2); 
+			gc.setEffect(grayscale);
+		}
+
 		Image img = AssetLoader.unit(unit.getType());
 		if (img != null) {
 			gc.drawImage(img, px, py, tileSize, unitBodyHeight);
@@ -149,19 +156,25 @@ public class Renderer {
 			gc.setFill(playerColor(unit.getPlayer()));
 			gc.fillOval(px + 4, py + 4, tileSize - 8, unitBodyHeight - 8);
 		}
-
+		
+		// Frame draw by player color
 		gc.setStroke(playerColor(unit.getPlayer()));
 		gc.setLineWidth(2);
 		gc.strokeRect(px + 1, py + 1, tileSize - 2, unitBodyHeight - 2);
-
+		
+		// HP Bar
 		drawBar(gc, px, py + unitBodyHeight, tileSize, barHeight,
 				unit.getHp() / 100.0,
 				playerColor(unit.getPlayer()),
 				Color.color(0.45, 0.45, 0.45));
-
+				
+		// Show HP
 		gc.setFill(Color.WHITE);
 		gc.setFont(Font.font(Math.max(9, tileSize / 9)));
 		gc.fillText(String.valueOf(unit.getHp()), px + 2, py + unitBodyHeight - 1);
+
+		// Destroy effect contrary for others infantries,tanks,...
+		gc.setEffect(null);
 	}
 
 	private Color fallbackColor(Terrain terrain) {

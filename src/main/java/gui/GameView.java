@@ -86,46 +86,66 @@ public class GameView extends HBox {
 		ContextMenu contextMenu = new ContextMenu();
 
 		canvas.setOnMouseClicked(e -> {
-			contextMenu.hide(); // Skryjeme menu pri každom novom kliknutí
+			contextMenu.hide();
 
 			if (e.getButton() != MouseButton.PRIMARY)
 				return;
 			Position pos = renderer.screenToGrid(e.getX(), e.getY());
+			
+			// Handle clicks outside the map or on invalid positions
 			if (!controller.getGame().getGameBoard().isValidPosition(pos)) {
-				if (controller.getSelectedUnit() != null)
-					controller.onWait();
+				// If a unit moved but no action was selected, clicking outside means "cancel move"
+				if (controller.getSelectedUnit() != null && controller.getAbailableMoveCosts() != null && controller.getAbailableMoveCosts().isEmpty()) {
+					controller.onStepBackward(); // Undo the move
+				} else if (controller.getSelectedUnit() != null) {
+					controller.onWait(); // Deselect unit if it hasn't moved
+				}
 				return;
 			}
 
-			// Uložíme si stav PRED kliknutím
 			boolean unitMovedBefore = controller.getAbailableMoveCosts() != null && controller.getAbailableMoveCosts().isEmpty();
 			Unit selectedUnitBefore = controller.getSelectedUnit();
 
+			// 1. If a moved unit is selected and the user clicks ELSEWHERE
+			// (selecting another tile or unit), treat it as a CANCEL action for the move.
+			if (selectedUnitBefore != null && unitMovedBefore && !pos.equals(selectedUnitBefore.getPosition())) {
+				// Keep the turn active if we are currently targeting an enemy
+				if (!controller.isAttacking()) {
+					controller.onStepBackward();
+					return; // Stop processing, unit is returned to original position
+				}
+			}
+
+			// Process the click via controller logic
 			controller.onTileClicked(pos);
 
-			// Uložíme si stav PO kliknutí
 			boolean unitMovedAfter = controller.getAbailableMoveCosts() != null && controller.getAbailableMoveCosts().isEmpty();
 			Unit selectedUnitAfter = controller.getSelectedUnit();
 
-			// Ak sa jednotka práve teraz pohla, ukážeme menu
-			if (selectedUnitAfter != null && unitMovedAfter && !unitMovedBefore && selectedUnitAfter == selectedUnitBefore) {
+			// 2. Show context menu if the unit just moved, or if clicking the already moved unit again
+			if (selectedUnitAfter != null && unitMovedAfter) {
 				contextMenu.getItems().clear();
 				
 				if (controller.canAttack()) {
-					MenuItem attackItem = new MenuItem("Útok (Attack)");
+					MenuItem attackItem = new MenuItem("Attack");
 					attackItem.setOnAction(ev -> controller.beginAttackMode());
 					contextMenu.getItems().add(attackItem);
 				}
 				
 				if (controller.canCaptureSelected()) {
-					MenuItem captureItem = new MenuItem("Zabrat (Capture)");
+					MenuItem captureItem = new MenuItem("Capture");
 					captureItem.setOnAction(ev -> controller.onCapture());
 					contextMenu.getItems().add(captureItem);
 				}
 				
-				MenuItem waitItem = new MenuItem("Čekat (Wait)");
+				MenuItem waitItem = new MenuItem("Wait");
 				waitItem.setOnAction(ev -> controller.onWait());
 				contextMenu.getItems().add(waitItem);
+				
+				// Optional cancel button for better UX
+				MenuItem cancelItem = new MenuItem("Cancel");
+				cancelItem.setOnAction(ev -> controller.onStepBackward());
+				contextMenu.getItems().add(cancelItem);
 				
 				contextMenu.show(canvas, e.getScreenX(), e.getScreenY());
 			}
