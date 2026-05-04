@@ -21,7 +21,7 @@ import javafx.scene.text.FontWeight;
 import javafx.util.Duration;
 
 public class GameEndView extends VBox {
-	private static final String UI_FONT = "Noto Sans";
+	private static final String UI_FONT = "Manrope";
 	public GameEndView(App app, Player winner, Consumer<Path> onExport) {
 		getStyleClass().add("root-view");
 		setSpacing(20);

@@ -41,7 +41,7 @@ import unit.UnitType;
 import tools.LogFiler;
 
 public class GameView extends HBox {
-	private static final String UI_FONT = "Noto Sans";
+	private static final String UI_FONT = "Manrope";
 	private final Renderer renderer;
 	private final Canvas canvas;
 	private final AvailableMaps.MapMetadata mapMetadata;
@@ -195,7 +195,7 @@ public class GameView extends HBox {
 				throw new RuntimeException("Failed to export replay", ex);
 			}
 		}));
-		HBox sidebar = buildSidebar(app, controller);
+		VBox sidebar = buildSidebar(app, controller);
 		getChildren().addAll(mapPanel, sidebar);
 		playIntro(mapPanel, sidebar);
 		if (replayLog == null)
@@ -259,12 +259,12 @@ public class GameView extends HBox {
 		}
 	}
 
-	private HBox buildSidebar(App app, GameController controller) {
-		HBox sidebar = new HBox(12);
+	private VBox buildSidebar(App app, GameController controller) {
+		VBox sidebar = new VBox(12);
 		sidebar.getStyleClass().add("sidebar");
 		sidebar.setPadding(new Insets(10));
-		sidebar.setPrefWidth(520);
-		sidebar.setMinWidth(480);
+		sidebar.setPrefWidth(420);
+		sidebar.setMinWidth(360);
 		playerLabel.setFont(Font.font(UI_FONT, FontWeight.BOLD, 16));
 		playerLabel.setTextFill(Color.BLACK);
 		playerLabel.getStyleClass().add("player-label");
@@ -273,17 +273,15 @@ public class GameView extends HBox {
 		moneyLabel.getStyleClass().add("money-label");
 		VBox actionPanel = new VBox(8);
 		actionPanel.getStyleClass().add("panel-card");
-		actionPanel.setPrefWidth(230);
-		actionPanel.setMinWidth(210);
+		actionPanel.setMaxWidth(Double.MAX_VALUE);
 		VBox logPanel = new VBox(8);
 		logPanel.getStyleClass().add("panel-card");
-		logPanel.setPrefWidth(250);
-		logPanel.setMinWidth(230);
+		logPanel.setMaxWidth(Double.MAX_VALUE);
 		Label historyLabel = new Label("Event History");
 		historyLabel.setFont(Font.font(UI_FONT, FontWeight.BOLD, 12));
 		historyLabel.setTextFill(Color.BLACK);
 		historyLabel.getStyleClass().add("section-title");
-		eventLogView.setPrefHeight(540);
+		eventLogView.setPrefHeight(300);
 		eventLogView.setFocusTraversable(false);
 		eventLogView.getStyleClass().add("log-list");
 		Label emptyPlaceholder = new Label("No events yet");
@@ -402,17 +400,26 @@ public class GameView extends HBox {
 		endTurnBtn.getStyleClass().add("btn-primary");
 		
 		Button stepBackBtn = new Button("◀ Step Back");
-		stepBackBtn.setPrefWidth(200);
+		stepBackBtn.setPrefWidth(160);
 		stepBackBtn.setOnAction(e -> controller.onStepBackward());
 		stepBackBtn.getStyleClass().add("btn-secondary");
+		stepBackBtn.getStyleClass().add("btn-compact");
 		
 		Button stepFwdBtn = new Button("Step Forward ▶");
-		stepFwdBtn.setPrefWidth(200);
+		stepFwdBtn.setPrefWidth(160);
 		stepFwdBtn.setOnAction(e -> controller.onStepForward());
 		stepFwdBtn.getStyleClass().add("btn-secondary");
+		stepFwdBtn.getStyleClass().add("btn-compact");
+
+		HBox stepRow = new HBox(8, stepBackBtn, stepFwdBtn);
+		stepRow.setAlignment(Pos.CENTER);
+		HBox.setHgrow(stepBackBtn, Priority.ALWAYS);
+		HBox.setHgrow(stepFwdBtn, Priority.ALWAYS);
+		stepBackBtn.setMaxWidth(Double.MAX_VALUE);
+		stepFwdBtn.setMaxWidth(Double.MAX_VALUE);
 		
 		Button exportBtn = new Button("Export Session...");
-		exportBtn.setPrefWidth(200);
+		exportBtn.setPrefWidth(160);
 		exportBtn.setOnAction(e -> {
 			Path exportPath = app.chooseSaveReplayFile();
 			if (exportPath == null)
@@ -424,11 +431,20 @@ public class GameView extends HBox {
 			}
 		});
 		exportBtn.getStyleClass().add("btn-secondary");
+		exportBtn.getStyleClass().add("btn-compact");
 		
 		Button menuBtn = new Button("Back to Menu");
-		menuBtn.setPrefWidth(200);
+		menuBtn.setPrefWidth(160);
 		menuBtn.setOnAction(e -> app.showMapSelect());
 		menuBtn.getStyleClass().add("btn-ghost");
+		menuBtn.getStyleClass().add("btn-compact");
+
+		HBox bottomRow = new HBox(8, exportBtn, menuBtn);
+		bottomRow.setAlignment(Pos.CENTER);
+		HBox.setHgrow(exportBtn, Priority.ALWAYS);
+		HBox.setHgrow(menuBtn, Priority.ALWAYS);
+		exportBtn.setMaxWidth(Double.MAX_VALUE);
+		menuBtn.setMaxWidth(Double.MAX_VALUE);
 		
 		controller.setOnStateChanged(() -> {
 			boolean factorySelected = controller.getSelectedFactory() != null;
@@ -445,16 +461,14 @@ public class GameView extends HBox {
 				new Separator(),
 				endTurnBtn,
 				new Separator(),
-				stepBackBtn,
-				stepFwdBtn,
+				stepRow,
 				new Separator(),
-				exportBtn,
-				new Separator(),
-				menuBtn);
+				bottomRow);
 				
-		VBox.setVgrow(actionMenu, Priority.ALWAYS);
+		VBox.setVgrow(actionMenu, Priority.NEVER);
 		logPanel.getChildren().addAll(historyLabel, eventLogView);
 		VBox.setVgrow(eventLogView, Priority.ALWAYS);
+		VBox.setVgrow(logPanel, Priority.ALWAYS);
 		sidebar.getChildren().addAll(actionPanel, logPanel);
 		return sidebar;
 	}

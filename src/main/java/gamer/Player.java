@@ -22,7 +22,8 @@ public class Player {
 	private int money = Consts.STARTING_MONEY;
 	private boolean isAlive = true;
 	private final boolean isBot;
-	private final Color color = PlayerColor.randomColor();
+	@Setter
+	private Color color = PlayerColor.randomColor();
 
 	public void addMoney(int amount) {
 		this.money += amount;

@@ -99,7 +99,8 @@ public class Renderer {
 		double px = x * tileSize;
 		double py = y * tileSize;
 
-		Image img = AssetLoader.terrain(tile.getTerrain());
+		Image img = AssetLoader.terrain(tile.getTerrain(),
+				tile.getOwner() == null ? null : tile.getOwner().getColor());
 		if (img != null) {
 			gc.drawImage(img, px, py, tileSize, tileSize);
 		} else {
@@ -137,14 +138,7 @@ public class Renderer {
 		int bottomBarsHeight = barHeight * 2;
 		double unitBodyHeight = tileSize - bottomBarsHeight;
 
-		if (unit.isUsed()) {
-			javafx.scene.effect.ColorAdjust grayscale = new javafx.scene.effect.ColorAdjust();
-			grayscale.setSaturation(-1.0);
-			grayscale.setBrightness(-0.2); 
-			gc.setEffect(grayscale);
-		}
-
-		Image img = AssetLoader.unit(unit.getType());
+		Image img = AssetLoader.unit(unit.getType(), unit.getPlayer().getColor());
 		if (img != null) {
 			gc.drawImage(img, px, py, tileSize, unitBodyHeight);
 		} else {
@@ -168,7 +162,7 @@ public class Renderer {
 		gc.setFont(Font.font(Math.max(9, tileSize / 9)));
 		gc.fillText(String.valueOf(unit.getHp()), px + 2, py + unitBodyHeight - 1);
 
-		// Destroy effect contrary for others infantries,tanks,...
+		// Reset any effects from earlier draws.
 		gc.setEffect(null);
 	}
 

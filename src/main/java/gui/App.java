@@ -9,9 +9,11 @@ import javafx.application.Application;
 import javafx.stage.FileChooser;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.scene.text.Font;
 
 public class App extends Application {
 	private Stage stage;
+	private boolean fontsLoaded = false;
 
 	@Override
 	public void start(Stage stage) {
@@ -49,7 +51,28 @@ public class App extends Application {
 	}
 
 	private void applyTheme(Scene scene) {
+		ensureFontsLoaded();
 		scene.getStylesheets().add(getClass().getResource("/gui/styles.css").toExternalForm());
+	}
+
+	private void ensureFontsLoaded() {
+		if (fontsLoaded)
+			return;
+		fontsLoaded = true;
+		loadFontIfPresent("/gui/fonts/Manrope-Regular.ttf");
+		loadFontIfPresent("/gui/fonts/Manrope-SemiBold.ttf");
+		loadFontIfPresent("/gui/fonts/Manrope-Bold.ttf");
+		loadFontIfPresent("/gui/fonts/Manrope-ExtraBold.ttf");
+		loadFontIfPresent("/gui/fonts/Manrope-Black.ttf");
+	}
+
+	private void loadFontIfPresent(String resourcePath) {
+		try (var stream = getClass().getResourceAsStream(resourcePath)) {
+			if (stream != null)
+				Font.loadFont(stream, 12);
+		} catch (Exception ignored) {
+			// Optional font not present.
+		}
 	}
 
 	public Path chooseLoadReplayFile() {
