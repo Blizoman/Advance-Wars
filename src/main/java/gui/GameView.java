@@ -30,6 +30,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.Slider;
 import javafx.scene.control.ToolBar;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.ScrollEvent;
@@ -48,6 +49,8 @@ public class GameView extends HBox {
 	private final AvailableMaps.MapMetadata mapMetadata;
 	private final Label playerLabel = new Label();
 	private final Label moneyLabel = new Label();
+	private final Label statusLabel = new Label();
+	private final Label infoLabel = new Label();
 	private final ListView<GameEvent> eventLogView = new ListView<>();
 	private int currentLogCursor = 0;
 
@@ -176,14 +179,17 @@ public class GameView extends HBox {
 		zoomSlider.valueProperty().addListener((obs, oldValue, newValue) -> applyZoom.run());
 		Button zoomOutBtn = new Button("-");
 		zoomOutBtn.getStyleClass().add("btn-icon");
+		zoomOutBtn.setTooltip(new Tooltip("Zoom out"));
 		zoomOutBtn.setOnAction(
 				e -> zoomSlider.setValue(Math.max(zoomSlider.getMin(), zoomSlider.getValue() - 0.05)));
 		Button zoomInBtn = new Button("+");
 		zoomInBtn.getStyleClass().add("btn-icon");
+		zoomInBtn.setTooltip(new Tooltip("Zoom in"));
 		zoomInBtn.setOnAction(
 				e -> zoomSlider.setValue(Math.min(zoomSlider.getMax(), zoomSlider.getValue() + 0.05)));
 		Button resetZoomBtn = new Button("100%");
 		resetZoomBtn.getStyleClass().add("btn-ghost");
+		resetZoomBtn.setTooltip(new Tooltip("Reset zoom"));
 		resetZoomBtn.setOnAction(e -> zoomSlider.setValue(1.0));
 		ToolBar mapToolbar =
 				new ToolBar(zoomOutBtn, zoomSlider, zoomValueLabel, zoomInBtn, resetZoomBtn);
@@ -204,6 +210,7 @@ public class GameView extends HBox {
 			javafx.scene.paint.Color c = active.getColor();
 			playerLabel.setTextFill(c);
 			moneyLabel.setText("Money: $" + active.getMoney());
+			updateStatusAndInfo(controller);
 			refreshEventLog(controller);
 			renderer.render();
 		};
@@ -266,6 +273,33 @@ public class GameView extends HBox {
 		contextMenu.show(canvas, screenX, screenY);
 	}
 
+	private void updateStatusAndInfo(GameController controller) {
+		UiState state = getUiState(controller);
+		switch (state) {
+			case IDLE -> statusLabel.setText("Select a unit or factory.");
+			case UNIT_SELECTED -> statusLabel.setText("Select a destination tile.");
+			case UNIT_MOVED -> statusLabel.setText("Choose an action: Attack, Capture, or Wait.");
+			case ATTACK_MODE -> statusLabel.setText("Select an enemy to attack.");
+			case FACTORY_SELECTED -> statusLabel.setText("Choose a unit to buy.");
+		}
+
+		Unit selected = controller.getSelectedUnit();
+		if (selected != null) {
+			String info = "Type: " + selected.getType().name()
+					+ "\nHP: " + selected.getHp()
+					+ "\nMoves left: " + selected.getMovesLeft();
+			if (selected.isUsed())
+				info += "\nState: Used";
+			infoLabel.setText(info);
+			return;
+		}
+		if (controller.getSelectedFactory() != null) {
+			infoLabel.setText("Factory selected.\nPick a unit to buy.");
+			return;
+		}
+		infoLabel.setText("No selection.");
+	}
+
 	private void playIntro(Node... nodes) {
 		for (int i = 0; i < nodes.length; i++) {
 			Node node = nodes[i];
@@ -291,12 +325,32 @@ public class GameView extends HBox {
 		moneyLabel.setFont(Font.font(UI_FONT, 14));
 		moneyLabel.setTextFill(Color.BLACK);
 		moneyLabel.getStyleClass().add("money-label");
+		statusLabel.setFont(Font.font(UI_FONT, 12));
+		statusLabel.setTextFill(Color.BLACK);
+		statusLabel.setWrapText(true);
+		infoLabel.setFont(Font.font(UI_FONT, 12));
+		infoLabel.setTextFill(Color.BLACK);
+		infoLabel.setWrapText(true);
 		VBox actionPanel = new VBox(8);
 		actionPanel.getStyleClass().add("panel-card");
 		actionPanel.setMaxWidth(Double.MAX_VALUE);
 		VBox logPanel = new VBox(8);
 		logPanel.getStyleClass().add("panel-card");
 		logPanel.setMaxWidth(Double.MAX_VALUE);
+
+		Label statusTitle = new Label("Status");
+		statusTitle.setFont(Font.font(UI_FONT, FontWeight.BOLD, 12));
+		statusTitle.setTextFill(Color.BLACK);
+		statusTitle.getStyleClass().add("section-title");
+		VBox statusPanel = new VBox(4, statusTitle, statusLabel);
+		statusPanel.getStyleClass().add("panel-card");
+
+		Label infoTitle = new Label("Selection");
+		infoTitle.setFont(Font.font(UI_FONT, FontWeight.BOLD, 12));
+		infoTitle.setTextFill(Color.BLACK);
+		infoTitle.getStyleClass().add("section-title");
+		VBox infoPanel = new VBox(4, infoTitle, infoLabel);
+		infoPanel.getStyleClass().add("panel-card");
 		Label historyLabel = new Label("Event History");
 		historyLabel.setFont(Font.font(UI_FONT, FontWeight.BOLD, 12));
 		historyLabel.setTextFill(Color.BLACK);
@@ -393,16 +447,19 @@ public class GameView extends HBox {
 		buyInfantryBtn.setPrefWidth(160);
 		buyInfantryBtn.setDisable(true);
 		buyInfantryBtn.getStyleClass().add("btn-secondary");
+		buyInfantryBtn.setTooltip(new Tooltip("Buy Infantry"));
 		
 		Button buyTankBtn = new Button("Tank");
 		buyTankBtn.setPrefWidth(160);
 		buyTankBtn.setDisable(true);
 		buyTankBtn.getStyleClass().add("btn-secondary");
+		buyTankBtn.setTooltip(new Tooltip("Buy Tank"));
 		
 		Button buyCannonBtn = new Button("Cannon");
 		buyCannonBtn.setPrefWidth(160);
 		buyCannonBtn.setDisable(true);
 		buyCannonBtn.getStyleClass().add("btn-secondary");
+		buyCannonBtn.setTooltip(new Tooltip("Buy Cannon"));
 		
 		buyInfantryBtn.setOnAction(e -> controller.onBuyUnit(UnitType.INFANTRY));
 		buyTankBtn.setOnAction(e -> controller.onBuyUnit(UnitType.TANK));
@@ -418,18 +475,21 @@ public class GameView extends HBox {
 		endTurnBtn.setPrefWidth(200);
 		endTurnBtn.setOnAction(e -> controller.onEndTurn());
 		endTurnBtn.getStyleClass().add("btn-primary");
+		endTurnBtn.setTooltip(new Tooltip("End current turn"));
 		
 		Button stepBackBtn = new Button("◀ Step Back");
 		stepBackBtn.setPrefWidth(160);
 		stepBackBtn.setOnAction(e -> controller.onStepBackward());
 		stepBackBtn.getStyleClass().add("btn-secondary");
 		stepBackBtn.getStyleClass().add("btn-compact");
+		stepBackBtn.setTooltip(new Tooltip("Step back in replay"));
 		
 		Button stepFwdBtn = new Button("Step Forward ▶");
 		stepFwdBtn.setPrefWidth(160);
 		stepFwdBtn.setOnAction(e -> controller.onStepForward());
 		stepFwdBtn.getStyleClass().add("btn-secondary");
 		stepFwdBtn.getStyleClass().add("btn-compact");
+		stepFwdBtn.setTooltip(new Tooltip("Step forward in replay"));
 
 		HBox stepRow = new HBox(8, stepBackBtn, stepFwdBtn);
 		stepRow.setAlignment(Pos.CENTER);
@@ -452,12 +512,14 @@ public class GameView extends HBox {
 		});
 		exportBtn.getStyleClass().add("btn-secondary");
 		exportBtn.getStyleClass().add("btn-compact");
+		exportBtn.setTooltip(new Tooltip("Export replay log"));
 		
 		Button menuBtn = new Button("Back to Menu");
 		menuBtn.setPrefWidth(160);
 		menuBtn.setOnAction(e -> app.showMapSelect());
 		menuBtn.getStyleClass().add("btn-ghost");
 		menuBtn.getStyleClass().add("btn-compact");
+		menuBtn.setTooltip(new Tooltip("Return to map select"));
 
 		HBox bottomRow = new HBox(8, exportBtn, menuBtn);
 		bottomRow.setAlignment(Pos.CENTER);
@@ -476,6 +538,8 @@ public class GameView extends HBox {
 		actionPanel.getChildren().addAll(
 				playerLabel,
 				moneyLabel,
+				statusPanel,
+				infoPanel,
 				new Separator(),
 				actionMenu,
 				new Separator(),
