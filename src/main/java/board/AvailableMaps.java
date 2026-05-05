@@ -25,7 +25,9 @@ public class AvailableMaps {
 			new MapMetadata("ASYMETRIC", "asymetric", 3),
 			new MapMetadata("BOT - ADVANTAGE", "botAdvantage", 2),
 			new MapMetadata("2 BOTS - ADVANTAGE", "2botsAdvantage", 3),
-			new MapMetadata("tactical", "tactical", 3)//
+			new MapMetadata("tactical", "tactical", 3),
+			new MapMetadata("Crossfire (4 Players)", "maps/4p_crossfire.json", 4),
+			new MapMetadata("Twin Rivers (2 Players)", "maps/2p_twin_rivers.json", 2)//
 	);
 
 	public static String getFilename(MapMetadata map) {
