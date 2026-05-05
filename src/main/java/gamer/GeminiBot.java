@@ -1,3 +1,5 @@
+// AI generated bot
+
 package gamer;
 
 import java.util.*;
@@ -26,6 +28,9 @@ public class GeminiBot {
         this.pathFinder = pathFinder;
     }
 
+    // Generate a threat map at the start of each turn.
+    // We calculate the movement reach and attack range of all enemy units 
+    // to identify dangerous tiles and avoid unnecessary casualties.
     private void startTurn(Session session) {
         Player me = session.getActive();
         GameBoard board = session.getGameBoard();
@@ -58,6 +63,9 @@ public class GeminiBot {
         isTurnActive = true;
     }
 
+    // Artillery rule enforcement: If the unit cannot move and attack in the same turn,
+    // check if an enemy is already within range. If so, cancel movement (bestTarget = startPos)
+    // to prioritize shooting over repositioning.
     public boolean performNextAction(Session session) {
         if (!isTurnActive) {
             startTurn(session);
@@ -119,15 +127,20 @@ public class GeminiBot {
             boolean canAttackNow = !unit.isUsed()
                     && (unit.getType().isCanAttackAfterMove() || !moved);
 
+            boolean didAction = false;
             if (canCapture) {
                 session.tryCapture(unit, currentTile);
+                didAction = true;
             } else if (canAttackNow) {
                 Unit targetEnemy = getBestEnemyToAttack(unit, enemies);
                 // GUI RULE: Ensure target is valid and in range
                 if (targetEnemy != null && unit.canAttackTo(targetEnemy)) {
                     session.attack(unit, targetEnemy);
+                    didAction = true;
                 }
             }
+            if (!didAction)
+                unit.setUsed(true);
             return true; // We performed an action!
         }
 
@@ -166,7 +179,22 @@ public class GeminiBot {
         }
         return bestMove;
     }
-
+    //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=//
+    // --- BUILDING PRIORITIES (Economy & Win Condition) ---                               //
+    // HQ grants +2000 score because capturing it results in an instant win.               //
+    // Factories grant +800 as they provide a crucial spawning advantage.                  //
+    // Cities grant +600 in the early game to quickly boost income, dropping to +300 later.//
+    //                                                                                     //
+    // --- SURVIVABILITY & TERRAIN ---                                                     //
+    // Prefer tiles with a high defense bonus (e.g., Mountains, Forests).                  //
+    // If the unit has low HP (<= 60) and is on an owned healing tile, stay and heal       //
+    // (+200 score).                                                                       //
+    //                                                                                     //
+    // --- THREAT AVOIDANCE ---                                                            //
+    // If the evaluated tile is within the enemy threat map, apply a penalty.              //
+    // Infantry tries to avoid combat entirely (-300) unless capturing an HQ.              //
+    // Injured units (< 50 HP) get a -200 penalty to retreat.                              //
+    //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=//
     private int evaluatePosition(Unit unit, Position pos, GameBoard board, List<Unit> enemies,
             Player me, boolean earlyGame) {
         int score = 0;
@@ -205,7 +233,7 @@ public class GeminiBot {
         // 4. Attack Positioning
         if (unit.getType().isCanAttackAfterMove()) {
             for (Unit enemy : enemies) {
-                if (unit.canAttackTo(enemy)) {
+                if (canAttackFromPosition(pos, unit, enemy)) {
                     int potentialDamage = unit.getType().getDamageAgainst(enemy.getType());
                     score += potentialDamage * 2; // Weight high damage moves
                     if (enemy.getHp() <= potentialDamage) {
@@ -216,7 +244,7 @@ public class GeminiBot {
         } else {
             // For CANNON/Rockets, try to get just outside enemy movement range
             for (Unit enemy : enemies) {
-                if (unit.canAttackTo(enemy)) {
+                if (canAttackFromPosition(pos, unit, enemy)) {
                     score += 150; // Good position to shoot next turn
                     if (!threatMap.contains(pos)) {
                         score += 200; // Safe position to shoot next turn!
@@ -278,13 +306,16 @@ public class GeminiBot {
         return bestTarget;
     }
 
+    // Dynamic counter-unit purchasing based on enemy army composition:
+    // If the enemy has many tanks (> 2), buy a TANK to hold the frontline.
+    // If the enemy is swarming with infantry (> 3), buy a CANNON for AoE/ranged clearing.
     private void buySmartUnit(Session session, Position pos, Player me, List<Unit> enemies) {
         int money = me.getMoney();
 
         // Count enemy types
         long enemyInfantry = enemies.stream().filter(u -> u.getType() == UnitType.INFANTRY).count();
         long enemyTanks = enemies.stream()
-                .filter(u -> u.getType() == UnitType.TANK || u.getType() == UnitType.TANK)
+                .filter(u -> u.getType() == UnitType.TANK || u.getType() == UnitType.CANNON)
                 .count();
 
         UnitType toBuy = null;
@@ -309,6 +340,15 @@ public class GeminiBot {
                 session.buyUnit(pos, toBuy);
             }
         }
+    }
+
+    private boolean canAttackFromPosition(Position pos, Unit unit, Unit enemy) {
+        if (enemy == null || !enemy.isAlive())
+            return false;
+        if (unit.getType().getAttackRange() == null)
+            return false;
+        int dist = pos.distanceTo(enemy.getPosition());
+        return unit.getType().getAttackRange().canReach(dist);
     }
 
     // Helper to get all tiles within a specific range for the threat map

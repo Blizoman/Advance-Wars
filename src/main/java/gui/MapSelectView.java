@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import board.AvailableMaps;
+import gamer.BotType;
 import gamer.Player;
 import javafx.animation.FadeTransition;
 import javafx.animation.Interpolator;
@@ -178,6 +179,9 @@ public class MapSelectView extends VBox {
 		List<Boolean> previousBots = playerRows.stream()
 				.map(row -> row.botCheckBox().isSelected())
 				.toList();
+		List<BotType> previousBotTypes = playerRows.stream()
+				.map(row -> row.botChoice().getValue())
+				.toList();
 		List<Color> previousColors = playerRows.stream()
 				.map(row -> row.colorChoice().getValue() == null ? null : row.colorChoice().getValue().color())
 				.toList();
@@ -194,8 +198,10 @@ public class MapSelectView extends VBox {
 							: "Player " + (i + 1);
 			boolean defaultBot =
 					i < previousBots.size() && previousBots.get(i) != null && previousBots.get(i);
+			BotType defaultBotType = i < previousBotTypes.size() ? previousBotTypes.get(i) : null;
 			Color defaultColor = i < previousColors.size() ? previousColors.get(i) : null;
-			PlayerInputRow row = createPlayerRow(i + 1, defaultName, defaultBot, defaultColor);
+			PlayerInputRow row =
+					createPlayerRow(i + 1, defaultName, defaultBot, defaultColor, defaultBotType);
 			playerRows.add(row);
 			playersBox.getChildren().add(row.container());
 		}
@@ -203,7 +209,7 @@ public class MapSelectView extends VBox {
 	}
 
 	private PlayerInputRow createPlayerRow(int index, String defaultName, boolean defaultBot,
-			Color defaultColor) {
+			Color defaultColor, BotType defaultBotType) {
 		Label label = new Label("Player " + index + ":");
 		label.setMinWidth(70);
 		label.setTextFill(Color.BLACK);
@@ -211,11 +217,17 @@ public class MapSelectView extends VBox {
 		nameField.setPrefWidth(160);
 		CheckBox botCheckBox = new CheckBox("Bot");
 		botCheckBox.setSelected(defaultBot);
+		ComboBox<BotType> botChoice = buildBotChoice(defaultBotType, defaultBot);
+		botCheckBox.selectedProperty().addListener((obs, oldValue, newValue) -> {
+			botChoice.setDisable(!newValue);
+			if (newValue && botChoice.getValue() == null)
+				botChoice.setValue(BotType.WEAK);
+		});
 		ComboBox<ColorOption> colorChoice = buildColorChoice(defaultColor);
 		colorChoice.valueProperty().addListener((obs, oldValue, newValue) -> updateActionButtons());
-		HBox row = new HBox(10, label, nameField, botCheckBox, colorChoice);
+		HBox row = new HBox(10, label, nameField, botCheckBox, botChoice, colorChoice);
 		row.setAlignment(Pos.CENTER_LEFT);
-		return new PlayerInputRow(row, nameField, botCheckBox, colorChoice);
+		return new PlayerInputRow(row, nameField, botCheckBox, botChoice, colorChoice);
 	}
 
 	private List<Player> buildPlayers() {
@@ -225,13 +237,61 @@ public class MapSelectView extends VBox {
 			String name = row.nameField().getText();
 			if (name == null || name.isBlank())
 				name = "Player " + (i + 1);
-			Player player = new Player(name, row.botCheckBox().isSelected());
+			boolean isBot = row.botCheckBox().isSelected();
+			Player player = new Player(name, isBot);
+			if (isBot) {
+				BotType botType = row.botChoice().getValue();
+				player.setBotType(botType == null ? BotType.WEAK : botType);
+			}
 			ColorOption option = row.colorChoice().getValue();
 			if (option != null)
 				player.setColor(option.color());
 			players.add(player);
 		}
 		return players;
+	}
+
+	private ComboBox<BotType> buildBotChoice(BotType defaultType, boolean isBot) {
+		ComboBox<BotType> box = new ComboBox<>();
+		box.getItems().setAll(BotType.WEAK, BotType.STRONG);
+		box.getStyleClass().add("bot-choice");
+		box.setPrefWidth(140);
+		box.setMaxWidth(140);
+		box.setMinHeight(28);
+		box.setPrefHeight(28);
+		box.setMaxHeight(28);
+		box.setButtonCell(createBotCell());
+		box.setCellFactory(list -> createBotCell());
+		BotType value = defaultType != null && defaultType != BotType.NONE
+				? defaultType
+				: BotType.WEAK;
+		box.setValue(value);
+		box.setDisable(!isBot);
+		return box;
+	}
+
+	private ListCell<BotType> createBotCell() {
+		return new ListCell<>() {
+			@Override
+			protected void updateItem(BotType item, boolean empty) {
+				super.updateItem(item, empty);
+				if (empty || item == null) {
+					setText(null);
+					setGraphic(null);
+					return;
+				}
+				setText(formatBotLabel(item));
+				setGraphic(null);
+			}
+		};
+	}
+
+	private String formatBotLabel(BotType type) {
+		return switch (type) {
+			case STRONG -> "Easy Bot";
+			case WEAK -> "Medium Bot";
+			default -> "Human";
+		};
 	}
 
 	private ComboBox<ColorOption> buildColorChoice(Color defaultColor) {
@@ -380,7 +440,7 @@ public class MapSelectView extends VBox {
 	}
 
 	private record PlayerInputRow(HBox container, TextField nameField, CheckBox botCheckBox,
-			ComboBox<ColorOption> colorChoice) {}
+			ComboBox<BotType> botChoice, ComboBox<ColorOption> colorChoice) {}
 
 	private record ColorOption(String label, Color color) {}
 }

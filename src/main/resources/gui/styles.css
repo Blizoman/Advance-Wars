@@ -209,6 +209,20 @@
   -fx-background-color: transparent;
 }
 
+.bot-choice {
+  -fx-background-radius: 8;
+  -fx-border-radius: 8;
+  -fx-border-color: rgba(120,132,148,0.35);
+  -fx-border-width: 2;
+  -fx-background-insets: 0;
+  -fx-border-insets: 0;
+}
+
+.bot-choice .list-cell {
+  -fx-text-fill: #1f2a37;
+  -fx-background-color: transparent;
+}
+
 /* Context menu */
 .context-menu,
 .action-menu {
