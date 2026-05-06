@@ -35,8 +35,7 @@ CJF=~/Downloads/IJA-projSrcs
 copyJavas:
 	rm -rf $(CJF)
 	mkdir -p $(CJF)
-# 	find src/main/java/ -name "*.java" -exec cp {} $(CJF) \;
-	find src/main/java/ \( -path "*/event/*" -o -path "*/game/*" -o -path "*/controllers/*" \) -type f -exec cp {} $(CJF)/ \;
+	find src/main/java/ -name "*.java" -exec cp {} $(CJF) \;
 
 # assignment: 	https://moodle.vut.cz/mod/folder/view.php?id=667385
 # github:		https://github.com/RomanPruzinsky/IJA-proj

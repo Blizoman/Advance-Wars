@@ -10,6 +10,7 @@ import java.util.Set;
 import board.AvailableMaps;
 import gamer.BotType;
 import gamer.Player;
+import tools.GameColors;
 import javafx.animation.FadeTransition;
 import javafx.animation.Interpolator;
 import javafx.geometry.Insets;
@@ -38,11 +39,6 @@ public class MapSelectView extends VBox {
 	private static final String TITLE_FONT = loadFontFamily(
 			"/gui/fonts/Manrope-Black.ttf", 46,
 			loadFontFamily("/gui/fonts/Manrope-ExtraBold.ttf", 46, "Arial Black"));
-	private static final List<ColorOption> COLOR_OPTIONS = List.of(
-			new ColorOption("Red", Color.web("#e74c3c")),
-			new ColorOption("Blue", Color.web("#3498db")),
-			new ColorOption("Green", Color.web("#2ecc71")),
-			new ColorOption("Yellow", Color.web("#f1c40f")));
 	private final VBox playersBox = new VBox(8);
 	private List<PlayerInputRow> playerRows = new ArrayList<>();
 	private Button startBtn;
@@ -132,8 +128,6 @@ public class MapSelectView extends VBox {
 		loadReplayBtn.setMaxHeight(38);
 		loadReplayBtn.setStyle("-fx-font-size: 16px; -fx-font-weight: 700;");
 		loadReplayBtn.setOnAction(e -> {
-			if (!isColorSelectionValid())
-				return;
 			AvailableMaps.MapMetadata selected = mapList.getSelectionModel().getSelectedItem();
 			if (selected == null)
 				return;
@@ -183,7 +177,8 @@ public class MapSelectView extends VBox {
 				.map(row -> row.botChoice().getValue())
 				.toList();
 		List<Color> previousColors = playerRows.stream()
-				.map(row -> row.colorChoice().getValue() == null ? null : row.colorChoice().getValue().color())
+				.map(row -> row.colorChoice().getValue() == null ? null
+						: row.colorChoice().getValue().color())
 				.toList();
 
 		playerRows = new ArrayList<>();
@@ -223,7 +218,7 @@ public class MapSelectView extends VBox {
 			if (newValue && botChoice.getValue() == null)
 				botChoice.setValue(BotType.WEAK);
 		});
-		ComboBox<ColorOption> colorChoice = buildColorChoice(defaultColor);
+		ComboBox<GameColors.ColorOption> colorChoice = buildColorChoice(defaultColor);
 		colorChoice.valueProperty().addListener((obs, oldValue, newValue) -> updateActionButtons());
 		HBox row = new HBox(10, label, nameField, botCheckBox, botChoice, colorChoice);
 		row.setAlignment(Pos.CENTER_LEFT);
@@ -243,7 +238,7 @@ public class MapSelectView extends VBox {
 				BotType botType = row.botChoice().getValue();
 				player.setBotType(botType == null ? BotType.WEAK : botType);
 			}
-			ColorOption option = row.colorChoice().getValue();
+			GameColors.ColorOption option = row.colorChoice().getValue();
 			if (option != null)
 				player.setColor(option.color());
 			players.add(player);
@@ -294,9 +289,9 @@ public class MapSelectView extends VBox {
 		};
 	}
 
-	private ComboBox<ColorOption> buildColorChoice(Color defaultColor) {
-		ComboBox<ColorOption> box = new ComboBox<>();
-		box.getItems().setAll(COLOR_OPTIONS);
+	private ComboBox<GameColors.ColorOption> buildColorChoice(Color defaultColor) {
+		ComboBox<GameColors.ColorOption> box = new ComboBox<>();
+		box.getItems().setAll(GameColors.COLOR_OPTIONS);
 		box.getStyleClass().add("color-choice");
 		box.setPrefWidth(140);
 		box.setMaxWidth(140);
@@ -310,10 +305,10 @@ public class MapSelectView extends VBox {
 		return box;
 	}
 
-	private ListCell<ColorOption> createColorCell(boolean useColorText) {
+	private ListCell<GameColors.ColorOption> createColorCell(boolean useColorText) {
 		return new ListCell<>() {
 			@Override
-			protected void updateItem(ColorOption item, boolean empty) {
+			protected void updateItem(GameColors.ColorOption item, boolean empty) {
 				super.updateItem(item, empty);
 				if (empty || item == null) {
 					setText(null);
@@ -336,10 +331,10 @@ public class MapSelectView extends VBox {
 		};
 	}
 
-	private ColorOption findMatchingColor(Color color) {
+	private GameColors.ColorOption findMatchingColor(Color color) {
 		if (color == null)
 			return null;
-		for (ColorOption option : COLOR_OPTIONS) {
+		for (GameColors.ColorOption option : GameColors.COLOR_OPTIONS) {
 			if (colorsEqual(option.color(), color))
 				return option;
 		}
@@ -349,7 +344,7 @@ public class MapSelectView extends VBox {
 	private boolean isColorSelectionValid() {
 		Set<String> seen = new HashSet<>();
 		for (PlayerInputRow row : playerRows) {
-			ColorOption option = row.colorChoice().getValue();
+			GameColors.ColorOption option = row.colorChoice().getValue();
 			if (option == null)
 				return false;
 			String key = colorKey(option.color());
@@ -369,7 +364,7 @@ public class MapSelectView extends VBox {
 			startBtn.setOpacity(1.0);
 		}
 		if (loadReplayBtn != null) {
-			loadReplayBtn.setDisable(!enabled);
+			loadReplayBtn.setDisable(false);
 			loadReplayBtn.setVisible(true);
 			loadReplayBtn.setManaged(true);
 			loadReplayBtn.setOpacity(1.0);
@@ -379,15 +374,15 @@ public class MapSelectView extends VBox {
 	private void updateDuplicateIndicators() {
 		Map<String, Integer> counts = new HashMap<>();
 		for (PlayerInputRow row : playerRows) {
-			ColorOption option = row.colorChoice().getValue();
+			GameColors.ColorOption option = row.colorChoice().getValue();
 			if (option == null)
 				continue;
 			String key = colorKey(option.color());
 			counts.put(key, counts.getOrDefault(key, 0) + 1);
 		}
 		for (PlayerInputRow row : playerRows) {
-			ComboBox<ColorOption> box = row.colorChoice();
-			ColorOption option = box.getValue();
+			ComboBox<GameColors.ColorOption> box = row.colorChoice();
+			GameColors.ColorOption option = box.getValue();
 			boolean duplicate = option != null && counts.getOrDefault(colorKey(option.color()), 0) > 1;
 			if (duplicate) {
 				if (!box.getStyleClass().contains("color-duplicate"))
@@ -439,8 +434,9 @@ public class MapSelectView extends VBox {
 		}
 	}
 
-	private record PlayerInputRow(HBox container, TextField nameField, CheckBox botCheckBox,
-			ComboBox<BotType> botChoice, ComboBox<ColorOption> colorChoice) {}
-
-	private record ColorOption(String label, Color color) {}
+	private record PlayerInputRow(
+			HBox container, TextField nameField, CheckBox botCheckBox,
+			ComboBox<BotType> botChoice, ComboBox<GameColors.ColorOption> colorChoice
+	) {
+	}
 }

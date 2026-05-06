@@ -13,6 +13,7 @@ import event.GameEvent;
 import game.Game;
 import game.Session;
 import gamer.Player;
+import tools.GameColors;
 import javafx.animation.FadeTransition;
 import javafx.animation.Interpolator;
 import javafx.geometry.Insets;
@@ -76,8 +77,12 @@ public class GameView extends HBox {
 				LogFiler.ReplayHeader replayHeader = LogFiler.loadHeader(replayData);
 				effectiveMap = replayHeader.map();
 				effectivePlayers = new java.util.ArrayList<>();
-				for (String playerName : replayHeader.playerNames())
-					effectivePlayers.add(new Player(playerName, false));
+				for (int pI = 0; pI < replayHeader.playerNames().size(); pI++) {
+					Player player = new Player(replayHeader.playerNames().get(pI), false);
+					player.setColor(
+							GameColors.AVAILABLE_COLORS[pI % GameColors.AVAILABLE_COLORS.length]);
+					effectivePlayers.add(player);
+				}
 			} catch (IOException e) {
 				throw new RuntimeException("Failed to load replay header", e);
 			}
@@ -434,56 +439,56 @@ public class GameView extends HBox {
 				}
 			}
 		});
-		
+
 		VBox actionMenu = new VBox(5);
 		actionMenu.getStyleClass().add("panel-card");
-		
+
 		Label buyLabel = new Label("Buy Unit:");
 		buyLabel.setFont(Font.font(UI_FONT, FontWeight.BOLD, 12));
 		buyLabel.setTextFill(Color.BLACK);
 		buyLabel.getStyleClass().add("section-title");
-		
+
 		Button buyInfantryBtn = new Button("Infantry");
 		buyInfantryBtn.setPrefWidth(160);
 		buyInfantryBtn.setDisable(true);
 		buyInfantryBtn.getStyleClass().add("btn-secondary");
 		buyInfantryBtn.setTooltip(new Tooltip("Buy Infantry"));
-		
+
 		Button buyTankBtn = new Button("Tank");
 		buyTankBtn.setPrefWidth(160);
 		buyTankBtn.setDisable(true);
 		buyTankBtn.getStyleClass().add("btn-secondary");
 		buyTankBtn.setTooltip(new Tooltip("Buy Tank"));
-		
+
 		Button buyCannonBtn = new Button("Cannon");
 		buyCannonBtn.setPrefWidth(160);
 		buyCannonBtn.setDisable(true);
 		buyCannonBtn.getStyleClass().add("btn-secondary");
 		buyCannonBtn.setTooltip(new Tooltip("Buy Cannon"));
-		
+
 		buyInfantryBtn.setOnAction(e -> controller.onBuyUnit(UnitType.INFANTRY));
 		buyTankBtn.setOnAction(e -> controller.onBuyUnit(UnitType.TANK));
 		buyCannonBtn.setOnAction(e -> controller.onBuyUnit(UnitType.CANNON));
-		
+
 		actionMenu.getChildren().addAll(
 				buyLabel,
 				buyInfantryBtn,
 				buyTankBtn,
 				buyCannonBtn);
-				
+
 		Button endTurnBtn = new Button("End Turn");
 		endTurnBtn.setPrefWidth(200);
 		endTurnBtn.setOnAction(e -> controller.onEndTurn());
 		endTurnBtn.getStyleClass().add("btn-primary");
 		endTurnBtn.setTooltip(new Tooltip("End current turn"));
-		
+
 		Button stepBackBtn = new Button("◀ Step Back");
 		stepBackBtn.setPrefWidth(160);
 		stepBackBtn.setOnAction(e -> controller.onStepBackward());
 		stepBackBtn.getStyleClass().add("btn-secondary");
 		stepBackBtn.getStyleClass().add("btn-compact");
 		stepBackBtn.setTooltip(new Tooltip("Step back in replay"));
-		
+
 		Button stepFwdBtn = new Button("Step Forward ▶");
 		stepFwdBtn.setPrefWidth(160);
 		stepFwdBtn.setOnAction(e -> controller.onStepForward());
@@ -497,7 +502,7 @@ public class GameView extends HBox {
 		HBox.setHgrow(stepFwdBtn, Priority.ALWAYS);
 		stepBackBtn.setMaxWidth(Double.MAX_VALUE);
 		stepFwdBtn.setMaxWidth(Double.MAX_VALUE);
-		
+
 		Button exportBtn = new Button("Export Session...");
 		exportBtn.setPrefWidth(160);
 		exportBtn.setOnAction(e -> {
@@ -513,7 +518,7 @@ public class GameView extends HBox {
 		exportBtn.getStyleClass().add("btn-secondary");
 		exportBtn.getStyleClass().add("btn-compact");
 		exportBtn.setTooltip(new Tooltip("Export replay log"));
-		
+
 		Button menuBtn = new Button("Back to Menu");
 		menuBtn.setPrefWidth(160);
 		menuBtn.setOnAction(e -> app.showMapSelect());
@@ -527,14 +532,14 @@ public class GameView extends HBox {
 		HBox.setHgrow(menuBtn, Priority.ALWAYS);
 		exportBtn.setMaxWidth(Double.MAX_VALUE);
 		menuBtn.setMaxWidth(Double.MAX_VALUE);
-		
+
 		controller.setOnStateChanged(() -> {
 			boolean factorySelected = controller.getSelectedFactory() != null;
 			buyInfantryBtn.setDisable(!factorySelected || !controller.canBuyUnit(UnitType.INFANTRY));
 			buyTankBtn.setDisable(!factorySelected || !controller.canBuyUnit(UnitType.TANK));
 			buyCannonBtn.setDisable(!factorySelected || !controller.canBuyUnit(UnitType.CANNON));
 		});
-		
+
 		actionPanel.getChildren().addAll(
 				playerLabel,
 				moneyLabel,
@@ -548,7 +553,7 @@ public class GameView extends HBox {
 				stepRow,
 				new Separator(),
 				bottomRow);
-				
+
 		VBox.setVgrow(actionMenu, Priority.NEVER);
 		logPanel.getChildren().addAll(historyLabel, eventLogView);
 		VBox.setVgrow(eventLogView, Priority.ALWAYS);

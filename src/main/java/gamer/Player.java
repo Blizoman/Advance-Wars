@@ -7,7 +7,6 @@
 package gamer;
 
 import tools.Consts;
-import tools.PlayerColor;
 import lombok.Getter;
 import lombok.Setter;
 import javafx.scene.paint.Color;
@@ -21,7 +20,7 @@ public class Player {
 	private boolean isAlive = true;
 	private final boolean isBot;
 	@Setter
-	private Color color = PlayerColor.randomColor();
+	private Color color;
 	@Setter
 	private BotType botType = BotType.NONE;
 
