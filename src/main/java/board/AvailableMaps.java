@@ -1,7 +1,9 @@
 /**
- * List of playable maps
- * 
- * @author: xpruzir00
+ * Provides a centralized registry of all playable maps available in the game.
+ * It stores map metadata (such as display title, internal file name, and required player count)
+ * and offers utility methods to retrieve map file paths and metadata by name.
+ *
+ * @author xpruzir00
  */
 
 package board;

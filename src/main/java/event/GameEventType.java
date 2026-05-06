@@ -1,7 +1,10 @@
 /**
- * Types of events
- * 
- * @author: xpruzir00
+ * Defines the various types of events that can occur and be tracked during a game session.
+ * These event types correspond to specific player actions or core game state changes, such as 
+ * unit manipulation (buying, moving, attacking, dying), territory control (capturing), 
+ * and turn progression.
+ *
+ * @author xpruzir00
  */
 
 package event;

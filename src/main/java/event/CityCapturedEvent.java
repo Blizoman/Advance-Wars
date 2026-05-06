@@ -1,7 +1,10 @@
 /**
- * Tracks that city (or HQ or Factory) has been captured
- * 
- * @author: xpruzir00
+ * Represents an event where a capturable structure (City, Factory, or HQ) is fully captured.
+ * This event handles the transfer of ownership, resetting the structure's capture health points, 
+ * and transforming a captured HQ into a standard City. It provides methods to execute 
+ * and cleanly undo these state changes within the game session's event history.
+ *
+ * @author xpruzir00
  */
 
 package event;

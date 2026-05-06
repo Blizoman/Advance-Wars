@@ -1,7 +1,9 @@
 /**
- * Loads wanted map
- * 
- * @author: xpruzir00
+ * Utility class responsible for loading and parsing game board maps from JSON files.
+ * It reads the map configuration (width, height, and grid layout), extracts terrain types 
+ * and player ownership data for each tile, and constructs the corresponding GameBoard instance.
+ *
+ * @author xpruzir00
  */
 
 package board;

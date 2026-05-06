@@ -1,8 +1,11 @@
 /**
- * Game colors constants
- * 
- * @author: xpruzir00
- * @author: xblizna00
+ * Utility class that defines the visual palette and color constants for the game.
+ * It provides standardized Hex-based colors for different players and maps these colors 
+ * to human-readable labels through the ColorOption record. This ensures visual 
+ * consistency across the UI, from unit sprites to territory highlighting.
+ *
+ * @author xpruzir00
+ * @author xblizna00
  */
 
 package tools;

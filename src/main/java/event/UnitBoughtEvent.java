@@ -1,7 +1,11 @@
 /**
- * Tracks that unit has been bought
- * 
- * @author: xpruzir00
+ * Represents a game event where a player purchases a new unit from a factory.
+ * This event handles the instantiation of the unit at a specific position and the 
+ * deduction of the purchase cost from the player's balance. It supports the undo 
+ * operation by removing the created unit from the board and refunding the full 
+ * cost to the player.
+ *
+ * @author xpruzir00
  */
 
 package event;

@@ -1,7 +1,11 @@
 /**
- * Log writer/reader
- * 
- * @author: xpruzir00
+ * Responsible for saving and loading game session logs (replays) in JSON format.
+ * This utility class manages the serialization of complex game states, including the map 
+ * metadata, player information, and the full history of game events. It employs custom 
+ * GSON type adapters to correctly handle polymorphic game events and to maintain 
+ * consistent player references across the event log.
+ *
+ * @author xpruzir00
  */
 
 package tools;

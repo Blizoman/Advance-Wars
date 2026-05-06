@@ -1,7 +1,11 @@
 /**
- * Tile on board behavior and state
- * 
- * @author: xpruzir00
+ * Represents a single tile on the game board.
+ * It maintains the state of the tile, including its terrain type, the current occupying unit, 
+ * the player who owns it (for capturable structures like cities, factories, or HQs), 
+ * and its remaining capture health points. It also provides the logic for capturing the tile 
+ * based on the health of the capturing unit.
+ *
+ * @author xpruzir00
  */
 
 package board;
