@@ -15,5 +15,5 @@ public class Consts {
 	public final static int CAPTURE_HP = 20;
 	public final static int CITY_INCOME = 1000;
 
-	public final static int BOT_ACTION_DELAY = 500;
+	public final static int BOT_ACTION_DELAY = 50;
 }
