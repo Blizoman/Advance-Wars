@@ -1,3 +1,13 @@
+/**
+ * Represents the main graphical interface for an active game session or replay mode.
+ * It integrates the interactive game board canvas, zooming and panning controls, 
+ * contextual action menus, and a comprehensive sidebar displaying player status, 
+ * unit information, purchasing options, and an event log. 
+ * This class acts as the primary bridge between user interactions and the underlying game controller.
+ *
+ * @author xblizna00
+ */
+
 package gui;
 
 import java.io.IOException;

@@ -1,3 +1,9 @@
+/**
+ * Defines the available types of AI bots and their difficulty levels.
+ *
+ * @author xblizna00
+ */
+
 package gamer;
 
 public enum BotType {

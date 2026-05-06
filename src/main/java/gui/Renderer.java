@@ -1,3 +1,12 @@
+/**
+ * Represents the rendering engine for the game board using a JavaFX Canvas.
+ * It is responsible for drawing terrain tiles, units, status bars (HP, capture progress), 
+ * and visual overlays such as movement ranges, attack targets, and selections.
+ * It also handles dynamic zooming and mapping screen coordinates to grid positions.
+ *
+ * @author xblizna00
+ */
+
 package gui;
 
 import board.GameBoard;

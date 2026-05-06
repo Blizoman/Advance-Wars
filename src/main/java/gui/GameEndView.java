@@ -1,3 +1,12 @@
+/**
+ * Represents the victory screen displayed at the end of a game.
+ * It announces the winning player, provides an option to export the game session 
+ * (replay log) to a file, and allows the user to return to the main map selection menu.
+ * Includes simple UI entrance animations for a smooth transition.
+ *
+ * @author xblizna00
+ */
+
 package gui;
 
 import java.nio.file.Path;
