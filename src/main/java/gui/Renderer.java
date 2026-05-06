@@ -1,8 +1,8 @@
 /**
- * Represents the rendering engine for the game board using a JavaFX Canvas.
- * It is responsible for drawing terrain tiles, units, status bars (HP, capture progress), 
- * and visual overlays such as movement ranges, attack targets, and selections.
- * It also handles dynamic zooming and mapping screen coordinates to grid positions.
+ * Represents the rendering engine for the game board using a JavaFX Canvas. It is responsible for
+ * drawing terrain tiles, units, status bars (HP, capture progress), and visual overlays such as
+ * movement ranges, attack targets, and selections. It also handles dynamic zooming and mapping
+ * screen coordinates to grid positions.
  *
  * @author xblizna00
  */
@@ -156,18 +156,18 @@ public class Renderer {
 			gc.setFill(playerColor(unit.getPlayer()));
 			gc.fillOval(px + 4, py + 4, tileSize - 8, unitBodyHeight - 8);
 		}
-		
+
 		// Frame draw by player color
 		gc.setStroke(playerColor(unit.getPlayer()));
 		gc.setLineWidth(2);
 		gc.strokeRect(px + 1, py + 1, tileSize - 2, unitBodyHeight - 2);
-		
+
 		// HP Bar
 		drawBar(gc, px, py + unitBodyHeight, tileSize, barHeight,
 				unit.getHp() / 100.0,
 				playerColor(unit.getPlayer()),
 				Color.color(0.45, 0.45, 0.45));
-				
+
 		// Show HP
 		gc.setFill(Color.WHITE);
 		gc.setFont(Font.font(Math.max(9, tileSize / 9)));

@@ -1,8 +1,7 @@
 /**
- * Represents a two-dimensional coordinate on the game board.
- * The grid uses a top-left origin system, where [0,0] is the top-left corner.
- * Provides utility methods for string formatting and calculating the Manhattan distance 
- * between two positions.
+ * Represents a two-dimensional coordinate on the game board. The grid uses a top-left origin
+ * system, where [0,0] is the top-left corner. Provides utility methods for string formatting and
+ * calculating the Manhattan distance between two positions.
  *
  * @author xpruzir00
  */

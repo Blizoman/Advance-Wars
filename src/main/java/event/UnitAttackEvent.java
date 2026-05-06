@@ -1,9 +1,9 @@
 /**
- * Represents a combat event where an attacking unit engages a defending unit.
- * This event handles the initial attack, potential counter-attacks (if the defender survives 
- * and is within range), and the removal of any units destroyed during the engagement. 
- * It stores the exact health points of both units prior to combat to allow for a complete 
- * and accurate restoration of the game state and unit presence when the event is undone.
+ * Represents a combat event where an attacking unit engages a defending unit. This event handles
+ * the initial attack, potential counter-attacks (if the defender survives and is within range), and
+ * the removal of any units destroyed during the engagement. It stores the exact health points of
+ * both units prior to combat to allow for a complete and accurate restoration of the game state and
+ * unit presence when the event is undone.
  *
  * @author xpruzir00
  */

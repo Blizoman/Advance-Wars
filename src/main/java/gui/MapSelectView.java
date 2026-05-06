@@ -1,8 +1,8 @@
 /**
- * Represents the initial setup screen where users can select a map and configure players.
- * It provides UI controls to assign player names, choose between human or AI control 
- * (along with bot difficulty), and select unique colors for each player. It also handles 
- * validation for color uniqueness before allowing the user to start a new game or load a replay.
+ * Represents the initial setup screen where users can select a map and configure players. It
+ * provides UI controls to assign player names, choose between human or AI control (along with bot
+ * difficulty), and select unique colors for each player. It also handles validation for color
+ * uniqueness before allowing the user to start a new game or load a replay.
  *
  * @author xblizna00
  */

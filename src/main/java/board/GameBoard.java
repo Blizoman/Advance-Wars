@@ -1,7 +1,7 @@
 /**
- * Represents the main game board, managing the grid of tiles and the units occupying them.
- * It handles spatial queries, validates positions, executes unit movements, and provides 
- * utility methods to retrieve all tiles or units, as well as filtering them by owner.
+ * Represents the main game board, managing the grid of tiles and the units occupying them. It
+ * handles spatial queries, validates positions, executes unit movements, and provides utility
+ * methods to retrieve all tiles or units, as well as filtering them by owner.
  *
  * @author xpruzir00
  */

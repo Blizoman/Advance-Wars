@@ -1,8 +1,8 @@
 /**
- * Utility class responsible for loading and caching image resources for the game.
- * It dynamically resolves file paths for terrain tiles and units based on their type
- * and associated player colors (e.g., red, blue, green, yellow). It also implements 
- * caching to optimize memory usage and fallback mechanisms for neutral or missing assets.
+ * Utility class responsible for loading and caching image resources for the game. It dynamically
+ * resolves file paths for terrain tiles and units based on their type and associated player colors
+ * (e.g., red, blue, green, yellow). It also implements caching to optimize memory usage and
+ * fallback mechanisms for neutral or missing assets.
  *
  * @author xpruzir00
  * @author xblizna00

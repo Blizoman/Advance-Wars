@@ -1,8 +1,8 @@
 /**
  * Defines the various types of terrain available on the game board and their specific properties.
- * It dictates movement costs for different unit types (foot, vehicle), defensive bonuses during combat, 
- * and special structure behaviors such as capturability, unit healing, production capabilities, 
- * and income generation.
+ * It dictates movement costs for different unit types (foot, vehicle), defensive bonuses during
+ * combat, and special structure behaviors such as capturability, unit healing, production
+ * capabilities, and income generation.
  *
  * @author xpruzir00
  */

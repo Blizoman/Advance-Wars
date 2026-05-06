@@ -1,9 +1,9 @@
 /**
- * Provides a simplified interface for reading and validating data from JSON objects.
- * This utility wraps GSON's basic accessors to offer safe extraction of strings, 
- * integers, and arrays. It distinguishes between optional fields (returning null if missing) 
- * and mandatory fields (throwing an exception if missing), ensuring consistent error 
- * handling during the deserialization of game resources.
+ * Provides a simplified interface for reading and validating data from JSON objects. This utility
+ * wraps GSON's basic accessors to offer safe extraction of strings, integers, and arrays. It
+ * distinguishes between optional fields (returning null if missing) and mandatory fields (throwing
+ * an exception if missing), ensuring consistent error handling during the deserialization of game
+ * resources.
  *
  * @author xpruzir00
  */

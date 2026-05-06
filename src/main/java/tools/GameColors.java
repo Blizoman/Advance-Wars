@@ -1,8 +1,8 @@
 /**
- * Utility class that defines the visual palette and color constants for the game.
- * It provides standardized Hex-based colors for different players and maps these colors 
- * to human-readable labels through the ColorOption record. This ensures visual 
- * consistency across the UI, from unit sprites to territory highlighting.
+ * Utility class that defines the visual palette and color constants for the game. It provides
+ * standardized Hex-based colors for different players and maps these colors to human-readable
+ * labels through the ColorOption record. This ensures visual consistency across the UI, from unit
+ * sprites to territory highlighting.
  *
  * @author xpruzir00
  * @author xblizna00
@@ -21,9 +21,10 @@ public class GameColors {
 	public static final Color GREEN = Color.web("#2ecc71");
 	public static final Color YELLOW = Color.web("#f1c40f");
 
-	public static final Color[] AVAILABLE_COLORS = { RED, BLUE, GREEN, YELLOW };
+	public static final Color[] AVAILABLE_COLORS = {RED, BLUE, GREEN, YELLOW};
 
-	public record ColorOption(String label, Color color) {}
+	public record ColorOption(String label, Color color) {
+	}
 
 	public static final List<ColorOption> COLOR_OPTIONS = List.of(
 			new ColorOption("Red", RED),

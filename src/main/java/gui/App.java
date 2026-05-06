@@ -1,9 +1,8 @@
 /**
- * The main entry point for the JavaFX application.
- * It manages the primary application window (Stage) and handles transitions
- * between different scenes (Map Selection, Game View, and Game End View).
- * Additionally, it handles loading global UI assets (fonts, themes) and 
- * provides utility dialogs for loading and saving replay files.
+ * The main entry point for the JavaFX application. It manages the primary application window
+ * (Stage) and handles transitions between different scenes (Map Selection, Game View, and Game End
+ * View). Additionally, it handles loading global UI assets (fonts, themes) and provides utility
+ * dialogs for loading and saving replay files.
  *
  * @author xblizna00
  */

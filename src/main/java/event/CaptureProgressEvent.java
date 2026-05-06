@@ -1,7 +1,8 @@
 /**
- * Represents a game event where a unit makes partial progress in capturing a tile (e.g., City, Factory, HQ).
- * This event records the capture health points (HP) before and after the action, allowing the game 
- * session to execute or undo the partial capture progress and update the involved unit's state.
+ * Represents a game event where a unit makes partial progress in capturing a tile (e.g., City,
+ * Factory, HQ). This event records the capture health points (HP) before and after the action,
+ * allowing the game session to execute or undo the partial capture progress and update the involved
+ * unit's state.
  *
  * @author xpruzir00
  */

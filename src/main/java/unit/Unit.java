@@ -1,10 +1,9 @@
 /**
- * Represents an individual combat or utility unit on the game board.
- * This class maintains the current state of a unit, including its health (HP), 
- * position, remaining movement points, and whether it has already performed 
- * an action in the current turn. It provides essential methods for combat 
- * interaction (taking damage, healing), movement management, and status resets 
- * at the beginning of a new turn.
+ * Represents an individual combat or utility unit on the game board. This class maintains the
+ * current state of a unit, including its health (HP), position, remaining movement points, and
+ * whether it has already performed an action in the current turn. It provides essential methods for
+ * combat interaction (taking damage, healing), movement management, and status resets at the
+ * beginning of a new turn.
  *
  * @author xpruzir00
  */

@@ -1,8 +1,8 @@
 /**
- * Global configuration class that stores constant values used throughout the application.
- * It defines core gameplay balance parameters such as starting capital, unit health limits, 
- * healing rates, capture thresholds, and economic income. It also includes technical 
- * settings like the artificial intelligence action delay.
+ * Global configuration class that stores constant values used throughout the application. It
+ * defines core gameplay balance parameters such as starting capital, unit health limits, healing
+ * rates, capture thresholds, and economic income. It also includes technical settings like the
+ * artificial intelligence action delay.
  *
  * @author xpruzir00
  */

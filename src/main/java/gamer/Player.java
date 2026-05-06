@@ -1,7 +1,7 @@
 /**
- * Represents a player in the game, tracking their current state and resources.
- * It manages the player's identity, financial balance, survival status, 
- * assigned color, and whether they are controlled by a human or an AI bot.
+ * Represents a player in the game, tracking their current state and resources. It manages the
+ * player's identity, financial balance, survival status, assigned color, and whether they are
+ * controlled by a human or an AI bot.
  *
  * @author xpruzir00
  * @author xblizna00

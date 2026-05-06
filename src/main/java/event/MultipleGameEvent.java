@@ -1,9 +1,9 @@
 /**
- * Represents a composite game event that groups multiple sub-events together, 
- * primarily used to handle the complex process of player elimination.
- * It executes a sequence of events (e.g., destroying all owned units, losing captured cities) 
- * and removes the player from the active game. When undone, it restores the player to their 
- * original turn index and reverts all sub-events in reverse order to maintain state consistency.
+ * Represents a composite game event that groups multiple sub-events together, primarily used to
+ * handle the complex process of player elimination. It executes a sequence of events (e.g.,
+ * destroying all owned units, losing captured cities) and removes the player from the active game.
+ * When undone, it restores the player to their original turn index and reverts all sub-events in
+ * reverse order to maintain state consistency.
  *
  * @author xpruzir00
  */

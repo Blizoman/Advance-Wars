@@ -1,7 +1,7 @@
 /**
- * Represents the core game controller that manages the main game state and logic.
- * It handles player turns, economy processing, unit management (creation, movement, combat), 
- * and overall interactions with the game board.
+ * Represents the core game controller that manages the main game state and logic. It handles player
+ * turns, economy processing, unit management (creation, movement, combat), and overall interactions
+ * with the game board.
  *
  * @author xpruzir00
  */

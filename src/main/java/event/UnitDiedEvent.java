@@ -1,9 +1,9 @@
 /**
- * Represents a game event where a unit is destroyed and removed from the board.
- * Beyond simply removing the unit, this event also handles the resetting of a tile's 
- * capture progress if the unit was in the middle of capturing a structure. It preserves 
- * the unit's health and the tile's capture status before the death occurred, enabling 
- * a complete restoration of both the unit and the capture state upon an undo operation.
+ * Represents a game event where a unit is destroyed and removed from the board. Beyond simply
+ * removing the unit, this event also handles the resetting of a tile's capture progress if the unit
+ * was in the middle of capturing a structure. It preserves the unit's health and the tile's capture
+ * status before the death occurred, enabling a complete restoration of both the unit and the
+ * capture state upon an undo operation.
  *
  * @author xpruzir00
  */

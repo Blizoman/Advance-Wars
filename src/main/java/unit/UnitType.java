@@ -1,10 +1,8 @@
 /**
- * Defines the static properties, combat statistics, and strategic capabilities 
- * for each class of unit in the game.
- * Each constant represents a unique unit class with specific values for cost, 
- * mobility, and engagement rules. This enum also encapsulates the game's combat 
- * balance through a damage matrix, defining how much base damage each unit 
- * type inflicts upon others.
+ * Defines the static properties, combat statistics, and strategic capabilities for each class of
+ * unit in the game. Each constant represents a unique unit class with specific values for cost,
+ * mobility, and engagement rules. This enum also encapsulates the game's combat balance through a
+ * damage matrix, defining how much base damage each unit type inflicts upon others.
  *
  * @author xpruzir00
  */

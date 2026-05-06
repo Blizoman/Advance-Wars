@@ -1,9 +1,9 @@
 /**
- * Represents a game event where a unit moves from one position to another on the board.
- * This event manages the physical relocation of the unit, updates its remaining movement points, 
- * and handles the resetting of capture progress if a unit moves away from a partially 
- * captured structure. It stores the necessary state (previous position, movement points, 
- * and capture progress) to allow for a seamless reversal of the move during an undo operation.
+ * Represents a game event where a unit moves from one position to another on the board. This event
+ * manages the physical relocation of the unit, updates its remaining movement points, and handles
+ * the resetting of capture progress if a unit moves away from a partially captured structure. It
+ * stores the necessary state (previous position, movement points, and capture progress) to allow
+ * for a seamless reversal of the move during an undo operation.
  *
  * @author xpruzir00
  */

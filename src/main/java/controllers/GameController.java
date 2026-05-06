@@ -1,8 +1,8 @@
 /**
  * Acts as the central bridge between the graphical user interface (GUI) and the backend game logic.
- * It manages user interactions such as selecting units, moving, attacking, capturing, 
- * and purchasing from factories. Additionally, it controls the turn cycle, manages UI states, 
- * handles AI bot execution, and notifies the view listeners of any state changes to trigger re-rendering.
+ * It manages user interactions such as selecting units, moving, attacking, capturing, and
+ * purchasing from factories. Additionally, it controls the turn cycle, manages UI states, handles
+ * AI bot execution, and notifies the view listeners of any state changes to trigger re-rendering.
  *
  * @author xpruzir00
  */
@@ -286,8 +286,8 @@ public class GameController {
 			deselect();
 		} else
 			isAttacking = false;
-			stateChanged();
-			// deselectAsWait();
+		stateChanged();
+		// deselectAsWait();
 		return true;
 	}
 

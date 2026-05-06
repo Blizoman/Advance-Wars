@@ -1,10 +1,9 @@
 /**
- * Represents an event triggered when a player ends their turn and the next player's turn begins.
- * It captures a snapshot of the game state prior to the transition—specifically tracking 
- * all players' financial balances and all units' health points. This snapshot is necessary 
- * because starting a new turn processes income generation and automatic unit healing. 
- * The event provides methods to execute the turn progression and to cleanly undo it by 
- * restoring the exact previous state.
+ * Represents an event triggered when a player ends their turn and the next player's turn begins. It
+ * captures a snapshot of the game state prior to the transition—specifically tracking all players'
+ * financial balances and all units' health points. This snapshot is necessary because starting a
+ * new turn processes income generation and automatic unit healing. The event provides methods to
+ * execute the turn progression and to cleanly undo it by restoring the exact previous state.
  *
  * @author xpruzir00
  */

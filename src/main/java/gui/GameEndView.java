@@ -1,8 +1,8 @@
 /**
- * Represents the victory screen displayed at the end of a game.
- * It announces the winning player, provides an option to export the game session 
- * (replay log) to a file, and allows the user to return to the main map selection menu.
- * Includes simple UI entrance animations for a smooth transition.
+ * Represents the victory screen displayed at the end of a game. It announces the winning player,
+ * provides an option to export the game session (replay log) to a file, and allows the user to
+ * return to the main map selection menu. Includes simple UI entrance animations for a smooth
+ * transition.
  *
  * @author xblizna00
  */
@@ -31,6 +31,7 @@ import javafx.util.Duration;
 
 public class GameEndView extends VBox {
 	private static final String UI_FONT = "Manrope";
+
 	public GameEndView(App app, Player winner, Consumer<Path> onExport) {
 		getStyleClass().add("root-view");
 		setSpacing(20);
