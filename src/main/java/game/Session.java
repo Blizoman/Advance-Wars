@@ -1,7 +1,10 @@
 /**
- * Current game session (game manager)
- * 
- * @author: xpruzir00
+ * Manages the current game session, acting as an event-driven controller for the core game logic.
+ * It handles the execution and logging of game events (allowing for undo/redo functionality),
+ * manages turn progression, processes interactions like movement, combat, and capturing, 
+ * and evaluates player eliminations and win conditions.
+ *
+ * @author xpruzir00
  */
 
 package game;

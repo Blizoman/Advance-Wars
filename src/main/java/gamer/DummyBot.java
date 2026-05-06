@@ -1,3 +1,11 @@
+/**
+ * Represents a basic AI opponent that automates a player's turn.
+ * It processes actions step-by-step using iterators to prevent UI freezes,
+ * handling unit movement, capturing, combat, and basic purchasing heuristics.
+ *
+ * @author xblizna00
+ */
+
 package gamer;
 
 import java.util.ArrayList;

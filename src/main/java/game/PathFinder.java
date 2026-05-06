@@ -1,3 +1,12 @@
+/**
+ * Provides pathfinding functionality for units on the game board.
+ * It calculates all reachable tiles within a unit's movement range, taking terrain 
+ * movement costs and enemy unit obstacles into account. 
+ * Used by /GeminiBot.java and /DummyBot.java.
+ *
+ * @author xblizna00
+ */
+
 package game;
 
 import java.util.*;
