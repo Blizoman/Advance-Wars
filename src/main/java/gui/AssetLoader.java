@@ -1,7 +1,13 @@
+/**
+ * Loads resources
+ * 
+ * @author: xpruzir00
+ */
+
 package gui;
 
 import java.io.IOException;
-import java.nio.file.Files;
+import java.io.InputStream;
 import java.nio.file.Path;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
@@ -52,7 +58,7 @@ public class AssetLoader {
 	}
 
 	private static Image load(String name) {
-		Path path = Path.of("lib/assets/" + name + ".png");
+		Path path = Path.of("lib/assets", name + ".png");
 		return loadPath(path);
 	}
 
@@ -76,14 +82,20 @@ public class AssetLoader {
 	private static Image loadPath(Path path) {
 		String key = path.toString();
 		return loaded.computeIfAbsent(key, ignored -> {
-			if (!Files.exists(path))
-				return null;
-			try (var stream = Files.newInputStream(path)) {
-				return new Image(stream);
+			try {
+				return new Image(openResource(path));
 			} catch (IOException e) {
 				return null;
 			}
 		});
+	}
+
+	private static InputStream openResource(Path path) throws IOException {
+		String resourcePath = "/" + path;
+		InputStream stream = AssetLoader.class.getResourceAsStream(resourcePath);
+		if (stream == null)
+			throw new IOException("Resource not found: " + resourcePath);
+		return stream;
 	}
 
 	private static String resolveColorKey(Color color) {

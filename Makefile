@@ -1,6 +1,8 @@
 LOGIN = xpruzir00
 
-.PHONY: c compile run exe clean docs clean gh zip
+.PHONY: all c compile run exe clean docs clean gh zip
+
+all: compile docs exe
 
 c: clean compile
 compile:

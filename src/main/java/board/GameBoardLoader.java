@@ -7,10 +7,10 @@
 package board;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,9 +30,12 @@ public class GameBoardLoader {
 	public static GameBoard loadMap(AvailableMaps.MapMetadata mapMetadata, List<Player> players)
 			throws IOException {
 		String filename = AvailableMaps.getFilename(mapMetadata);
-		Path path = Path.of(filename);
+		String resourcePath = "/" + filename;
+		InputStream stream = GameBoardLoader.class.getResourceAsStream(resourcePath);
+		if (stream == null)
+			throw new IOException("Map not found: " + resourcePath);
 
-		try (Reader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
+		try (Reader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
 			JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
 			return loadFromJson(json, players);
 		}
