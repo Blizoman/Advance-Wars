@@ -18,15 +18,8 @@
 
 ## Compilation
 
-> Mostly reusing **maven** commands
-
-- **Compile project**: `make compile`
-- **Run game**: `make run`
-- **Create distributable**: `make exe`
-- **Generate docs**: `make docs`
-
----
-
-- _All required_: `make all` ( == `compile + docs + exe`)
-- **Clean**: `make clean`
-- **Zip**: `make zip`
+- **Compile project**: `mvn compile`
+- **Run game**: `mvn javafx:run -Djavafx.mainClass=gui.App`
+- **Create distributable**: `mvn package`
+- **Generate docs**: `mvn javadoc:javadoc`
+- **Clean**: `mvn clean`
