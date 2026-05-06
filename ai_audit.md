@@ -1,6 +1,6 @@
 # AI Audit Log - Tým xpruzir00
 
-**Datum poslední aktualizace:** [DD. MM. 2026]
+**Datum poslední aktualizace:** [06. 05. 2026]
 
 ---
 
@@ -110,7 +110,5 @@
 * **Prompt:**
   > (Vložil som môj pom.xml aj Makefile) Nejde mi vygenerovať dokumentáciu, čo mi chýba?
 * **Úprava studentem:**
-  Bolo potrebné iba vložiť 1 plugin (maven-javadoc-plugin)
-* **Míra generování:** 50%
-
----
+  Bolo potrebné iba pridať 1 plugin (maven-javadoc-plugin)
+* **Míra generování:** 5%
