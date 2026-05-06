@@ -16,6 +16,8 @@ import unit.Unit;
 
 public class Renderer {
 	private static final double BASE_TILE_SIZE = 80.0;
+	private static final double MIN_ZOOM = 0.3;
+	private static final double MAX_ZOOM = 2.0;
 
 	private final Canvas canvas;
 	private final GameController controller;
@@ -27,8 +29,8 @@ public class Renderer {
 	}
 
 	public void setZoom(double zoom) {
-		this.zoom = Math.max(0.3, Math.min(1.0, zoom));
-		applyZoom();
+		this.zoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, zoom));
+		resizeCanvasToBoard();
 	}
 
 	public double getZoom() { return zoom; }
@@ -39,14 +41,9 @@ public class Renderer {
 
 	public void resizeCanvasToBoard() {
 		GameBoard board = controller.getGame().getGameBoard();
-		canvas.setWidth(board.getWidth() * BASE_TILE_SIZE);
-		canvas.setHeight(board.getHeight() * BASE_TILE_SIZE);
-		applyZoom();
-	}
-
-	private void applyZoom() {
-		canvas.setScaleX(zoom);
-		canvas.setScaleY(zoom);
+		double tileSize = tileSize();
+		canvas.setWidth(board.getWidth() * tileSize);
+		canvas.setHeight(board.getHeight() * tileSize);
 	}
 
 	public void render() {
@@ -104,7 +101,8 @@ public class Renderer {
 		double px = x * tileSize;
 		double py = y * tileSize;
 
-		Image img = AssetLoader.terrain(tile.getTerrain());
+		Image img = AssetLoader.terrain(tile.getTerrain(),
+				tile.getOwner() == null ? null : tile.getOwner().getColor());
 		if (img != null) {
 			gc.drawImage(img, px, py, tileSize, tileSize);
 		} else {
@@ -142,26 +140,32 @@ public class Renderer {
 		int bottomBarsHeight = barHeight * 2;
 		double unitBodyHeight = tileSize - bottomBarsHeight;
 
-		Image img = AssetLoader.unit(unit.getType());
+		Image img = AssetLoader.unit(unit.getType(), unit.getPlayer().getColor());
 		if (img != null) {
 			gc.drawImage(img, px, py, tileSize, unitBodyHeight);
 		} else {
 			gc.setFill(playerColor(unit.getPlayer()));
 			gc.fillOval(px + 4, py + 4, tileSize - 8, unitBodyHeight - 8);
 		}
-
+		
+		// Frame draw by player color
 		gc.setStroke(playerColor(unit.getPlayer()));
 		gc.setLineWidth(2);
 		gc.strokeRect(px + 1, py + 1, tileSize - 2, unitBodyHeight - 2);
-
+		
+		// HP Bar
 		drawBar(gc, px, py + unitBodyHeight, tileSize, barHeight,
 				unit.getHp() / 100.0,
 				playerColor(unit.getPlayer()),
 				Color.color(0.45, 0.45, 0.45));
-
+				
+		// Show HP
 		gc.setFill(Color.WHITE);
 		gc.setFont(Font.font(Math.max(9, tileSize / 9)));
 		gc.fillText(String.valueOf(unit.getHp()), px + 2, py + unitBodyHeight - 1);
+
+		// Reset any effects from earlier draws.
+		gc.setEffect(null);
 	}
 
 	private Color fallbackColor(Terrain terrain) {

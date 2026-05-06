@@ -1,18 +1,25 @@
-TODO: @ado
-- gui/
-- - AssetLoader should be done
-- - in others, you can inspire by generated UI, but code wasnt revieved by me, so probably just create own
-- - but can use `Stage` style for 3 screens, i find it nice
+# IJA projekt 2026
 
-- also can modify Controller, as it is combination of my and yours work
+> Game inspired by the game series **Advance Wars**
 
-- gamer/Bot
-- - little bit of problems come from Controller validation:
-- - - in control., i validate valid moves, views etc, but bot dont have access to them, so maybe create duplicate checks for it
+## Authors:
 
-vsetky checky treby robit v GUIku, robil som to stylom ze BE veri ze GUI mu nic zle neposle (inak by som mal tak 3× viac kodu)
+- **Roman Pružinský** (xpruzir00): OOP design, logging, parsing
+- **Andrej Bližnák** (xblizna00): GUI, Bot, PathFinder
 
-keby sa ti chce, budem rad ked skontrolujes riesenie na konci a skompilujes .jar (makefile by uz mal byt takmer nastaveny na to)
+## Used technologies:
 
-TODO: hlavicky suborov, autori obsah
-TODO: AI
+- **Build system**: maven
+- **Program language**: Java 21
+- **GUI**: JavaFX
+- **Logs, maps**: JSON
+
+> Tested on **Linux Debian 12**
+
+## Compilation
+
+- **Compile project**: `mvn compile`
+- **Run game**: `mvn javafx:run -Djavafx.mainClass=gui.App`
+- **Create distributable**: `mvn package`
+- **Generate docs**: `mvn javadoc:javadoc`
+- **Clean**: `mvn clean`

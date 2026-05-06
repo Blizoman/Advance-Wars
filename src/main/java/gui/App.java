@@ -9,9 +9,11 @@ import javafx.application.Application;
 import javafx.stage.FileChooser;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.scene.text.Font;
 
 public class App extends Application {
 	private Stage stage;
+	private boolean fontsLoaded = false;
 
 	@Override
 	public void start(Stage stage) {
@@ -25,19 +27,52 @@ public class App extends Application {
 	}
 
 	public void showMapSelect() {
-		stage.setScene(new Scene(new MapSelectView(this), 760, 620));
+		Scene scene = new Scene(new MapSelectView(this), 760, 620);
+		applyTheme(scene);
+		stage.setScene(scene);
 	}
 
 	public void showGame(AvailableMaps.MapMetadata map, List<Player> players) {
-		stage.setScene(new Scene(new GameView(this, map, players), 1500, 860));
+		Scene scene = new Scene(new GameView(this, map, players), 1500, 860);
+		applyTheme(scene);
+		stage.setScene(scene);
 	}
 
 	public void showGame(AvailableMaps.MapMetadata map, List<Player> players, Path replayLog) {
-		stage.setScene(new Scene(new GameView(this, map, players, replayLog), 1500, 860));
+		Scene scene = new Scene(new GameView(this, map, players, replayLog), 1500, 860);
+		applyTheme(scene);
+		stage.setScene(scene);
 	}
 
 	public void showGameEnd(Player winner, Consumer<Path> onExport) {
-		stage.setScene(new Scene(new GameEndView(this, winner, onExport), 400, 340));
+		Scene scene = new Scene(new GameEndView(this, winner, onExport), 400, 340);
+		applyTheme(scene);
+		stage.setScene(scene);
+	}
+
+	private void applyTheme(Scene scene) {
+		ensureFontsLoaded();
+		scene.getStylesheets().add(getClass().getResource("/gui/styles.css").toExternalForm());
+	}
+
+	private void ensureFontsLoaded() {
+		if (fontsLoaded)
+			return;
+		fontsLoaded = true;
+		loadFontIfPresent("/gui/fonts/Manrope-Regular.ttf");
+		loadFontIfPresent("/gui/fonts/Manrope-SemiBold.ttf");
+		loadFontIfPresent("/gui/fonts/Manrope-Bold.ttf");
+		loadFontIfPresent("/gui/fonts/Manrope-ExtraBold.ttf");
+		loadFontIfPresent("/gui/fonts/Manrope-Black.ttf");
+	}
+
+	private void loadFontIfPresent(String resourcePath) {
+		try (var stream = getClass().getResourceAsStream(resourcePath)) {
+			if (stream != null)
+				Font.loadFont(stream, 12);
+		} catch (Exception ignored) {
+			// Optional font not present.
+		}
 	}
 
 	public Path chooseLoadReplayFile() {

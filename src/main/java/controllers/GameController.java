@@ -17,8 +17,10 @@ import board.Tile;
 import game.Game;
 import game.PathFinder;
 import game.Session;
-import gamer.Player;
+import gamer.BotType;
+import gamer.DummyBot;
 import gamer.GeminiBot;
+import gamer.Player;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.util.Duration;
@@ -35,7 +37,8 @@ public class GameController {
 	@Getter
 	private final Game game;
 
-	private final GeminiBot bot;
+	private final DummyBot weakBot;
+	private final GeminiBot strongBot;
 	private final PathFinder pathFinder;
 
 	private final List<Runnable> stateListeners = new ArrayList<>();
@@ -57,7 +60,8 @@ public class GameController {
 		this.session = session;
 		this.game = game;
 		this.pathFinder = new PathFinder(game.getGameBoard());
-		this.bot = new GeminiBot(this.pathFinder);
+		this.weakBot = new DummyBot(this.pathFinder);
+		this.strongBot = new GeminiBot(this.pathFinder);
 		this.session.setOnGameEnd(ignored -> stateChanged());
 	}
 
@@ -115,7 +119,7 @@ public class GameController {
 			botTimeline.setCycleCount(Timeline.INDEFINITE);
 
 			KeyFrame frame = new KeyFrame(Duration.millis(Consts.BOT_ACTION_DELAY), e -> {
-				boolean hasMoreActions = this.bot.performNextAction(this.session);
+				boolean hasMoreActions = performBotAction(getActivePlayer());
 				stateChanged();
 
 				if (!hasMoreActions) {
@@ -131,6 +135,15 @@ public class GameController {
 		} else {
 			stateChanged();
 		}
+	}
+
+	private boolean performBotAction(Player player) {
+		BotType type = player.getBotType();
+		if (type == null || type == BotType.NONE)
+			type = BotType.WEAK;
+		if (type == BotType.STRONG)
+			return strongBot.performNextAction(this.session);
+		return weakBot.performNextAction(this.session);
 	}
 
 	public void onEndTurn() {
@@ -224,7 +237,8 @@ public class GameController {
 			return;
 		if (tryMove(clickedPosition))
 			return;
-		deselectAsWait();
+		// deselectAsWait();
+		deselect();
 	}
 
 	private boolean trySelectFactory(Position position) {
@@ -268,7 +282,9 @@ public class GameController {
 			this.session.attack(selectedUnit, clicked);
 			deselect();
 		} else
-			deselectAsWait();
+			isAttacking = false;
+			stateChanged();
+			// deselectAsWait();
 		return true;
 	}
 

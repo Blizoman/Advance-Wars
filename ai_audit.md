@@ -74,46 +74,43 @@
 
 ---
 
-## 7. [NÁZEV DALŠÍ KOMPONENTY]
+## 7. Gemini Bot
 * **Nástroj:** Gemini 3
-* **Datum:** DD. MM. 2026
+* **Datum:** 05. 05. 2026
 * **Prompt:**
-  > 
+  > (Attached ASSIGNMENT.pdf) Generate a basic AI bot for the game that can perform valid moves (movement, capture), mainly for automated testing of UI and game mechanics
 * **Úprava studentem:**
-  ...
-* **Míra generování:** X%
+  Vznikol halvne kvoli testovaniu UI a inych hernych mechanik. Povodna verzia obsahovala iba obsadzovanie zakladni, avsak nebola schopna nejakeho utoku ci taktickeho nakupu, neskor som pouzil tuto zakladnu kostru a pridal k nej dalsie poziadavky ktore boli nutne ako logika utoku a vyberu cielov, rozhodovanie pri nakupe jendnotiek a taktiez heuristicky system v metode evaluatePosition.
+* **Míra generování:** 30-40%
 
 ---
 
-## 8. [NÁZEV DALŠÍ KOMPONENTY]
-* **Nástroj:** Gemini 3
-* **Datum:** DD. MM. 2026
+## 8. GUI and ASSETS
+* **Nástroj:** Gemini 3 / CanvaAI / GPT-5.2-Codex-Xhigh
+* **Datum:** 03. 05. 2026
 * **Prompt:**
-  > 
+  Neslo o jednorazove upravy ale skor mensie prompty pre rozne upravy... napr.:
+
+    > simplify this method 
+    > fix rendering 
+    > adjust layout 
+    > improve styling
+    > create small icon of tank, infantry and cannon, use resolution between 60x60 to 200x200 pixels, make it look like from same machinery
 * **Úprava studentem:**
-  ...
-* **Míra generování:** X%
+  GUI bolo implementovane manualne, AI bola vyuzita primarne ako pomocnik pri upravach kodu, navrhu priecinka resources a taktiez navrh vyberu spravneho fontu.
+  Ostatne graficke prvky boli vytvarane v Canve/photopea ci basic skicar.
+
+* **Míra generování:** 15–25%
 
 ---
 
-## 9. [NÁZEV DALŠÍ KOMPONENTY]
-* **Nástroj:** Gemini 3
-* **Datum:** DD. MM. 2026
+## 9. Javadoc
+* **Nástroj:** Ckaude Sonnet 4.6
+* **Datum:** 06. 05. 2026
 * **Prompt:**
-  > 
+  > (Vložil som môj pom.xml aj Makefile) Nejde mi vygenerovať dokumentáciu, čo mi chýba?
 * **Úprava studentem:**
-  ...
-* **Míra generování:** X%
-
----
-
-## 10. [NÁZEV DALŠÍ KOMPONENTY]
-* **Nástroj:** Gemini 3
-* **Datum:** DD. MM. 2026
-* **Prompt:**
-  > 
-* **Úprava studentem:**
-  ...
-* **Míra generování:** X%
+  Bolo potrebné iba vložiť 1 plugin (maven-javadoc-plugin)
+* **Míra generování:** 50%
 
 ---
