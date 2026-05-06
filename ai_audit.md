@@ -104,24 +104,13 @@
 
 ---
 
-## 9. [NÁZEV DALŠÍ KOMPONENTY]
-* **Nástroj:** Gemini 3
-* **Datum:** DD. MM. 2026
+## 9. Javadoc
+* **Nástroj:** Ckaude Sonnet 4.6
+* **Datum:** 06. 05. 2026
 * **Prompt:**
-  > 
+  > (Vložil som môj pom.xml aj Makefile) Nejde mi vygenerovať dokumentáciu, čo mi chýba?
 * **Úprava studentem:**
-  ...
-* **Míra generování:** X%
-
----
-
-## 10. [NÁZEV DALŠÍ KOMPONENTY]
-* **Nástroj:** Gemini 3
-* **Datum:** DD. MM. 2026
-* **Prompt:**
-  > 
-* **Úprava studentem:**
-  ...
-* **Míra generování:** X%
+  Bolo potrebné iba vložiť 1 plugin (maven-javadoc-plugin)
+* **Míra generování:** 50%
 
 ---
