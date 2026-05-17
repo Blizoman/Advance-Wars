@@ -5,17 +5,17 @@ Developed as a team project for the **IJA (Java Seminar Project)** course during
 
 ## 👨‍💻 Team Authors
 
-### Andrej Bližnák (`xblizna00`)
-- GUI implementation
-- Bot logic (Dummy / Gemini)
-- Pathfinding
-- Asset management
-
 ### Roman Pružinský (`xpruzir00`)
 - OOP architecture design
 - JSON logging system
 - Parser
 - Game loop and game state management
+  
+### Andrej Bližnák (`xblizna00`)
+- GUI implementation
+- Bot logic (Dummy / Gemini)
+- Pathfinding
+- Asset management
 
 ---
 
