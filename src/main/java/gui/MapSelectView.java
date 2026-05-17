@@ -45,6 +45,7 @@ import javafx.util.Duration;
 
 public class MapSelectView extends VBox {
 	private static final String UI_FONT = "Manrope";
+	// Load the heaviest font variant for the title; fall back to lighter variants or system font.
 	private static final String TITLE_FONT = loadFontFamily(
 			"/gui/fonts/Manrope-Black.ttf", 46,
 			loadFontFamily("/gui/fonts/Manrope-ExtraBold.ttf", 46, "Arial Black"));
@@ -60,6 +61,7 @@ public class MapSelectView extends VBox {
 		setAlignment(Pos.CENTER);
 		setFillWidth(true);
 
+		// Title row with decorative tank icons on both sides.
 		Text title = new Text("Advance Wars");
 		title.setFont(Font.font(TITLE_FONT, FontWeight.BLACK, 46));
 		title.setStyle("-fx-font-weight: 900;");
@@ -67,9 +69,11 @@ public class MapSelectView extends VBox {
 		title.setStroke(Color.web("#1f2a37"));
 		title.setStrokeWidth(0.6);
 		title.getStyleClass().add("title-text");
+
 		ImageView leftIcon = loadHeaderIcon("/gui/tank_left.png", 36);
 		ImageView rightIcon = loadHeaderIcon("/gui/tank_right.png", 36);
 		HBox titleRow = new HBox(12);
+
 		titleRow.setAlignment(Pos.CENTER);
 		titleRow.getStyleClass().add("title-row");
 		if (leftIcon != null)
@@ -78,6 +82,8 @@ public class MapSelectView extends VBox {
 		if (rightIcon != null)
 			titleRow.getChildren().add(rightIcon);
 
+		//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-//
+		// Map list – selecting a different map refreshes the player rows to match its player count.//
 		ListView<AvailableMaps.MapMetadata> mapList = new ListView<>();
 		mapList.getItems().addAll(AvailableMaps.getAvailableMaps());
 		mapList.setPrefHeight(220);
@@ -91,6 +97,7 @@ public class MapSelectView extends VBox {
 						: item.title() + " (" + item.players() + " players)");
 			}
 		});
+
 		mapList.getSelectionModel().selectFirst();
 
 		Label playersLabel = new Label("Players:");
@@ -162,6 +169,7 @@ public class MapSelectView extends VBox {
 		updateActionButtons();
 	}
 
+	// Plays a staggered fade-in on each node with a short delay between them.
 	private void playIntro(Node... nodes) {
 		for (int i = 0; i < nodes.length; i++) {
 			Node node = nodes[i];
@@ -175,6 +183,8 @@ public class MapSelectView extends VBox {
 		}
 	}
 
+	// Rebuilds the player configuration rows when the map changes.
+	// Preserves previously entered names, bot settings, and colors where possible.
 	private void refreshPlayerRows(int count) {
 		List<String> previousNames = playerRows.stream()
 				.map(row -> row.nameField().getText())
@@ -212,6 +222,8 @@ public class MapSelectView extends VBox {
 		updateActionButtons();
 	}
 
+	// Creates one player configuration row: name field, bot checkbox, bot type selector,
+	// and color picker. Enabling the bot checkbox activates the type selector.
 	private PlayerInputRow createPlayerRow(int index, String defaultName, boolean defaultBot,
 			Color defaultColor, BotType defaultBotType) {
 		Label label = new Label("Player " + index + ":");
@@ -234,6 +246,7 @@ public class MapSelectView extends VBox {
 		return new PlayerInputRow(row, nameField, botCheckBox, botChoice, colorChoice);
 	}
 
+	// Reads all player rows and constructs Player objects with name, bot flag, bot type, and color.
 	private List<Player> buildPlayers() {
 		List<Player> players = new ArrayList<>();
 		for (int i = 0; i < playerRows.size(); i++) {
@@ -255,6 +268,7 @@ public class MapSelectView extends VBox {
 		return players;
 	}
 
+	// Builds the bot difficulty dropdown. Disabled when the player is not set to bot.
 	private ComboBox<BotType> buildBotChoice(BotType defaultType, boolean isBot) {
 		ComboBox<BotType> box = new ComboBox<>();
 		box.getItems().setAll(BotType.WEAK, BotType.STRONG);
@@ -298,6 +312,7 @@ public class MapSelectView extends VBox {
 		};
 	}
 
+	// Builds the color picker dropdown with a colored swatch next to each option.
 	private ComboBox<GameColors.ColorOption> buildColorChoice(Color defaultColor) {
 		ComboBox<GameColors.ColorOption> box = new ComboBox<>();
 		box.getItems().setAll(GameColors.COLOR_OPTIONS);
@@ -314,6 +329,9 @@ public class MapSelectView extends VBox {
 		return box;
 	}
 
+	
+	// Creates a list cell that shows a colored rectangle swatch next to the color name.
+	// useColorText=true colors the label text itself (used inside the dropdown list).
 	private ListCell<GameColors.ColorOption> createColorCell(boolean useColorText) {
 		return new ListCell<>() {
 			@Override
@@ -340,6 +358,7 @@ public class MapSelectView extends VBox {
 		};
 	}
 
+	// Finds the ColorOption that matches a given Color by component comparison.
 	private GameColors.ColorOption findMatchingColor(Color color) {
 		if (color == null)
 			return null;
@@ -363,6 +382,7 @@ public class MapSelectView extends VBox {
 		return true;
 	}
 
+	// Enables/disables Start Game based on color validity; highlights duplicate color pickers.
 	private void updateActionButtons() {
 		boolean enabled = isColorSelectionValid();
 		updateDuplicateIndicators();
@@ -402,6 +422,7 @@ public class MapSelectView extends VBox {
 		}
 	}
 
+	// Converts a Color to a hex string key for deduplication comparisons.
 	private String colorKey(Color color) {
 		return String.format("%02x%02x%02x",
 				(int) Math.round(color.getRed() * 255.0),
@@ -417,6 +438,7 @@ public class MapSelectView extends VBox {
 				&& Math.abs(a.getBlue() - b.getBlue()) < 0.001;
 	}
 
+	// Loads an image resource as an ImageView; returns null silently if the asset is missing.
 	private ImageView loadHeaderIcon(String resourcePath, double size) {
 		try (var stream = getClass().getResourceAsStream(resourcePath)) {
 			if (stream == null)
@@ -432,6 +454,7 @@ public class MapSelectView extends VBox {
 		}
 	}
 
+	// Loads a font from resources and returns its family name; falls back to the provided default.
 	private static String loadFontFamily(String resourcePath, double size, String fallback) {
 		try (var stream = MapSelectView.class.getResourceAsStream(resourcePath)) {
 			if (stream == null)

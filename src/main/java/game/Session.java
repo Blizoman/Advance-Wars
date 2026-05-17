@@ -135,7 +135,8 @@ public class Session {
 			if (!this.game.getGameBoard().getUnitsOf(player).isEmpty())
 				continue;
 			boolean hasFactory = this.game.getGameBoard().getTilesOf(player).stream()
-					.anyMatch(t -> t.getTerrain().isProduceUnits());
+					.anyMatch(t -> t.getTerrain().isProduceUnits() && t.isEmpty())
+            		&& player.getMoney() >= UnitType.INFANTRY.getCost();
 			if (!hasFactory)
 				eliminatePlayer(player);
 		}

@@ -65,6 +65,7 @@ public class GameView extends HBox {
 	private final ListView<GameEvent> eventLogView = new ListView<>();
 	private int currentLogCursor = 0;
 
+	// Represents the current interaction state of the UI.
 	private enum UiState {
 		IDLE,
 		UNIT_SELECTED,
@@ -73,10 +74,13 @@ public class GameView extends HBox {
 		FACTORY_SELECTED
 	}
 
+	// Convenience constructor for a new game (no replay).
 	public GameView(App app, AvailableMaps.MapMetadata map, List<Player> players) {
 		this(app, map, players, null);
 	}
 
+	// Main constructor. If replayLog is provided, loads map and players from the replay header
+	// and populates the session event log for step-by-step playback.
 	public GameView(App app, AvailableMaps.MapMetadata map, List<Player> players, Path replayLog) {
 		AvailableMaps.MapMetadata effectiveMap = map;
 		List<Player> effectivePlayers = players;
@@ -93,10 +97,12 @@ public class GameView extends HBox {
 							GameColors.AVAILABLE_COLORS[pI % GameColors.AVAILABLE_COLORS.length]);
 					effectivePlayers.add(player);
 				}
-			} catch (IOException e) {
+			}
+			catch (IOException e) {
 				throw new RuntimeException("Failed to load replay header", e);
 			}
 		}
+
 		final AvailableMaps.MapMetadata finalMap = effectiveMap;
 		final List<Player> finalPlayers = effectivePlayers;
 		this.mapMetadata = finalMap;
@@ -104,11 +110,15 @@ public class GameView extends HBox {
 		setSpacing(12);
 		setPadding(new Insets(12));
 		Game game;
+
 		try {
 			game = new Game(loadMap(finalMap, finalPlayers), finalPlayers);
-		} catch (IOException e) {
+		} 
+		catch (IOException e) {
 			throw new RuntimeException("Failed to load map", e);
 		}
+
+		// Load event log from file for replay mode, or start fresh for a new game.
 		Session session;
 		if (replayLog != null)
 			session = new Session(game, LogFiler.loadEvents(replayData, finalPlayers));
@@ -122,6 +132,8 @@ public class GameView extends HBox {
 		ContextMenu contextMenu = new ContextMenu();
 		contextMenu.getStyleClass().add("action-menu");
 
+		//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+		// Handle left-click on the canvas: route to controller and show action menu when needed./
 		canvas.setOnMouseClicked(e -> {
 			contextMenu.hide();
 
@@ -134,10 +146,13 @@ public class GameView extends HBox {
 
 			UiState before = getUiState(controller);
 			Unit selected = controller.getSelectedUnit();
+
+			// If unit already moved, show action menu immediately instead of moving again.
 			if (before == UiState.UNIT_MOVED) {
 				showActionMenu(contextMenu, controller, e.getScreenX(), e.getScreenY());
 				return;
 			}
+			// In attack mode, clicking the unit's own tile cancels and re-shows action menu.
 			if (before == UiState.ATTACK_MODE
 					&& selected != null
 					&& pos.equals(selected.getPosition())) {
@@ -150,11 +165,13 @@ public class GameView extends HBox {
 			controller.onTileClicked(pos);
 			UiState after = getUiState(controller);
 
+			// Show action menu automatically after a successful move.
 			if (after == UiState.UNIT_MOVED) {
 				showActionMenu(contextMenu, controller, e.getScreenX(), e.getScreenY());
 			}
 		});
 
+		// Map canvas is placed inside a scrollable pane to support large maps.
 		Group mapGroup = new Group(canvas);
 		ScrollPane mapScrollPane = new ScrollPane(mapGroup);
 		mapScrollPane.setPannable(true);
@@ -162,6 +179,8 @@ public class GameView extends HBox {
 		mapScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
 		mapScrollPane.setFitToWidth(true);
 		mapScrollPane.setFitToHeight(true);
+
+		// Zoom controls: slider + buttons + Ctrl+Scroll.
 		Slider zoomSlider = new Slider(0.3, 2.0, renderer.getZoom());
 		zoomSlider.setPrefWidth(160);
 		Label zoomValueLabel = new Label("100%");
@@ -172,6 +191,8 @@ public class GameView extends HBox {
 			zoomValueLabel.setText((int) Math.round(renderer.getZoom() * 100) + "%");
 			renderer.render();
 		};
+
+		// Ctrl+Scroll zooms the map; Shift inverts direction.
 		mapScrollPane.addEventFilter(ScrollEvent.SCROLL, e -> {
 			if (!e.isControlDown())
 				return;
@@ -191,6 +212,7 @@ public class GameView extends HBox {
 			zoomSlider.setValue(next);
 			e.consume();
 		});
+
 		zoomSlider.valueProperty().addListener((obs, oldValue, newValue) -> applyZoom.run());
 		Button zoomOutBtn = new Button("-");
 		zoomOutBtn.getStyleClass().add("btn-icon");
@@ -219,6 +241,8 @@ public class GameView extends HBox {
 		VBox.setVgrow(mapScrollPane, Priority.ALWAYS);
 		mapScrollPane.getStyleClass().add("map-scroll");
 		canvas.setOnContextMenuRequested(null);
+		
+		// Central refresh callback: updates sidebar labels, event log, and redraws the canvas.
 		Runnable refresh = () -> {
 			Player active = controller.getActivePlayer();
 			playerLabel.setText("Turn: " + active.getName());
@@ -229,7 +253,10 @@ public class GameView extends HBox {
 			refreshEventLog(controller);
 			renderer.render();
 		};
+
 		controller.setOnStateChanged(refresh);
+
+		// When a player wins, show the end screen and offer to export the replay.
 		session.setOnGameEnd(winner -> app.showGameEnd(winner, exportPath -> {
 			try {
 				controller.onSave(exportPath, finalMap);
@@ -237,15 +264,19 @@ public class GameView extends HBox {
 				throw new RuntimeException("Failed to export replay", ex);
 			}
 		}));
+
 		VBox sidebar = buildSidebar(app, controller);
 		getChildren().addAll(mapPanel, sidebar);
 		playIntro(mapPanel, sidebar);
+
+		// Replay mode: don't call startGame(), just render the initial state.
 		if (replayLog == null)
 			controller.startGame();
 		else
 			refresh.run();
 	}
 
+	// Derives the current UI state from the controller's selection/attack flags.
 	private UiState getUiState(GameController controller) {
 		if (controller.isAttacking())
 			return UiState.ATTACK_MODE;
@@ -261,6 +292,7 @@ public class GameView extends HBox {
 		return UiState.IDLE;
 	}
 
+	// Builds and shows the right-click context menu with available actions for the moved unit.
 	private void showActionMenu(ContextMenu contextMenu, GameController controller,
 			double screenX, double screenY) {
 		contextMenu.getItems().clear();
@@ -281,6 +313,7 @@ public class GameView extends HBox {
 		waitItem.setOnAction(ev -> controller.onWait());
 		contextMenu.getItems().add(waitItem);
 
+		// Cancel undoes the move and returns the unit to its original position.
 		MenuItem cancelItem = new MenuItem("Cancel");
 		cancelItem.setOnAction(ev -> controller.onStepBackward());
 		contextMenu.getItems().add(cancelItem);
@@ -288,6 +321,7 @@ public class GameView extends HBox {
 		contextMenu.show(canvas, screenX, screenY);
 	}
 
+	// Updates the status and selection info labels based on the current UI state.
 	private void updateStatusAndInfo(GameController controller) {
 		UiState state = getUiState(controller);
 		switch (state) {
@@ -315,6 +349,7 @@ public class GameView extends HBox {
 		infoLabel.setText("No selection.");
 	}
 
+	// Plays a staggered fade-in on each node for a smooth entrance animation.
 	private void playIntro(Node... nodes) {
 		for (int i = 0; i < nodes.length; i++) {
 			Node node = nodes[i];
@@ -328,6 +363,8 @@ public class GameView extends HBox {
 		}
 	}
 
+	// Builds the entire right sidebar: player info, status, selection info, buy buttons,
+	// end turn, step back/forward, export, and event log.
 	private VBox buildSidebar(App app, GameController controller) {
 		VBox sidebar = new VBox(12);
 		sidebar.getStyleClass().add("sidebar");
@@ -376,6 +413,9 @@ public class GameView extends HBox {
 		Label emptyPlaceholder = new Label("No events yet");
 		emptyPlaceholder.setTextFill(Color.BLACK);
 		eventLogView.setPlaceholder(emptyPlaceholder);
+
+		// Custom cell factory: shows a colored dot per player, bold for current event,
+		// dimmed for future events (replay mode), split-dot for turn-change events.
 		eventLogView.setCellFactory(list -> new ListCell<>() {
 			@Override
 			protected void updateItem(GameEvent event, boolean empty) {
@@ -396,6 +436,9 @@ public class GameView extends HBox {
 				String marker =
 						index == currentLogCursor - 1 ? "▶ " : index >= currentLogCursor ? "↷ " : "  ";
 				String text = marker + (index + 1) + ". " + formatEvent(event);
+				
+
+				// TurnChanged events use a split-color dot showing both players involved.
 				if (event instanceof event.TurnChangedEvent tce && tce.getPlayerBefore() != null
 						&& tce.getPlayerAfter() != null) {
 					javafx.scene.Group splitDot = createSplitColorDot(tce.getPlayerBefore().getColor(),
@@ -406,7 +449,9 @@ public class GameView extends HBox {
 					hb.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
 					setGraphic(hb);
 					setText(null);
-				} else {
+				} 
+				else {
+					// All other events: resolve the responsible player for the colored dot.
 					gamer.Player evPlayer = null;
 					if (event instanceof event.UnitBoughtEvent ube)
 						evPlayer = ube.getPlayer();
@@ -439,6 +484,7 @@ public class GameView extends HBox {
 						setGraphic(null);
 					}
 				}
+				// Bold = current event; gray+dimmed = future (replay); normal = past.
 				if (index == currentLogCursor - 1) {
 					setFont(Font.font(UI_FONT, FontWeight.BOLD, getFont().getSize()));
 				} else if (index >= currentLogCursor) {
@@ -543,6 +589,7 @@ public class GameView extends HBox {
 		exportBtn.setMaxWidth(Double.MAX_VALUE);
 		menuBtn.setMaxWidth(Double.MAX_VALUE);
 
+		// Re-evaluate buy button states on every state change.
 		controller.setOnStateChanged(() -> {
 			boolean factorySelected = controller.getSelectedFactory() != null;
 			buyInfantryBtn.setDisable(!factorySelected || !controller.canBuyUnit(UnitType.INFANTRY));
@@ -572,6 +619,7 @@ public class GameView extends HBox {
 		return sidebar;
 	}
 
+	// Syncs the event log ListView with the session log and scrolls to the current event.
 	private void refreshEventLog(GameController controller) {
 		currentLogCursor = controller.getSession().getLogCursor();
 		eventLogView.getItems().setAll(controller.getSession().getEventLog());
@@ -582,6 +630,8 @@ public class GameView extends HBox {
 			eventLogView.scrollTo(0);
 	}
 
+
+	// Maps each event type to a short human-readable string for the event log.
 	private String formatEvent(GameEvent event) {
 		return switch (event.type()) {
 			case UNIT_BOUGHT -> "Unit bought";
@@ -600,6 +650,10 @@ public class GameView extends HBox {
 		return GameBoardLoader.loadMap(map, players);
 	}
 
+
+
+	// Creates a split half-circle graphic used in the event log for turn-change events,
+	// showing both the outgoing and incoming player's colors side by side.
 	private javafx.scene.Group createSplitColorDot(javafx.scene.paint.Color colorLeft,
 			javafx.scene.paint.Color colorRight, double radius) {
 		javafx.scene.Group group = new javafx.scene.Group();

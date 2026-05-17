@@ -79,7 +79,8 @@ public class App extends Application {
 		try (var stream = getClass().getResourceAsStream(resourcePath)) {
 			if (stream != null)
 				Font.loadFont(stream, 12);
-		} catch (Exception ignored) {
+		} 
+		catch (Exception ignored) {
 			// Optional font not present.
 		}
 	}
