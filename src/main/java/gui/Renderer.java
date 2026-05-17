@@ -37,6 +37,7 @@ public class Renderer {
 		this.controller = controller;
 	}
 
+	// Changes zoom within [MIN_ZOOM, MAX_ZOOM] and resizes canvas to match.
 	public void setZoom(double zoom) {
 		this.zoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, zoom));
 		resizeCanvasToBoard();
@@ -44,10 +45,12 @@ public class Renderer {
 
 	public double getZoom() { return zoom; }
 
+	// Returns the pixel size of one tile at the current zoom level.
 	private double tileSize() {
 		return BASE_TILE_SIZE * zoom;
 	}
 
+	// Resizes the canvas to exactly fit the board at the current zoom level.
 	public void resizeCanvasToBoard() {
 		GameBoard board = controller.getGame().getGameBoard();
 		double tileSize = tileSize();
@@ -55,6 +58,7 @@ public class Renderer {
 		canvas.setHeight(board.getHeight() * tileSize);
 	}
 
+	// Main render pass: draws terrain, overlays (movement/attack/selection), then units on top.
 	public void render() {
 		resizeCanvasToBoard();
 		GraphicsContext gc = canvas.getGraphicsContext2D();
@@ -63,6 +67,7 @@ public class Renderer {
 		GameBoard board = controller.getGame().getGameBoard();
 		double tileSize = tileSize();
 
+		// Draw all terrain tiless first (bottom layer)
 		for (int y = 0; y < board.getHeight(); y++) {
 			for (int x = 0; x < board.getWidth(); x++) {
 				Position pos = new Position(x, y);
@@ -71,12 +76,14 @@ public class Renderer {
 			}
 		}
 
+		// Green overlay - reachable movement tiles for the selected unit.
 		gc.setFill(Color.color(0, 1, 0, 0.35));
 		var moveCosts = controller.getAbailableMoveCosts();
 		if (moveCosts != null)
 			moveCosts.keySet().forEach(
 					pos -> gc.fillRect(pos.x() * tileSize, pos.y() * tileSize, tileSize, tileSize));
-
+		
+		// Yellow overlay: currently selected unit.
 		Unit selected = controller.getSelectedUnit();
 		if (selected != null) {
 			gc.setFill(Color.color(1, 1, 0, 0.5));
@@ -86,6 +93,7 @@ public class Renderer {
 					tileSize, tileSize);
 		}
 
+		// Red overlay: valid attack target in attack mode
 		if (controller.isAttacking()) {
 			gc.setFill(Color.color(1, 0, 0, 0.45));
 			controller.getAttackTargets().forEach(target -> gc.fillRect(
@@ -94,6 +102,7 @@ public class Renderer {
 					tileSize, tileSize));
 		}
 
+		// Blue overlay: selected factory tile.
 		Position selectedFactoryTile = controller.getSelectedFactory();
 		if (selectedFactoryTile != null) {
 			gc.setFill(Color.color(0.3, 0.6, 1.0, 0.35));
@@ -106,6 +115,9 @@ public class Renderer {
 		board.getAllUnits().forEach(u -> drawUnit(gc, u));
 	}
 
+
+	// Draws a single terrain tile: sprite (or fallback color), capture progress bar,
+	 // ownership border for buildings, and a subtle grid line.
 	private void drawTile(GraphicsContext gc, Tile tile, int x, int y, double tileSize) {
 		double px = x * tileSize;
 		double py = y * tileSize;
@@ -119,6 +131,7 @@ public class Renderer {
 			gc.fillRect(px, py, tileSize, tileSize);
 		}
 
+		// capture progress bar at the bottom of capturable tiles.
 		if (tile.getTerrain().isCapturable()) {
 			Color foreground =
 					tile.getOwner() == null ? Color.LIGHTGRAY : playerColor(tile.getOwner());
@@ -141,12 +154,14 @@ public class Renderer {
 		gc.strokeRect(px, py, tileSize, tileSize);
 	}
 
+	// Draws a unit: sprite (or fallback oval), player-colored frame, HP bar, and HP number.
 	private void drawUnit(GraphicsContext gc, Unit unit) {
 		double tileSize = tileSize();
 		double px = unit.getPosition().x() * tileSize;
 		double py = unit.getPosition().y() * tileSize;
 		int barHeight = 6;
 		int bottomBarsHeight = barHeight * 2;
+		// Reserve bottom pixels for the HP bar, unit sprite fills the rest.
 		double unitBodyHeight = tileSize - bottomBarsHeight;
 
 		Image img = AssetLoader.unit(unit.getType(), unit.getPlayer().getColor());
@@ -168,7 +183,7 @@ public class Renderer {
 				playerColor(unit.getPlayer()),
 				Color.color(0.45, 0.45, 0.45));
 
-		// Show HP
+		// Numeric HP value in the bottom-left corner of the tile.
 		gc.setFill(Color.WHITE);
 		gc.setFont(Font.font(Math.max(9, tileSize / 9)));
 		gc.fillText(String.valueOf(unit.getHp()), px + 2, py + unitBodyHeight - 1);
@@ -177,6 +192,7 @@ public class Renderer {
 		gc.setEffect(null);
 	}
 
+	// Returns a solid fallback color for each terrain type when the sprite asset is missing.
 	private Color fallbackColor(Terrain terrain) {
 		return switch (terrain) {
 			case PLAIN -> Color.LIGHTGREEN;
@@ -202,6 +218,7 @@ public class Renderer {
 		gc.fillRect(x, y, width * ratio, height);
 	}
 
+	// Converts screen pixel coordinates to board grid position
 	public Position screenToGrid(double x, double y) {
 		double size = tileSize();
 		return new Position((int) (x / size), (int) (y / size));

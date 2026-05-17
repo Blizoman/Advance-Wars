@@ -100,7 +100,7 @@
   GUI bolo implementovane manualne, AI bola vyuzita primarne ako pomocnik pri upravach kodu, navrhu priecinka resources a taktiez navrh vyberu spravneho fontu.
   Ostatne graficke prvky boli vytvarane v Canve/photopea ci basic skicar.
 
-* **Míra generování:** 15–25%
+* **Míra generování:** 20–30%
 
 ---
 

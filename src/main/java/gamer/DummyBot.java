@@ -39,12 +39,16 @@ public class DummyBot {
 
         Player me = session.getActive();
         GameBoard board = session.getGameBoard();
+        // Collect live enemy units once per tick to avoid redundant board manipulatiopn.
         List<Unit> enemies = board.getAllUnits().stream()
                 .filter(u -> u.getPlayer() != me && u.isAlive())
                 .toList();
 
+        // [Phase 1] - Process units one by one.
         if (unitIterator != null && unitIterator.hasNext()) {
             Unit unit = unitIterator.next();
+
+            // Skip dead or already moved units
             if (!unit.isAlive() || unit.isUsed())
                 return true;
 
@@ -52,6 +56,8 @@ public class DummyBot {
             Map<Position, Integer> reachable = pathFinder.findReachableTiles(unit);
             Position target = chooseTarget(unit, board, enemies, me);
 
+            // If unit cannot attack after moving (Cannon) and already has a target in range,
+            // skip movement to assure the ability to fire this turn.
             Position bestMove = startPos;
             boolean canShootNow =
                     !unit.getType().isCanAttackAfterMove()
@@ -59,18 +65,21 @@ public class DummyBot {
             if (!canShootNow)
                 bestMove = chooseBestMove(unit, reachable, target, board, enemies);
 
+            // Only move if the destination tile is free.
             boolean moved = !bestMove.equals(startPos);
             if (moved && board.getTile(bestMove).isEmpty())
                 session.moveUnit(unit, bestMove);
             else
                 moved = false;
 
+            // Attempt capture before attack – capturing ends the units action for this tick.
             Tile tile = board.getTile(unit.getPosition());
             if (canCapture(unit, tile, me)) {
                 session.tryCapture(unit, tile);
                 return true;
             }
 
+            // Attack if allowed (respecting 'isCanAttackAfterMove' rule).
             if (canAttackNow(unit, moved)) {
                 Unit targetEnemy = chooseAttackTarget(unit, enemies);
                 if (targetEnemy != null && unit.canAttackTo(targetEnemy)) {
@@ -83,17 +92,19 @@ public class DummyBot {
             return true;
         }
 
+        // [Phase 2] - Buy units in owned factories after all units have acted.
         if (factoryIterator != null && factoryIterator.hasNext()) {
             Tile factory = factoryIterator.next();
             if (factory.isEmpty())
                 buyUnit(session, board, factory, me, enemies);
             return true;
         }
-
+        // Both phases done so it is an end of turn.
         isTurnActive = false;
         return false;
     }
-
+    // Initializes iterators at the start of every turn. 
+    // Called only once thanks to isTurnActive guard
     private void startTurn(Session session) {
         Player me = session.getActive();
         GameBoard board = session.getGameBoard();
@@ -126,6 +137,7 @@ public class DummyBot {
                 return best;
         }
 
+        // Fallback: closest enemy unit.
         Position enemyPos = null;
         int bestDist = Integer.MAX_VALUE;
         for (Unit enemy : enemies) {
@@ -135,9 +147,27 @@ public class DummyBot {
                 enemyPos = enemy.getPosition();
             }
         }
+
+        if (enemyPos == null) {
+            for (Tile tile : board.getAllTiles()) {
+                if (!tile.getTerrain().isCapturable()) continue;
+                if (tile.getOwner() == null || tile.getOwner() == me) continue;
+                Position pos = board.getPosition(tile);
+                int dist = unit.getPosition().distanceTo(pos);
+                if (dist < bestDist) {
+                    bestDist = dist;
+                    enemyPos = pos;
+                }
+            }
+        }
         return enemyPos;
     }
 
+    // Pick reachable tile that shorten distance to the target.
+    // Adds a small bonus (-2) for positions that allow an immediate attack,
+    // so the unit prefers an attack-ready tile over one that is closer.
+    // If target is null (no enemies, no buildings), the score is 0 for all tiles and
+    // the unit stays in place.
     private Position chooseBestMove(Unit unit, Map<Position, Integer> reachable, Position target,
             GameBoard board, List<Unit> enemies) {
         Position best = unit.getPosition();
@@ -146,11 +176,14 @@ public class DummyBot {
             Tile tile = board.getTile(pos);
             if (tile == null)
                 continue;
+            // Skip tiles occupied by any unit
             if (!pos.equals(unit.getPosition()) && tile.getUnit() != null)
                 continue;
 
             int dist = target == null ? 0 : pos.distanceTo(target);
             int score = dist;
+
+            // Prefer positions that give an immediate attack opportunity.
             if (unit.getType().isCanAttackAfterMove()
                     && canAttackFromPosition(pos, unit, enemies))
                 score -= 2;
@@ -163,6 +196,9 @@ public class DummyBot {
         return best;
     }
 
+    // Unit can capture if:
+    // 1. It has capture ability, the tile is capturable
+    // 2. The tile is not already owned by us
     private boolean canCapture(Unit unit, Tile tile, Player me) {
         return !unit.isCaptured()
                 && unit.getType().isCanCapture()
@@ -187,9 +223,11 @@ public class DummyBot {
         return false;
     }
 
+    // Target the weakest (lowest HP) enemy to finish them off
     private Unit chooseAttackTarget(Unit attacker, List<Unit> enemies) {
         Unit best = null;
         int bestHp = Integer.MAX_VALUE;
+
         for (Unit enemy : enemies) {
             if (!enemy.isAlive() || !attacker.canAttackTo(enemy))
                 continue;
@@ -209,10 +247,10 @@ public class DummyBot {
         int money = me.getMoney();
         UnitType toBuy = null;
 
-        if (money >= UnitType.TANK.getCost())
-            toBuy = UnitType.TANK;
-        else if (money >= UnitType.CANNON.getCost() && enemies.size() > 2)
+        if (money >= UnitType.CANNON.getCost() && enemies.size() > 2)
             toBuy = UnitType.CANNON;
+        else if (money >= UnitType.TANK.getCost())
+            toBuy = UnitType.TANK;
         else if (money >= UnitType.INFANTRY.getCost())
             toBuy = UnitType.INFANTRY;
 

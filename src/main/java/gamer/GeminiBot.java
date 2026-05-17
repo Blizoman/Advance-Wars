@@ -250,8 +250,9 @@ public class GeminiBot {
                     }
                 }
             }
-        } else {
-            // For CANNON/Rockets, try to get just outside enemy movement range
+        } 
+        else {
+            // For CANNON, try to get just outside enemy movement range
             for (Unit enemy : enemies) {
                 if (canAttackFromPosition(pos, unit, enemy)) {
                     score += 150; // Good position to shoot next turn
@@ -328,17 +329,24 @@ public class GeminiBot {
                 .count();
 
         UnitType toBuy = null;
-
+        //*-*-*-*-*-*--*-*-*-*-*-*-*-*-*-*-*-*-*--*-*-*-*-*-*-*-*-*-*-*-*-*--*-*-*-*-*-*-*-* */
         // Rock-Paper-Scissors buying logic
         if (money >= UnitType.TANK.getCost() && enemyTanks > 2) {
             toBuy = UnitType.TANK; // Counter heavy armor
-        } else if (money >= UnitType.CANNON.getCost() && enemyInfantry > 3) {
+        } 
+        //*-*-*-*-*-*--*-*-*-*-*-*-*-*-*-*-*-*-*--*-*-*-*-*-*-*-*-*-*-*-*-*--*-*-*-*-*-*-*-* */
+        else if (money >= UnitType.CANNON.getCost() && enemyInfantry > 3) {
             toBuy = UnitType.CANNON; // Good against swarms if protected
-        } else if (money >= UnitType.TANK.getCost()) {
+        } 
+        //*-*-*-*-*-*--*-*-*-*-*-*-*-*-*-*-*-*-*--*-*-*-*-*-*-*-*-*-*-*-*-*--*-*-*-*-*-*-*-* */
+        else if (money >= UnitType.TANK.getCost()) {
             toBuy = UnitType.TANK; // Solid default
-        } else if (money >= UnitType.INFANTRY.getCost()) {
+        } 
+        //*-*-*-*-*-*--*-*-*-*-*-*-*-*-*-*-*-*-*--*-*-*-*-*-*-*-*-*-*-*-*-*--*-*-*-*-*-*-*-* */
+        else if (money >= UnitType.INFANTRY.getCost()) {
             toBuy = UnitType.INFANTRY; // Always buy something if possible
         }
+        //*-*-*-*-*-*--*-*-*-*-*-*-*-*-*-*-*-*-*--*-*-*-*-*-*-*-*-*-*-*-*-*--*-*-*-*-*-*-*-* */
 
         if (toBuy != null) {
             // GUI RULE: Same conditions as GameController.canBuyUnit()
